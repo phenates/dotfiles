@@ -1,7 +1,7 @@
 #!/bin/bash
 
 {{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
-set -e # -e: exit on error
+set -e # -e: script exit on error
 
 # Variables
 NOCOLOR=$(tput sgr0)
