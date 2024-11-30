@@ -25,8 +25,10 @@ sudo apt install -qq -y /tmp/chezmoi_package.deb
 info "chezmoi apt package installed"
 
 # remove chezmoi binary
-rm -r ~/bin/chezmoi
-info "chezmoi binary file removed"
+if [[ -f "~/bin/chezmoi" ]]; then
+  rm -r ~/bin/chezmoi
+  info "chezmoi binary file removed"
+fi
 
 echo -e ""
 {{ end -}}

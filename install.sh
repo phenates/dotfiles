@@ -48,7 +48,7 @@ if [ ! "$(command -v chezmoi)" ]; then
 else
   info "chezmoi package already installed"
   # Init and apply chemoi from a github dotfiles repo
-  chezmoi "$CMD_OPTION"
+  chezmoi " $CMD_OPTION"
 fi
 
 info "chezmoi initiated & will be apply"
