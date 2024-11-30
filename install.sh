@@ -18,7 +18,7 @@ expr "$*" : ".*--help" >/dev/null && usage
 ## Variables:
 SCRIPT_NAME=$(basename "$0")
 ARG_1=${1:-"default"}
-CMD_OPTION="-- init --apply phenates"
+CMD_OPTION="init --apply phenates"
 
 ## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
 info() { echo -e "\033[0;36m--->   $*"; }
@@ -44,7 +44,7 @@ if [ ! "$(command -v chezmoi)" ]; then
   fi
   info "chezmoi binary file downloaded"
   # Init and apply chemoi from a github dotfiles repo
-  bash ~/bin/chezmoi "$CMD_OPTION"
+  bash ~/bin/chezmoi " -- $CMD_OPTION"
 else
   info "chezmoi package already installed"
   # Init and apply chemoi from a github dotfiles repo
