@@ -13,16 +13,16 @@ SCRIPT_NAME=$(basename "$0")
 PACKAGE_URL={{ .chezmoi_package }}
 
 ## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
-info() { echo -e "\033[0;36m--->   $*"; }
+info() { echo -e "\033[0;36m $*"; }
 warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
-info "$SCRIPT_NAME : replace chezmoi binary by package"
+info "$SCRIPT_NAME: Replace chezmoi binary by package"
 
 # Install chezmoi package
-wget -q -O /tmp/chezmoi_package.deb $PACKAGE_URL
-sudo apt install -qq -y /tmp/chezmoi_package.deb
-info "chezmoi apt package installed"
+wget -q -O /tmp/chezmoi_package.deb $PACKAGE_URL >/dev/null
+sudo apt install -qq -y /tmp/chezmoi_package.deb >/dev/null
+info "---> chezmoi apt package installed"
 
 # remove chezmoi binary
 if [[ -f "~/bin/chezmoi" ]]; then
