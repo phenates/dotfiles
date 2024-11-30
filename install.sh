@@ -18,7 +18,7 @@ expr "$*" : ".*--help" >/dev/null && usage
 ## Variables:
 SCRIPT_NAME=$(basename "$0")
 ARG_1=${1:-"default"}
-CMD_OPTION="init --apply phenates"
+CMD_OPTION="-- init --apply phenates"
 
 ## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
 info() { echo -e "\033[0;36m--->   $*"; }
@@ -26,29 +26,29 @@ warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 error() { echo -e "\033[0;31m--->[ERROR]   $*"; }
 
 ## Main
-info "dotfiles management started   <---"
+info "///// dotfiles management started \\\\\   <---"
 info "$SCRIPT_NAME : download binary chezmoi and initiate it"
 
 # Check if chezmoi package is installed
 if [ ! "$(command -v chezmoi)" ]; then
   # Download chezmoi binary file
   if [ "$(command -v wget)" ]; then
-    wget -qO- get.chezmoi.io/
-    # sh -c "$(wget -qO- get.chezmoi.io/)" $OPTION
+    # wget -qO- get.chezmoi.io/
+    sh -c "$(wget -qO- get.chezmoi.io/)" $OPTION
   elif [ "$(command -v curl)" ]; then
-    curl -fsLS get.chezmoi.io/
-    # sh -c "$(curl -fsLS get.chezmoi.io/)" $OPTION
+    # curl -fsLS get.chezmoi.io/
+    sh -c "$(curl -fsLS get.chezmoi.io/)" $OPTION
   else
     warning "To install chezmoi, you must have curl or wget installed."
     exit 1
   fi
-  info "chezmoi binary file downloaded"
+  # info "chezmoi binary file downloaded"
   # Init and apply chemoi from a github dotfiles repo
-  bash ~/bin/chezmoi " -- $CMD_OPTION"
+  # bash ~/bin/chezmoi " -- $CMD_OPTION"
 else
   info "chezmoi package already installed"
   # Init and apply chemoi from a github dotfiles repo
-  chezmoi " $CMD_OPTION"
+  bash chezmoi " $CMD_OPTION"
 fi
 
 info "chezmoi initiated & will be apply"
