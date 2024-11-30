@@ -19,11 +19,11 @@ PACKAGES_GENERAL=(
 )
 
 ## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
-info() { echo -e "\033[0;36m--->   $*"; }
+info() { echo -e "\033[0;36m $*"; }
 warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
-info "$SCRIPT_NAME: apt package installation"
+info ">>> chezmoi package installation"
 
 # Packages installation
 for package in ${PACKAGES_GENERAL[@]}; do
@@ -33,7 +33,7 @@ for package in ${PACKAGES_GENERAL[@]}; do
 {{ else -}}
     apt install -qq -y $package >/dev/null
 {{ end -}}
-    info "$---> package installed"
+    info "---> $package package installed"
   else
     info "---> $package already installed"
   fi

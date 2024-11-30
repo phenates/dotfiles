@@ -21,30 +21,30 @@ info() { echo -e "\033[0;36m--->   $*"; }
 warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
-info "$SCRIPT_NAME : ZSH shell, Oh-my-zsh and plungins installalation"
+info ">>> ZSH shell, Oh-my-zsh and plungins installalation"
 
 # Zsh shell install
 for package in ${packages_zsh[@]}; do
   if [ ! $(command -v $package) ]; then
 {{ if ne .chezmoi.username "root" -}}
-    sudo apt install -y -qq $package
+    sudo apt install -y -qq $package >/dev/null
 {{ else -}}
-    apt install -y -qq ${packages_zsh[@]}
+    apt install -y -qq $package >/dev/null
 {{ end -}}
-  info "$package installed"
+  info "---> $package package installed"
   else
-    info "$package already installed"
+    info "---> $package already installed"
   fi
 done
 
 # Oh-my-zsh
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-  sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-  info "oh-my-zsh installed"
+  sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
+  info "---> oh-my-zsh installed"
 else
-  info "oh-my-zsh already installed"
+  info "---> oh-my-zsh already installed"
 fi
 
 chsh -s $(which zsh)
-info "default shell to zsh changed"
+info "---> default shell to zsh changed"
 {{ end -}}

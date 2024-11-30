@@ -26,7 +26,7 @@ warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
 info "///// dotfiles management started \\\\\   "
-info "$SCRIPT_NAME: Download binary chezmoi and initiate it"
+info ">>> chezmoi download binary file, init & apply"
 
 # Check if chezmoi package is installed
 # if [ ! "$(command -v chezmoi)" ]; then
