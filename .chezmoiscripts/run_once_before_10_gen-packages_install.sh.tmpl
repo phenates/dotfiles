@@ -1,15 +1,15 @@
 #!/bin/bash
 
 {{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
+#^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
+
+#/ Description: apt package installation
+
 set -e # -e: script exit on error
 
-# Variables
-NOCOLOR=$(tput sgr0)
-CYAN=$(tput setaf 6)
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
-
-packages_gloabal=(
+## Variables:
+SCRIPT_NAME=$(basename "$0")
+PACKAGES_GENERAL=(
   curl
   git
   unzip
@@ -18,24 +18,25 @@ packages_gloabal=(
   tree
 )
 
-# Header
-echo -e ""
-echo -e $CYAN"###### Globals packages installation #####"$NOCOLOR
+## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
+info() { echo -e "\033[0;36m--->   $*"; }
+warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
+
+## Main
+info "$SCRIPT_NAME : apt package installation"
 
 # Packages installation
-echo -e $CYAN">>>>> PACKAGES INSTALLATION"$NOCOLOR
-for package in ${packages_gloabal[@]}; do
+for package in ${PACKAGES_GENERAL[@]}; do
   if [ ! $(command -v $package) ]; then
-    echo -e $CYAN"--> Installing $package"$NOCOLOR
 {{ if ne .chezmoi.username "root" -}}
     sudo apt install -qq -y $package
 {{ else -}}
-    apt install -qq -y ${packages_gloabal[@]}
+    apt install -qq -y ${PACKAGES_GENERAL[@]}
 {{ end -}}
+    info "$package installed"
   else
-    echo $CYAN"--> $package already installed"$NOCOLOR
+    info "$package already installed"
   fi
-  echo -e ""
 done
 echo -e ""
 {{ end -}}

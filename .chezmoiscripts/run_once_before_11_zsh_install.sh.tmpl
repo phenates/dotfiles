@@ -1,52 +1,50 @@
 #!/bin/bash
 
 {{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
+#^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
+
+#/ Description: chezmoi package installation to benefit of autocompleting, and remove
+#/ binary file downloded during install.sh script
+
 set -e # -e: exit on error
 
-# Variables
-NOCOLOR=$(tput sgr0)
-CYAN=$(tput setaf 6)
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
-
+## Variables:
+SCRIPT_NAME=$(basename "$0")
 packages_zsh=(
   zsh
   fonts-powerline
   zsh-syntax-highlighting
 )
 
-# Header
-echo -e ""
-echo -e $CYAN"###### ZSH shell, Oh-my-zsh and plungins installalation #####"$NOCOLOR
-echo -e ""
+## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
+info() { echo -e "\033[0;36m--->   $*"; }
+warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
-# Zsh shell
+## Main
+info "$SCRIPT_NAME : ZSH shell, Oh-my-zsh and plungins installalation"
+
+# Zsh shell install
 for package in ${packages_zsh[@]}; do
   if [ ! $(command -v $package) ]; then
-    echo -e $CYAN"--> Installing $package"$NOCOLOR
 {{ if ne .chezmoi.username "root" -}}
     sudo apt install -y -qq $package
 {{ else -}}
     apt install -y -qq ${packages_zsh[@]}
 {{ end -}}
+  info "$package installed"
   else
-    echo $CYAN"--> $package already installed"$NOCOLOR
+    info "$package already installed"
   fi
-  echo -e ""
 done
 
 # Oh-my-zsh
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-  echo -e $CYAN"--> Install oh-my-zsh"$NOCOLOR
   sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  info "oh-my-zsh installed"
 else
-  echo -e $CYAN"--> ohmyzsh already installed"$NOCOLOR
+  info "oh-my-zsh already installed"
 fi
 
-echo -e $CYAN"--> Change default shell to zsh"$NOCOLOR
 chsh -s $(which zsh)
-
-echo -e ""
-echo -e $CYAN"###### Preparation before chezmoi apply finished #####"$NOCOLOR
-echo -e ""
+info "default shell to zsh changed"
 {{ end -}}

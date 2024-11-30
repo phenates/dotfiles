@@ -1,48 +1,53 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -eu # StrictMode, e:exit on non-zero status code; u:prevent undefined variable
 
-# Install chezmoi and/or init and apply
-# Run: sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
+## Usage display:
+#/ Usage: ./install.sh [OPTION]
+#/ Run command: sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
+#/ Description: This script will install and initiate chezmoi package for the current user.
+#/              chezmoi helps you manage your personal configuration files
+#/              (dotfiles, like ~/.gitconfig) across multiple machines.
+#/ Options:
+#/   --help: Display this help message
+usage() {
+  grep '^#/' "$0" | cut -c4-
+  exit 0
+}
+expr "$*" : ".*--help" >/dev/null && usage
 
-set -e # -e: exit on error
+## Variables:
+SCRIPT_NAME=$(basename "$0")
+ARG_1=${1:-"default"}
+CMD_OPTION="-- init --apply phenates"
 
-NOCOLOR=$(tput sgr0)
-CYAN=$(tput setaf 6)
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
+## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
+info() { echo -e "\033[0;36m--->   $*"; }
+warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
+error() { echo -e "\033[0;31m--->[ERROR]   $*"; }
 
-echo ""
-echo $CYAN">>>>> dotfiles management <<<<<"$NOCOLOR
+## Main
+info "dotfiles management started   <---"
+info "$SCRIPT_NAME : download binary chezmoi and initiate it"
 
+# Check if chezmoi package is installed
 if [ ! "$(command -v chezmoi)" ]; then
-  echo $CYAN"--> chezmoi binary installation, options:"$NOCOLOR
-
-  # Chezmoi binary install
-  echo $GREEN"    Install (default) [1]; Install and Init [2]; Install, Init and Apply [3]; Abord [0]"$NOCOLOR
-  read -r RES
-  case "$RES" in
-  0)
-    exit 0
-    ;;
-  2)
-    OPTION="-- init phenates"
-    ;;
-  3)
-    OPTION="-- init --apply phenates"
-    ;;
-  *)
-    OPTION=""
-    ;;
-  esac
-
+  # Download chezmoi binary file
   if [ "$(command -v wget)" ]; then
-    sh -c "$(wget -qO- get.chezmoi.io/)" $OPTION
+    wget -qO- get.chezmoi.io/
+    # sh -c "$(wget -qO- get.chezmoi.io/)" $OPTION
   elif [ "$(command -v curl)" ]; then
-    sh -c "$(curl -fsLS get.chezmoi.io/)" $OPTION
+    curl -fsLS get.chezmoi.io/
+    # sh -c "$(curl -fsLS get.chezmoi.io/)" $OPTION
   else
-    echo $CYAN"--> To install chezmoi, you must have curl or wget installed."$NOCOLOR
+    warning "To install chezmoi, you must have curl or wget installed."
     exit 1
   fi
+  info "chezmoi binary file downloaded"
 else
-  echo $CYAN"--> chezmoi seems to be already installed"$NOCOLOR
+  info "chezmoi package already installed"
 fi
-echo ""
+
+# Init and apply chemoi from a github dotfiles repo
+bash ~/bin/chezmoi "$CMD_OPTION"
+info "chezmoi initiated & will be apply"
+echo -e ""

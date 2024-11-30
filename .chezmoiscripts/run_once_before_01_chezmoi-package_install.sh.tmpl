@@ -1,26 +1,32 @@
 #!/bin/bash
 
 {{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
+#^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
+
+#/ Description: chezmoi package installation to benefit of autocompleting, and remove
+#/ binary file downloded during install.sh script
+
 set -e # -e: exit on error
 
-# Variables
-NOCOLOR=$(tput sgr0)
-CYAN=$(tput setaf 6)
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
+## Variables:
+SCRIPT_NAME=$(basename "$0")
+PACKAGE_URL={{ .chezmoi_package }}
 
-package_url={{ .chezmoi_package }}
+## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
+info() { echo -e "\033[0;36m--->   $*"; }
+warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
-# Header
-echo -e ""
-echo -e $CYAN"###### chezmoi package installalation #####"$NOCOLOR
+## Main
+info "$SCRIPT_NAME : replace chezmoi binary by package"
 
-# install package
-wget -q -O /tmp/chezmoi_package.deb $package_url
+# Install chezmoi package
+wget -q -O /tmp/chezmoi_package.deb $PACKAGE_URL
 sudo apt install -qq -y /tmp/chezmoi_package.deb
+info "chezmoi apt package installed"
 
 # remove chezmoi binary
 rm -r ~/bin/chezmoi
+info "chezmoi binary file removed"
 
 echo -e ""
 {{ end -}}
