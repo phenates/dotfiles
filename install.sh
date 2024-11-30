@@ -34,10 +34,10 @@ if [ ! "$(command -v chezmoi)" ]; then
   # Download chezmoi binary file
   if [ "$(command -v wget)" ]; then
     # wget -qO- get.chezmoi.io/
-    sh -c "$(wget -qO- get.chezmoi.io/)" $OPTION
+    sh -c "$(wget -qO- get.chezmoi.io/)" $CMD_OPTION
   elif [ "$(command -v curl)" ]; then
     # curl -fsLS get.chezmoi.io/
-    sh -c "$(curl -fsLS get.chezmoi.io/)" $OPTION
+    sh -c "$(curl -fsLS get.chezmoi.io/)" $CMD_OPTION
   else
     warning "To install chezmoi, you must have curl or wget installed."
     exit 1
