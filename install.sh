@@ -43,11 +43,13 @@ if [ ! "$(command -v chezmoi)" ]; then
     exit 1
   fi
   info "chezmoi binary file downloaded"
+  # Init and apply chemoi from a github dotfiles repo
+  bash ~/bin/chezmoi "$CMD_OPTION"
 else
   info "chezmoi package already installed"
+  # Init and apply chemoi from a github dotfiles repo
+  chezmoi "$CMD_OPTION"
 fi
 
-# Init and apply chemoi from a github dotfiles repo
-bash ~/bin/chezmoi "$CMD_OPTION"
 info "chezmoi initiated & will be apply"
 echo -e ""
