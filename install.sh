@@ -25,12 +25,12 @@ info() { echo -e "\033[0;36m $*"; }
 warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
-info "///// dotfiles management started \\\\\   "
+info "<<<<< dotfiles management started >>>>>"
 info ">>> chezmoi download binary file, init & apply"
 
-# Check if chezmoi package is installed
-# if [ ! "$(command -v chezmoi)" ]; then
-# Download chezmoi binary file
+#TODO Check if sudo
+
+# Download chezmoi binary file and run with option
 if [ "$(command -v wget)" ]; then
   # wget -qO- get.chezmoi.io/
   sh -c "$(wget -qO- get.chezmoi.io/)" $CMD_OPTION
@@ -41,14 +41,6 @@ else
   warning "To install chezmoi, you must have curl or wget installed."
   exit 1
 fi
-# info "chezmoi binary file downloaded"
-# Init and apply chemoi from a github dotfiles repo
-# bash ~/bin/chezmoi " -- $CMD_OPTION"
-# else
-# info "chezmoi package already installed"
-# Init and apply chemoi from a github dotfiles repo
-# bash chezmoi " $CMD_OPTION"
-# fi
 
-info "\\\\\ dotfiles management finished /////   "
+info "<<<<< dotfiles management finished >>>>>"
 echo -e ""
