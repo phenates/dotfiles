@@ -1,8 +1,11 @@
 # dotfiles
 My dotfiles managament with [chezmoi](https://www.chezmoi.io)
 
->!Install
-Run: sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
+> [!TIP]
+> Install command:
+> ```shell
+> sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
+> ```
 
 ## Tips
 ### Write Access
