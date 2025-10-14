@@ -90,12 +90,14 @@ for package in "${ZSH_PACKAGES[@]}"; do
     # Installation avec gestion sudo/root
     if sudo apt install -qq -y "$package" 2>/dev/null; then
       success "$package installed"
+      echo ""
     else
       error "Failed to install $package"
       exit 1
     fi
   else
     info "$package already installed"
+    echo ""
   fi
 done
 
@@ -105,7 +107,7 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
   success "oh-my-zsh installed"
 else
-  info "---> oh-my-zsh already installed"
+  info "oh-my-zsh already installed"
 fi
 
 # Change default shell to zsh
