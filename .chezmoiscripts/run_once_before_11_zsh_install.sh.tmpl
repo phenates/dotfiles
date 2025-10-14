@@ -17,7 +17,7 @@ packages_zsh=(
 )
 
 ## Log (add "| tee -a "$LOG_FILE" >&2" to into a file):
-info() { echo -e "\033[0;36m--->   $*"; }
+info() { echo -e "\033[0;36m$*"; }
 warning() { echo -e "\033[1;33m--->[WARNING]   $*"; }
 
 ## Main
