@@ -4,22 +4,26 @@
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
-#title            :run_once_before_11_zsh_install.sh.tmpl
-#description      :Action script for chezmoi.io, install zsh and oh-my-zsh.
+#title            :run_once_before_10_linux-package_install.sh.tmpl
+#description      :Action script for chezmoi.io, install linux packages.
 #author		        :phenates
 #date             :2025-10-14
-#version          :0.2 
+#version          :0.1 
 #usage		        :used by chezmoi apply sequence
 #==============================================================================
 
-set -e # -e: exit on error
+set -e # -e: script exit on error
 
 ## Variables:
 SCRIPT_NAME=$(basename "$0")
-ZSH_PACKAGES=(
-  zsh
-  fonts-powerline
-  zsh-syntax-highlighting
+LINUX_PACKAGES=(
+  curl
+  wget
+  git
+  unzip
+  eza
+  tree
+  openssh-client
 )
 
 ## Log (enhanced with colors and symbols):
@@ -49,42 +53,12 @@ step() {
   echo -e "\033[1;34m  →  $*\033[0m"
 }
 
-prompt() {
-  echo -e "\033[1;33m  ?  $*\033[0m"
-}
-
-## Helper function: ask user confirmation
-ask_user() {
-  local question="$1"
-  local response
-  
-  prompt "$question (y/N): "
-  read -r response
-  
-  case "$response" in
-    [yY][eE][sS]|[yY])
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
-
 ## Main
-header "SCRIPT: zsh shell, Oh-my-zsh (plungins, theme) installation"
+header "SCRIPT: Linux packages installation"
 
-# Ask user for installation
-if ! ask_user "Do you want to install them now?"; then
-  echo ""
-  info "Installation cancelled by user"
-  echo ""
-  exit 0
-fi
-
-# Zsh packages install
-step "Checking and installing required zsh packages..."
-for package in "${ZSH_PACKAGES[@]}"; do
+# Install packages
+step "Checking and installing required packages..."
+for package in "${LINUX_PACKAGES[@]}"; do
   if ! command -v "$package" &>/dev/null; then
     step "Installing $package..."
     # Installation avec gestion sudo/root
@@ -99,26 +73,8 @@ for package in "${ZSH_PACKAGES[@]}"; do
   fi
 done
 
-# Oh-my-zsh install
-step "Checking and installing required zsh packages..."
-if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-  sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
-  success "oh-my-zsh installed"
-else
-  info "---> oh-my-zsh already installed"
-fi
-
-# Change default shell to zsh
-step "Change default shell to zsh..."
-if command -v chsh -s $(which zsh) &>/dev/null; then
-  success "Default shell changed to zsh"
-  info "You may need to log out and log back in for the change to take effect."
-else
-  error "Failed to change default shell to zsh"
-fi
-
 echo ""
-success "zsh installation completed! 🎉"
+success "Linux packages installation completed! 🎉"
 echo ""
 
 {{ end -}}

@@ -8,7 +8,7 @@
 #                  remove the binary file downloaded during the official installation command (sh -c "$(curl -fsLS get.chezmoi.io)").
 #author		        :phenates
 #date             :2025-10-14
-#version          :0.2    
+#version          :0.2 
 #usage		        :used by chezmoi apply sequence
 #==============================================================================
 
@@ -63,7 +63,7 @@ download_file() {
 }
 
 ## Main
-header "CHEZMOI: Replace Binary with Package"
+header "SCRIPT: Replace Chezmoi binary with Package"
 
 # Validation
 step "Validating configuration..."
@@ -120,7 +120,7 @@ else
 fi
 
 echo ""
-success "Chezmoi package installation completed! 🎉"
+success "Replacing Binary with Package completed! 🎉"
 echo ""
 
 {{ end -}}
