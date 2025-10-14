@@ -112,12 +112,21 @@ fi
 
 # Change default shell to zsh
 step "Change default shell to zsh..."
-if command -v chsh -s $(which zsh) &>/dev/null; then
+chsh -s $(which zsh)
+if [ $? -eq 0 ]; then
   success "Default shell changed to zsh"
   info "You may need to log out and log back in for the change to take effect."
 else
   error "Failed to change default shell to zsh"
 fi
+
+
+# if command -v chsh -s $(which zsh) &>/dev/null; then
+#   success "Default shell changed to zsh"
+#   info "You may need to log out and log back in for the change to take effect."
+# else
+#   error "Failed to change default shell to zsh"
+# fi
 
 echo ""
 success "zsh installation completed! 🎉"
