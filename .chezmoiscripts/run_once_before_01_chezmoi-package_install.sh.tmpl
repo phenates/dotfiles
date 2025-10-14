@@ -18,9 +18,6 @@ set -e # -e: exit on error
 PACKAGE_URL={{ .chezmoi_package }}
 TEMP_DEB="/tmp/chezmoi_package.deb"
 
-## Cleanup on exit
-trap 'rm -f "$TEMP_DEB"' EXIT
-
 ## Log (enhanced with colors and symbols):
 header() {
   echo -e "\n\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
@@ -48,6 +45,23 @@ step() {
   echo -e "\033[1;34m  →  $*\033[0m"
 }
 
+## Cleanup on exit
+trap 'rm -f "$TEMP_DEB"' EXIT
+
+## Helper function: download file
+download_file() {
+  local url="$1"
+  local output="$2"
+  
+  if command -v wget &>/dev/null; then
+    wget -q -O "$output" "$url"
+  elif command -v curl &>/dev/null; then
+    curl -fsSL -o "$output" "$url"
+  else
+    return 1
+  fi
+}
+
 ## Main
 header "CHEZMOI: Replace Binary with Package"
 
@@ -59,9 +73,23 @@ if [[ -z "$PACKAGE_URL" ]]; then
 fi
 success "Configuration validated"
 
+# Validation: Check download tool availability
+step "Checking system requirements..."
+if ! command -v wget &>/dev/null && ! command -v curl &>/dev/null; then
+  error "Neither wget nor curl is installed"
+  error "Please install one of them: sudo apt install wget"
+  exit 1
+fi
+
+if command -v wget &>/dev/null; then
+  success "Download tool found: wget"
+elif command -v curl &>/dev/null; then
+  success "Download tool found: curl"
+fi
+
 # Install chezmoi package
 step "Downloading chezmoi .deb from: $PACKAGE_URL"
-if ! wget -q -O "$TEMP_DEB" "$PACKAGE_URL" 2>/dev/null; then
+if ! download_file "$PACKAGE_URL" "$TEMP_DEB"; then
   error "Failed to download package"
   exit 1
 fi

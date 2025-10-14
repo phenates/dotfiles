@@ -3,7 +3,7 @@
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
-#title            :run_once_before_00_header-start.sh.tmpl
+#title            :run_before_00_header-start.sh.tmpl
 #description      :Action script for chezmoi.io, "Starting Script Execution" header.
 #author		        :phenates
 #date             :2025-10-14
@@ -22,9 +22,9 @@ trap 'rm -f "$TEMP_DEB"' EXIT
 
 ## Log (enhanced with colors and symbols):
 header() {
-  echo -e "\n\033[1;35m━*************************************************\033[0m"
+  echo -e "\n\033[1;35m****************************************************\033[0m"
+  echo -e "\033[1;35m****************************************************\033[0m"
   echo -e "\033[1;35m  $*\033[0m"
-  echo -e "\033[1;35m*************************************************\033[0m"
 }
 
 ## Main
