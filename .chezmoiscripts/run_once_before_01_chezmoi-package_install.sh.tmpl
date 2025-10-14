@@ -1,5 +1,4 @@
 #!/bin/bash
-
 {{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
@@ -48,8 +47,48 @@ error() {
 step() {
   echo -e "\033[1;34m  →  $*\033[0m"
 }
+TEMP_DEB="/tmp/chezmoi_package.deb"
+
+## Cleanup on exit
+trap 'rm -f "$TEMP_DEB"' EXIT
+
+## Log (enhanced with colors and symbols):
+header() {
+  echo -e "\n\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+  echo -e "\033[1;35m  $*\033[0m"
+  echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+}
+
+info() {
+  echo -e "\033[1;36m  ℹ  $*\033[0m"
+}
+
+success() {
+  echo -e "\033[1;32m  ✓  $*\033[0m"
+}
+
+warning() {
+  echo -e "\033[1;33m  ⚠  WARNING: $*\033[0m"
+}
+
+error() {
+  echo -e "\033[1;31m  ✗  ERROR: $*\033[0m" >&2
+}
+
+step() {
+  echo -e "\033[1;34m  →  $*\033[0m"
+}
 
 ## Main
+header "CHEZMOI: Replace Binary with Package"
+
+# Validation
+step "Validating configuration..."
+if [[ -z "$PACKAGE_URL" ]]; then
+  error "PACKAGE_URL is not defined"
+  exit 1
+fi
+success "Configuration validated"
 header "CHEZMOI: Replace Binary with Package"
 
 # Validation
@@ -74,7 +113,28 @@ if ! sudo apt install -qq -y "$TEMP_DEB" 2>/dev/null; then
   exit 1
 fi
 success "Chezmoi apt package installed"
+step "Downloading chezmoi .deb from: $PACKAGE_URL"
+if ! wget -q -O "$TEMP_DEB" "$PACKAGE_URL" 2>/dev/null; then
+  error "Failed to download package"
+  exit 1
+fi
+success "Package downloaded successfully"
 
+step "Installing chezmoi apt package..."
+if ! sudo apt install -qq -y "$TEMP_DEB" 2>/dev/null; then
+  error "Failed to install package"
+  exit 1
+fi
+success "Chezmoi apt package installed"
+
+# Remove chezmoi binary
+step "Cleaning up binary installation..."
+if [[ -f "$HOME/bin/chezmoi" ]]; then
+  rm -f "$HOME/bin/chezmoi"
+  success "Chezmoi binary file removed"
+else
+  info "No binary file found in ~/bin (skipped)"
+fi
 # Remove chezmoi binary
 step "Cleaning up binary installation..."
 if [[ -f "$HOME/bin/chezmoi" ]]; then
@@ -90,7 +150,17 @@ if [[ -f "$HOME/install.sh" ]]; then
   success "install.sh file removed"
 else
   info "No install.sh file found (skipped)"
+# Remove install.sh script
+if [[ -f "$HOME/install.sh" ]]; then
+  rm -f "$HOME/install.sh"
+  success "install.sh file removed"
+else
+  info "No install.sh file found (skipped)"
 fi
+
+echo ""
+success "Chezmoi package installation completed! 🎉"
+echo ""
 
 echo ""
 success "Chezmoi package installation completed! 🎉"
