@@ -1,6 +1,21 @@
+#==============================================================================
+# File use to customize the chezmoi config file when doing a `chezmoi init` or
+# when a command supports the --init flag.
+#
+# Use template to populate or trigger prompts to populate values.
+#==============================================================================
+
+## Default values
+{{- $private := false -}}{{/* true if this machine should have personal secrets */}}
+
+## Prompts
+{{- $private = promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
+
+
 data:
   name: "phenates"
   email: "phen4tes@gmail.com"
+  private = {{ $private }}
   signingKey: ""
   chezmoi_package: "https://github.com/twpayne/chezmoi/releases/download/v{{ .chezmoi.version.version }}/chezmoi_{{ .chezmoi.version.version }}_linux_amd64.deb"
 
@@ -10,3 +25,4 @@ edit:
 git:
   autoCommit: true
   autoPush: true
+
