@@ -31,7 +31,7 @@ warning() { echo -e "\033[1;33m  ⚠  WARNING: $*\033[0m"; }
 
 error() { echo -e "\033[1;31m  ✗  ERROR: $*\033[0m" >&2; }
 
-step() { echo -e "\033[1;34m  →  $*\033[0m"; }
+step() { echo -e "\n\033[1;34m  →  $*\033[0m"; }
 
 ## Main
 header "Installing chezmoi, init and apply dotfiles"
@@ -66,7 +66,7 @@ script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 info "Using dotfiles source directory: $script_dir"
 # exec: replace current process with chezmoi init
 # exec "$chezmoi" init --apply "--source=$script_dir"
-chezmoi init --apply phenates
+$chezmoi init --apply phenates
 
 success "chezmoi dotfiles management finished successfully!"
 echo -e ""
