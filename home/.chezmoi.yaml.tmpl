@@ -1,14 +1,10 @@
-#==============================================================================
-# File use to customize the chezmoi config file when doing a `chezmoi init` or
-# when a command supports the --init flag.
-#
-# Use template to populate or trigger prompts to populate values.
-#==============================================================================
+{{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
+{{/* Use template to populate or trigger prompts to populate values. */}}
 
-## Default values
+{{/* Default values */}}
 {{- $private := false -}}{{/* true if this machine should have personal secrets */}}
 
-## Prompts
+{{/* Prompts */}}
 {{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
 
 
