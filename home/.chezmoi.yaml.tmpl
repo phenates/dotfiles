@@ -9,7 +9,7 @@
 {{- $private := false -}}{{/* true if this machine should have personal secrets */}}
 
 ## Prompts
-{{- $private = promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
+{{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
 
 
 data:
