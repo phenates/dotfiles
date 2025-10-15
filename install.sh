@@ -9,7 +9,6 @@
 #usage		        :sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
 #==============================================================================
 
-
 set -eu # StrictMode, e:exit on non-zero status code; u:prevent undefined variable
 
 ## Variables:
