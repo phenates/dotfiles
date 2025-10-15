@@ -1,16 +1,21 @@
-#!/bin/bash
-
-{{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu")) -}}
+{{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu" "raspbian")) -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
+#!/bin/bash
+
 #==============================================================================
-#title            :run_once_before_10_linux-package_install.sh.tmpl
-#description      :Action script for chezmoi.io, install linux packages.
-#author		        :phenates
-#date             :2025-10-14
-#version          :0.1 
-#usage		        :used by chezmoi apply sequence
+#description  :chezmoi bash script (with template), running before `chezmoi apply`
+#              to install packages on debian, ubuntu, raspian linux dtistribution.
+#              This script checks if a package is already installed before attempting installation.
+#author		    :phenates
+#date         :2025-10-14
+#version      :0.1
 #==============================================================================
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
 
 set -e # -e: script exit on error
 
@@ -25,11 +30,12 @@ LINUX_PACKAGES=(
   tree
   openssh-client
 )
+INSTALLED=()
+TO_INSTALL=()
 
 ## Log (enhanced with colors and symbols):
 header() {
-  echo -e "\n\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-  echo -e "\033[1;35m  $*\033[0m"
+  echo -e "\n\033[1;35m  $*\033[0m"
   echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 }
 
@@ -54,22 +60,33 @@ step() {
 }
 
 ## Main
-header "SCRIPT: Linux packages installation"
+header "chezmoi script: before 10 - Linux packages installation"
 
-# Install packages
-step "Checking and installing required packages..."
+
+# Update package list
+step "Updating package list..."
+if {{ $sudo }} apt update -qq 2>/dev/null; then
+  success "Package list updated"
+else
+  error "Failed to update package list"
+  exit 1
+fi
+
+# Install packages if not already installed
 for package in "${LINUX_PACKAGES[@]}"; do
-  if ! command -v "$package" &>/dev/null; then
-    step "Installing $package..."
-    # Installation avec gestion sudo/root
-    if sudo apt install -qq -y "$package" 2>/dev/null; then
+  step "Checking and installing $package package..."
+  if dpkg -l | grep -q "^ii  $package "; then
+    info "$package already installed"
+    INSTALLED+=("$package")
+  else
+    info "Installing $package..."
+    TO_INSTALL+=("$package")
+    if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
       success "$package installed"
     else
       error "Failed to install $package"
       exit 1
     fi
-  else
-    info "$package already installed"
   fi
 done
 

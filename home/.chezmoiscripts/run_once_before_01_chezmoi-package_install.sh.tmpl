@@ -20,8 +20,7 @@ TEMP_DEB="/tmp/chezmoi_package.deb"
 
 ## Log (enhanced with colors and symbols):
 header() {
-  echo -e "\n\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-  echo -e "\033[1;35m  $*\033[0m"
+  echo -e "\n\033[1;35m  $*\033[0m"
   echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 }
 
@@ -63,7 +62,7 @@ download_file() {
 }
 
 ## Main
-header "SCRIPT: Replace Chezmoi binary with Package"
+header "chezmoi script: Replace Chezmoi binary file with package"
 
 # Validation
 step "Validating configuration..."
