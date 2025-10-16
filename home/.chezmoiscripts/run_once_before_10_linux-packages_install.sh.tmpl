@@ -64,7 +64,6 @@ step() {
 ## Main
 header "chezmoi script: before 10 - Linux packages installation"
 
-
 # Update package list
 step "Updating package list..."
 if {{ $sudo }} apt update -qq 2>/dev/null; then

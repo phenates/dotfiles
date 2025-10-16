@@ -47,12 +47,6 @@ header "chezmoi dotfiles manager\n install, init and apply dotfiles"
 
 #TODO Check if sudo
 
-info "test info"
-success "test success"
-warning "test warning"
-error "test error"
-step "test step"
-
 # Check if chezmoi is already installed, if not install it
 step "Checking for chezmoi installation..."
 if [ ! "$(command -v chezmoi)" ]; then
