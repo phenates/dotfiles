@@ -75,7 +75,7 @@ step "Initializing and applying dotfiles with chezmoi..."
 # info "Using dotfiles source directory: $script_dir"
 # exec: replace current process with chezmoi init
 # exec "$chezmoi" init --apply "--source=$script_dir"
-$chezmoi init --apply phenates
+$chezmoi init --apply phenates --verbose
 
 header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"
 echo -e ""
