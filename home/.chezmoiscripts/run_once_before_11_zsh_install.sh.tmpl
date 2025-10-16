@@ -7,9 +7,13 @@
 #description  :chezmoi bash script (with template), install zsh and oh-my-zsh.
 #author		    :phenates
 #date         :2025-10-14
-#version      :0.3 
-#usage		    :used by chezmoi apply sequence
+#version      :0.3
 #==============================================================================
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
 
 set -e # -e: exit on error
 
@@ -23,8 +27,7 @@ ZSH_PACKAGES=(
 
 ## Log (enhanced with colors and symbols):
 header() {
-  echo -e "\n\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-  echo -e "\033[1;35m  $*\033[0m"
+  echo -e "\n\033[1;35m  $*\033[0m"
   echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 }
 
@@ -71,10 +74,10 @@ ask_user() {
 }
 
 ## Main
-header "SCRIPT: zsh shell, Oh-my-zsh (plungins, theme) installation"
+header "chezmoi script: before 11 - zsh, Oh-my-zsh, Powerlevel10k theme installation"
 
 # Ask user for installation
-if ! ask_user "Do you want to install them now?"; then
+if ! ask_user "Do you want to proceed ?"; then
   echo ""
   info "Installation cancelled by user"
   echo ""
@@ -82,31 +85,59 @@ if ! ask_user "Do you want to install them now?"; then
 fi
 
 # Zsh packages install
-step "Checking and installing required zsh packages..."
+# step "Checking and installing required zsh packages..."
+# for package in "${ZSH_PACKAGES[@]}"; do
+#   if ! command -v "$package" &>/dev/null; then
+#     step "Installing $package..."
+#     # Installation avec gestion sudo/root
+#     if sudo apt install -qq -y "$package" 2>/dev/null; then
+#       success "$package installed"
+#       echo ""
+#     else
+#       error "Failed to install $package"
+#       exit 1
+#     fi
+#   else
+#     info "$package already installed"
+#     echo ""
+#   fi
+# done
+
+# Zsh Install packages if not already installed
 for package in "${ZSH_PACKAGES[@]}"; do
-  if ! command -v "$package" &>/dev/null; then
-    step "Installing $package..."
-    # Installation avec gestion sudo/root
-    if sudo apt install -qq -y "$package" 2>/dev/null; then
+  step "Checking and installing $package package..."
+  if dpkg -l | grep -q "^ii  $package "; then
+    info "$package already installed"
+    INSTALLED+=("$package")
+  else
+    info "Installing $package..."
+    TO_INSTALL+=("$package")
+    if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
       success "$package installed"
-      echo ""
     else
       error "Failed to install $package"
       exit 1
     fi
-  else
-    info "$package already installed"
-    echo ""
   fi
 done
 
+
 # Oh-my-zsh install
-step "Checking and installing required zsh packages..."
+step "Checking and installing oh-my-zsh framework ..."
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
   success "oh-my-zsh installed"
 else
   info "oh-my-zsh already installed"
+fi
+
+# Powerlevel10k install
+step "Checking and installing Powerlevel10k theme ..."
+if [[ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]]; then
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" >/dev/null
+  success "Powerlevel10k theme installed"
+else
+  info "Powerlevel10k theme already installed"
 fi
 
 # Change default shell to zsh
