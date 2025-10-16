@@ -42,6 +42,23 @@ step() {
   echo -e "\n\033[1;34m  →  $*\033[0m"
 }
 
+prompt() {
+  local question="$1"
+  local response
+  
+  echo -e "\033[1;33m  ?  $* (y/N): \033[0m"
+  read -r response
+  
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 ## Main
 header "chezmoi dotfiles manager\n install, init and apply dotfiles"
 
@@ -75,7 +92,20 @@ step "Initializing and applying dotfiles with chezmoi..."
 # info "Using dotfiles source directory: $script_dir"
 # exec: replace current process with chezmoi init
 # exec "$chezmoi" init --apply "--source=$script_dir"
-$chezmoi init --apply phenates --verbose
 
-header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"
+# Ask user for init and apply
+if ! prompt "Do you want to init & apply ?"; then
+  echo ""
+  info "Init and apply cancelled by user"
+  echo ""
+  exit 0
+else
+  step "Initializing and applying dotfiles with chezmoi..."
+  $chezmoi init --apply phenates --verbose
+fi
+
+
+
+
+# header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"S
 echo -e ""

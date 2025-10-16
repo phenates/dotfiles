@@ -52,15 +52,10 @@ step() {
 }
 
 prompt() {
-  echo -e "\033[1;33m  ?  $*\033[0m"
-}
-
-## Helper function: ask user confirmation
-ask_user() {
   local question="$1"
   local response
   
-  prompt "$question (y/N): "
+  echo -e "\033[1;33m  ?  $* (y/N): \033[0m"
   read -r response
   
   case "$response" in
@@ -73,11 +68,12 @@ ask_user() {
   esac
 }
 
+
 ## Main
 header "chezmoi script: before 11 - zsh, Oh-my-zsh, Powerlevel10k theme installation"
 
 # Ask user for installation
-if ! ask_user "Do you want to proceed ?"; then
+if ! prompt "Do you want to proceed ?"; then
   echo ""
   info "Installation cancelled by user"
   echo ""
