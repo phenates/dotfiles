@@ -18,7 +18,7 @@ CMD_OPTION="-- init --apply phenates"
 ## Log (enhanced with colors and symbols):
 header() {
   echo -e "\n\033[1;35m****************************************************\033[0m"
-  echo -e "\033[1;35m  $*\033[0m"
+  echo -e "\033[1;35m    $*\033[0m"
   echo -e "\033[1;35m****************************************************\033[0m"
 }
 
@@ -43,9 +43,15 @@ step() {
 }
 
 ## Main
-header "chezmoi dotfiles manager\n Install, init and apply dotfiles"
+header "chezmoi dotfiles manager\n install, init and apply dotfiles"
 
 #TODO Check if sudo
+
+info "test info"
+success "test success"
+warning "test warning"
+error "test error"
+step "test step"
 
 # Check if chezmoi is already installed, if not install it
 step "Checking for chezmoi installation..."
@@ -77,5 +83,5 @@ step "Initializing and applying dotfiles with chezmoi..."
 # exec "$chezmoi" init --apply "--source=$script_dir"
 $chezmoi init --apply phenates
 
-success "chezmoi dotfiles management finished successfully!"
+header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"
 echo -e ""
