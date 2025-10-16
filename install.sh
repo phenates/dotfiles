@@ -46,7 +46,7 @@ prompt() {
   local question="$1"
   local response
   
-  echo -e "\033[1;33m  ?  $* (y/N): \033[0m"
+  echo -e -n "\033[1;33m  ?  $* (y/N): \033[0m"
   read -r response
   
   case "$response" in
@@ -98,9 +98,8 @@ if ! prompt "Do you want to init & apply ?"; then
   info "Init and apply cancelled by user"
   exit 0
 else
-  step "Initializing and applying dotfiles with chezmoi..."
+  info "Running: chezmoi init --apply GITHUB_USERNAME"
   $chezmoi init --apply phenates
 fi
 
-# header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"S
 echo -e ""

@@ -3,14 +3,18 @@
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
-#title            :run_once_before_01_chezmoi-package_install.sh.tmpl
-#description      :Action script for chezmoi.io, install chezmoi package (to benefit of autocompleting) and
-#                  remove the binary file downloaded during the official installation command (sh -c "$(curl -fsLS get.chezmoi.io)").
-#author		        :phenates
-#date             :2025-10-14
-#version          :0.2 
-#usage		        :used by chezmoi apply sequence
+#description  :chezmoi bash script (with template), running after `chezmoi apply`
+#              Install chezmoi package (to benefit of autocompleting) and remove
+#              the binary file downloaded during installation.
+#author		    :phenates
+#date         :2025-10-17
+#version      :0.2 
 #==============================================================================
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
 
 set -e # -e: exit on error
 
@@ -62,7 +66,7 @@ download_file() {
 }
 
 ## Main
-header "chezmoi script: Replace Chezmoi binary file with package"
+header "chezmoi script: after 10 - Replace Chezmoi binary file by the package"
 
 # Validation
 step "Validating configuration..."
@@ -95,16 +99,17 @@ fi
 success "Package downloaded successfully"
 
 step "Installing chezmoi apt package..."
-if ! sudo apt install -qq -y "$TEMP_DEB" 2>/dev/null; then
+if ! {{ $sudo }} apt install -qq -y "$TEMP_DEB" 2>/dev/null; then
+  success "Chezmoi apt package installed"
+else
   error "Failed to install package"
   exit 1
 fi
-success "Chezmoi apt package installed"
 
 # Remove chezmoi binary
 step "Cleaning up binary installation..."
-if [[ -f "$HOME/bin/chezmoi" ]]; then
-  rm -f "$HOME/bin/chezmoi"
+if [[ -f "$HOME/.local/bin/chezmoi" ]]; then
+  rm -f "$HOME/.local/bin/chezmoi"
   success "Chezmoi binary file removed"
 else
   info "No binary file found in ~/bin (skipped)"

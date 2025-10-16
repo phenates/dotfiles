@@ -55,7 +55,7 @@ prompt() {
   local question="$1"
   local response
   
-  echo -e "\033[1;33m  ?  $* (y/N): \033[0m"
+  echo -e -n "\033[1;33m  ?  $* (y/N): \033[0m"
   read -r response
   
   case "$response" in
