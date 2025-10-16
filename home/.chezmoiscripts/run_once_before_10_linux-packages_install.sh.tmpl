@@ -83,7 +83,8 @@ for package in "${LINUX_PACKAGES[@]}"; do
   else
     info "Installing $package..."
     TO_INSTALL+=("$package")
-    if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
+    # if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
+    if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
       success "$package installed"
     else
       error "Failed to install $package"

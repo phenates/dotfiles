@@ -93,19 +93,14 @@ step "Initializing and applying dotfiles with chezmoi..."
 # exec: replace current process with chezmoi init
 # exec "$chezmoi" init --apply "--source=$script_dir"
 
-# Ask user for init and apply
+# Ask user for init and apply dotfiles
 if ! prompt "Do you want to init & apply ?"; then
-  echo ""
   info "Init and apply cancelled by user"
-  echo ""
   exit 0
 else
   step "Initializing and applying dotfiles with chezmoi..."
-  $chezmoi init --apply phenates --verbose
+  $chezmoi init --apply phenates
 fi
-
-
-
 
 # header "chezmoi dotfiles manager\n ✓ dotfiles installation finished successfully!"S
 echo -e ""
