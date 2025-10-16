@@ -9,7 +9,7 @@
 #              This script checks if a package is already installed before attempting installation.
 #author		    :phenates
 #date         :2025-10-14
-#version      :0.1
+#version      :0.2
 #==============================================================================
 
 {{ $sudo := "sudo " -}}
@@ -29,6 +29,7 @@ LINUX_PACKAGES=(
   eza
   tree
   openssh-client
+  fontconfig
 )
 INSTALLED=()
 TO_INSTALL=()

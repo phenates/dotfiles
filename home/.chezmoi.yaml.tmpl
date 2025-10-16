@@ -7,11 +7,25 @@
 {{/* Prompts */}}
 {{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
 
+{{/* OS infos */}}
+{{- $osID := .chezmoi.os -}}
+{{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
+{{-   $osID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+{{- $isWSL := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
+{{-   $isWSL := true -}}
+{{-   end -}}
+{{- end -}}
 
 data:
   name: "phenates"
   email: "phen4tes@gmail.com"
   private: {{ $private }}
+  osid: {{ $osID | quote }}
+  isWSL: {{ $isWSL }}
   signingKey: ""
   chezmoi_package: "https://github.com/twpayne/chezmoi/releases/download/v{{ .chezmoi.version.version }}/chezmoi_{{ .chezmoi.version.version }}_linux_amd64.deb"
 
