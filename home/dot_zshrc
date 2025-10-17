@@ -1,6 +1,6 @@
 # Neofetch command-line system information
 if [ -f $HOME/.local/bin/neofetch ]; then
-    neofetch
+    $HOME/.local/bin/neofetch
 fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
