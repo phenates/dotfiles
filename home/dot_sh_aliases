@@ -12,4 +12,4 @@ alias ..='cd ..'
 
 alias sys='systemctl'
 
-alias upgrade=sudo apt update && sudo apt upgrade
+alias upgrade="sudo apt update && sudo apt upgrade"
