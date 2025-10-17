@@ -108,7 +108,7 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias ll="exa -lgah --icons"
+alias ll="eza -lgah --icons"
 #alias chezmoi-cd="cd ~/.local/share/chezmoi/"
 
 # source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
