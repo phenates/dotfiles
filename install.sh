@@ -2,9 +2,10 @@
 
 #==============================================================================
 #title            :install.sh
-#description      :This bash script install chezmoi binary file for the operating system and architecture in ./bin.
+#description      :This bash script install chezmoi binary file in .local//bin, then
+#                  initializes and applies dotfiles from the GitHub repository.
 #author		        :phenates
-#date             :2025-10-15
+#date             :2025-10-17
 #version          :0.3
 #usage		        :sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
 #==============================================================================
@@ -22,31 +23,21 @@ header() {
   echo -e "\033[1;35m****************************************************\033[0m"
 }
 
-info() {
-  echo -e "\033[1;36m  ℹ  $*\033[0m"
-}
+info() { echo -e "\033[1;36m  ℹ  $*\033[0m"; }
 
-success() {
-  echo -e "\033[1;32m  ✓  $*\033[0m"
-}
+success() { echo -e "\033[1;32m  ✅  $*\033[0m"; }
 
-warning() {
-  echo -e "\033[1;33m  ⚠  WARNING: $*\033[0m"
-}
+warning() { echo -e "\033[1;33m  ⚠️  WARNING: $*\033[0m"; }
 
-error() {
-  echo -e "\033[1;31m  ✗  ERROR: $*\033[0m" >&2
-}
+error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
 
-step() {
-  echo -e "\n\033[1;34m  →  $*\033[0m"
-}
+step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
 
-prompt() {
+ask_yN() {
   local question="$1"
   local response
   
-  echo -e -n "\033[1;33m  ?  $* (y/N): \033[0m"
+  echo -e -n "\033[1;33m  ?  $question (y/N): \033[0m"
   read -r response
   
   case "$response" in
@@ -61,8 +52,6 @@ prompt() {
 
 ## Main
 header "chezmoi dotfiles manager\n install, init and apply dotfiles"
-
-#TODO Check if sudo
 
 # Check if chezmoi is already installed, if not install it
 step "Checking for chezmoi installation..."
@@ -94,7 +83,7 @@ step "Initializing and applying dotfiles with chezmoi..."
 # exec "$chezmoi" init --apply "--source=$script_dir"
 
 # Ask user for init and apply dotfiles
-if ! prompt "Do you want to init & apply ?"; then
+if ! ask_yN "Do you want to init & apply ?"; then
   info "Init and apply cancelled by user"
   exit 0
 else
