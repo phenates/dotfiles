@@ -5,8 +5,9 @@
 {{- $private := false -}}{{/* true if this machine should have personal secrets */}}
 
 {{- /* Prompts */ -}}
-{{- promptString "\n  chezmoi configuration:  " -}}
+{{- writeToStdout "\n  chezmoi configuration:  " -}}
 {{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
+{{- $private := promptBool "  ?  Change default shell to zsh ? (y/n)" false -}}
 
 {{- /* OS infos */ -}}
 {{- $osID := .chezmoi.os -}}
