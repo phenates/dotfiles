@@ -7,7 +7,7 @@
 {{- /* Prompts */ -}}
 {{- writeToStdout "\n  chezmoi configuration:  \n" -}}
 {{- $private := promptBool "\n  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
-{{- $chsh := promptBool "\n  ?  Change default shell to zsh ? (y/n)" false -}}
+{{- $changeShell := promptBool "\n  ?  Change default shell to zsh ? (y/n)" false -}}
 
 {{- /* OS infos */ -}}
 {{- $osID := .chezmoi.os -}}
@@ -25,11 +25,12 @@
 data:
   name: "phenates"
   email: "phen4tes@gmail.com"
-  private: {{ $private }}
   osid: {{ $osID | quote }}
   isWSL: {{ $isWSL }}
   signingKey: ""
   chezmoi_package: "https://github.com/twpayne/chezmoi/releases/download/v{{ .chezmoi.version.version }}/chezmoi_{{ .chezmoi.version.version }}_linux_amd64.deb"
+  private: {{ $private }}
+  changeShell: {{ $changeShell }}
 
 edit:
   command: "nano"
