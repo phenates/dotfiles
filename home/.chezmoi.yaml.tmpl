@@ -7,7 +7,7 @@
 {{- /* Prompts */ -}}
 {{- writeToStdout "\n  chezmoi configuration:  \n" -}}
 {{- $private := promptBool "\n  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
-{{- writeToStdout "  This is a private installation (should have personal secrets) ? -> Responce: $private  \n" -}}
+{{- writeToStdout "  This is a private installation (should have personal secrets) ? -> Responce: " $private "\n" -}}
 
 {{- $changeShell := promptBool "\n  ?  Change default shell to zsh ? (y/n)" false -}}
 {{- writeToStdout "  Change default shell to zsh ? -> Responce: $changeShell  \n" -}}
