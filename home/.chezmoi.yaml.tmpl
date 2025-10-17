@@ -5,7 +5,7 @@
 {{- $private := false -}}{{/* true if this machine should have personal secrets */}}
 
 {{- /* Prompts */ -}}
-{{- promptString "\n\033[1;35m  chezmoi configuration:  \033[0m" -}}
+{{- promptString "\n  chezmoi configuration:  " -}}
 {{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
 
 {{- /* OS infos */ -}}
