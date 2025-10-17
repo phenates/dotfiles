@@ -45,3 +45,14 @@
     include: ["MesloLGSNerdFont-*"]
 
 {{ end }}
+
+{{ if .private }}
+
+".local/bin/shell-script":
+    type: "archive"
+    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+
+{{ end }}
