@@ -37,10 +37,9 @@
 {{- else if eq .chezmoi.os "linux" }}
 {{-   $fontDir = ".local/share/fonts" }}
 {{- end }}
-"{{ $fontDir }}"
+"{{ $fontDir }}":
     type: "archive-file"
     url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
     refreshPeriod: "168h"
-    path: "Meslo"
 
 {{ end }}
