@@ -32,6 +32,7 @@ LINUX_PACKAGES=(
   openssh-client
   fontconfig
   zsh
+  guake
 )
 INSTALLED=()
 TO_INSTALL=()
@@ -53,7 +54,7 @@ error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
 step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
 
 ## Main
-header "chezmoi script: before 10 - Linux packages installation"
+header "chezmoi script: Linux packages installation"
 
 # Update package list
 step "Updating package list..."

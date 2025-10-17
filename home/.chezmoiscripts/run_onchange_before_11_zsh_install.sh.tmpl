@@ -21,8 +21,6 @@ set -e # -e: exit on error
 SCRIPT_NAME=$(basename "$0")
 ZSH_PACKAGES=(
   zsh
-  fonts-powerline
-  zsh-syntax-highlighting
 )
 
 ## Log (enhanced with colors and symbols):
@@ -58,9 +56,8 @@ ask_yN() {
   esac
 }
 
-
 ## Main
-header "chezmoi script: before 11 - zsh, Oh-my-zsh, Powerlevel10k theme installation"
+header "chezmoi script: zsh, Oh-my-zsh, Powerlevel10k theme installation"
 
 # Ask user for installation
 if ! ask_yN "Do you want to proceed ?"; then
@@ -68,25 +65,6 @@ if ! ask_yN "Do you want to proceed ?"; then
   echo ""
   exit 0
 fi
-
-# Zsh packages install
-# step "Checking and installing required zsh packages..."
-# for package in "${ZSH_PACKAGES[@]}"; do
-#   if ! command -v "$package" &>/dev/null; then
-#     step "Installing $package..."
-#     # Installation avec gestion sudo/root
-#     if sudo apt install -qq -y "$package" 2>/dev/null; then
-#       success "$package installed"
-#       echo ""
-#     else
-#       error "Failed to install $package"
-#       exit 1
-#     fi
-#   else
-#     info "$package already installed"
-#     echo ""
-#   fi
-# done
 
 # Zsh Install packages if not already installed
 for package in "${ZSH_PACKAGES[@]}"; do
@@ -105,7 +83,6 @@ for package in "${ZSH_PACKAGES[@]}"; do
     fi
   fi
 done
-
 
 # Oh-my-zsh install
 step "Checking and installing oh-my-zsh framework ..."
@@ -134,14 +111,6 @@ if [ $? -eq 0 ]; then
 else
   error "Failed to change default shell to zsh"
 fi
-
-
-# if command -v chsh -s $(which zsh) &>/dev/null; then
-#   success "Default shell changed to zsh"
-#   info "You may need to log out and log back in for the change to take effect."
-# else
-#   error "Failed to change default shell to zsh"
-# fi
 
 echo ""
 success "zsh installation completed! 🎉"
