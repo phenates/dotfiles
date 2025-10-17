@@ -109,8 +109,8 @@ fi
 alias zshconfig="nano ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ls="eza --icons=auto"
-alias l="eza -lh --icons=auto"
-alias ll="eza -lhT --icons=auto"
+alias l="eza -lah --icons=auto"
+alias ll="eza -lahT --icons=auto"
 #alias chezmoi-cd="cd ~/.local/share/chezmoi/"
 
 # source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
