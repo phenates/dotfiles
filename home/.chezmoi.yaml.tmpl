@@ -6,7 +6,7 @@
 
 {{- /* Prompts */ -}}
 {{- writeToStdout "\n  chezmoi configuration:  \n" -}}
-{{- writeToStdout (echo -e "\n\033[1;34m ✅ Name set as \033[0m") -}}
+{{- writeToStdout "\n\033\[1;34m ✅ Name set as \033\[0m" -}}
 {{- $private := promptBool "\n  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
 {{- $chsh := promptBool "\n  ?  Change default shell to zsh ? (y/n)" false -}}
 
