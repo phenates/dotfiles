@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian" "ubuntu" "raspbian")) -}}
+{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
