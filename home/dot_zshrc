@@ -106,15 +106,12 @@ fi
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zshconfig="nano ~/.zshrc"
+alias zshconfig="chezmoi edit ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ls="eza --icons=auto"
-alias l="eza -lah --icons=auto"
-alias ll="eza -lahT --icons=auto"
-#alias chezmoi-cd="cd ~/.local/share/chezmoi/"
-
-# source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# export PATH="~/bin/:$PATH"
+alias l="eza --all --long --header --icons=auto"
+alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
+alias lll="eza --all --long --header --tree --color=always --icons=auto"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
