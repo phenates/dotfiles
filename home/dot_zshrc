@@ -1,3 +1,8 @@
+# Neofetch command-line system information
+if [ -f $HOME/.local/bin/neofetch ]; then
+    neofetch
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -106,7 +111,7 @@ fi
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-if [ -f ~/.bash_aliases ]; then
+if [ -f $HOME/.sh_aliases ]; then
     . $HOME/.sh_aliases
 fi
 
