@@ -106,12 +106,9 @@ fi
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zshconfig="chezmoi edit ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-alias ls="eza --icons=auto"
-alias l="eza --all --long --header --icons=auto"
-alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
-alias lll="eza --all --long --header --tree --color=always --icons=auto"
+if [ -f ~/.bash_aliases ]; then
+    . $HOME/.sh_aliases
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
