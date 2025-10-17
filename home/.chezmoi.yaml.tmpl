@@ -6,8 +6,9 @@
 
 {{- /* Prompts */ -}}
 {{- writeToStdout "\n  chezmoi configuration:  \n" -}}
-{{- $private := promptBool "  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
-{{- $private := promptBool "  ?  Change default shell to zsh ? (y/n)" false -}}
+{{- writeToStdout (echo -e "\n\033[1;34m ✅ Name set as \033[0m") -}}
+{{- $private := promptBool "\n  ?  This is a private installation (should have personal secrets) ? (y/n)" false -}}
+{{- $chsh := promptBool "\n  ?  Change default shell to zsh ? (y/n)" false -}}
 
 {{- /* OS infos */ -}}
 {{- $osID := .chezmoi.os -}}
