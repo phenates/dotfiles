@@ -13,3 +13,8 @@ alias ..='cd ..'
 alias sys='systemctl'
 
 alias upgrade="sudo apt update && sudo apt upgrade"
+
+{{ if .is_WSL -}}
+# WSL aliases
+alias ssh-add="ssh-add.exe"
+{{- end }}
