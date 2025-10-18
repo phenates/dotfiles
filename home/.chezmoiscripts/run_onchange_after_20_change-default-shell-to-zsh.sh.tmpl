@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if (and (eq .OS_ID "linux-debian" "linux-raspbian" "linux-ubuntu") (.changeShell)) -}}
+{{ if (and (eq .OS_id "linux-debian" "linux-raspbian" "linux-ubuntu") (.changeShell)) -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
