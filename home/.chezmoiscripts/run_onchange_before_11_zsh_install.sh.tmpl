@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+{{ if eq .OS_ID "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
@@ -57,8 +57,9 @@ ask_yN() {
 }
 
 ## Main
-header "chezmoi script: Oh-my-zsh, Powerlevel10k theme installation"
+header "chezmoi script: zsh, Oh-my-zsh, Powerlevel10k theme installation"
 echo ""
+info "zsh installed by Linux packages install script."
 info "oh-my-zsh framework, plugin, theme, and Nerd font, are traited by .chezmoiexternal files."
 echo ""
 

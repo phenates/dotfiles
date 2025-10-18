@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+{{ if eq .OS_ID "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
@@ -57,7 +57,7 @@ download_file() {
 }
 
 ## Main
-header "chezmoi script: Replace Chezmoi binary file by the package"
+header "chezmoi script: Replace chezmoi binary file by the package"
 
 # Validation: Check PACKAGE_URL
 if [[ -z "$PACKAGE_URL" ]]; then

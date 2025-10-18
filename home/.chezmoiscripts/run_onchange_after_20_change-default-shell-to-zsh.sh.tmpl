@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if (and (eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu") (.changeShell)) -}}
+{{ if (and (eq .OS_ID "linux-debian" "linux-raspbian" "linux-ubuntu") (.changeShell)) -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
@@ -40,7 +40,7 @@ step "Change default shell to zsh..."
 chsh -s $(which zsh)
 if [ $? -eq 0 ]; then
   success "Default shell changed to zsh"
-  info "You may need to log out and log back in for the change to take effect."
+  info "Log out and log in or run "source .zshrc", for the change to take effect."
 else
   error "Failed to change default shell to zsh"
 fi
