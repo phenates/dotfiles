@@ -25,10 +25,10 @@
 
 {{- /* Prompts */ -}}
 
-{{-   writeToStdout "\n  chezmoi configuration:  " -}}
-{{-   writeToStdout "echo -e '\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m'" -}}
+{{-   writeToStdout (printf "\n  chezmoi configuration: \n") -}}
+{{-   writeToStdout (echo -e '\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m') -}}
 {{-   $personal  := promptBool "  ?  This is a personal installation (should have personal secrets) ? (y/n)" false -}}
-{{-   writeToStdout (printf " ➜ Personal installation: '%s'\n" $personal) -}}
+{{-   writeToStdout (printf " ➜ Personal installation: '%s'\n" $personal | quote) -}}
 {{-   $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" false -}}
 {{-   $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" false -}}
 
