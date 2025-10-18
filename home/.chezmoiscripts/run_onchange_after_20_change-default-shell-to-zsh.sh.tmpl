@@ -40,7 +40,7 @@ step "Change default shell to zsh..."
 chsh -s $(which zsh)
 if [ $? -eq 0 ]; then
   success "Default shell changed to zsh"
-  info "Log out and log in or run "source .zshrc", for the change to take effect."
+  info "Log out and log in or run 'source .zshrc', for the change to take effect."
 else
   error "Failed to change default shell to zsh"
 fi

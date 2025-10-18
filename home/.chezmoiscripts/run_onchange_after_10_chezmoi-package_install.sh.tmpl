@@ -81,7 +81,7 @@ fi
 success "Package downloaded successfully"
 
 step "Installing chezmoi apt package..."
-if {{ $sudo }} apt install -qq -y "$TEMP_DEB" 2>/dev/null; then
+if {{ $sudo }} apt install -qq -y "$TEMP_DEB" > /dev/null 2>&1; then
   success "Chezmoi apt package installed"
 else
   error "Failed to install package"
