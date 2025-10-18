@@ -57,63 +57,67 @@ ask_yN() {
 }
 
 ## Main
-header "chezmoi script: zsh, Oh-my-zsh, Powerlevel10k theme installation"
-
-# Ask user for installation
-if ! ask_yN "Do you want to proceed ?"; then
-  info "Installation cancelled by user"
-  echo ""
-  exit 0
-fi
-
-# Zsh Install packages if not already installed
-for package in "${ZSH_PACKAGES[@]}"; do
-  step "Checking and installing $package package..."
-  if dpkg -l | grep -q "^ii  $package "; then
-    info "$package already installed"
-    INSTALLED+=("$package")
-  else
-    info "Installing $package..."
-    TO_INSTALL+=("$package")
-    if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
-      success "$package installed"
-    else
-      error "Failed to install $package"
-      exit 1
-    fi
-  fi
-done
-
-# Oh-my-zsh install
-step "Checking and installing oh-my-zsh framework ..."
-if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-  sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
-  success "oh-my-zsh installed"
-else
-  info "oh-my-zsh already installed"
-fi
-
-# Powerlevel10k install
-step "Checking and installing Powerlevel10k theme ..."
-if [[ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]]; then
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" >/dev/null
-  success "Powerlevel10k theme installed"
-else
-  info "Powerlevel10k theme already installed"
-fi
-
-# Change default shell to zsh
-step "Change default shell to zsh..."
-chsh -s $(which zsh)
-if [ $? -eq 0 ]; then
-  success "Default shell changed to zsh"
-  info "You may need to log out and log back in for the change to take effect."
-else
-  error "Failed to change default shell to zsh"
-fi
-
+header "chezmoi script: Oh-my-zsh, Powerlevel10k theme installation"
 echo ""
-success "zsh installation completed! 🎉"
+info "oh-my-zsh framework, plugin, theme, and Nerd font, are traited by .chezmoiexternal files."
 echo ""
+
+
+# # Ask user for installation
+# if ! ask_yN "Do you want to proceed ?"; then
+#   info "Installation cancelled by user"
+#   echo ""
+#   exit 0
+# fi
+
+# # Zsh Install packages if not already installed
+# for package in "${ZSH_PACKAGES[@]}"; do
+#   step "Checking and installing $package package..."
+#   if dpkg -l | grep -q "^ii  $package "; then
+#     info "$package already installed"
+#     INSTALLED+=("$package")
+#   else
+#     info "Installing $package..."
+#     TO_INSTALL+=("$package")
+#     if {{ $sudo }} apt install -qq -y "$package" 2>/dev/null; then
+#       success "$package installed"
+#     else
+#       error "Failed to install $package"
+#       exit 1
+#     fi
+#   fi
+# done
+
+# # Oh-my-zsh install
+# step "Checking and installing oh-my-zsh framework ..."
+# if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+#   sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >/dev/null
+#   success "oh-my-zsh installed"
+# else
+#   info "oh-my-zsh already installed"
+# fi
+
+# # Powerlevel10k install
+# step "Checking and installing Powerlevel10k theme ..."
+# if [[ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]]; then
+#   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" >/dev/null
+#   success "Powerlevel10k theme installed"
+# else
+#   info "Powerlevel10k theme already installed"
+# fi
+
+# # Change default shell to zsh
+# step "Change default shell to zsh..."
+# chsh -s $(which zsh)
+# if [ $? -eq 0 ]; then
+#   success "Default shell changed to zsh"
+#   info "You may need to log out and log back in for the change to take effect."
+# else
+#   error "Failed to change default shell to zsh"
+# fi
+
+# echo ""
+# success "zsh installation completed! 🎉"
+# echo ""
 
 {{ end -}}

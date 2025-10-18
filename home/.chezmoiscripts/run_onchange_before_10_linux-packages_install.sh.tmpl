@@ -1,6 +1,6 @@
 #!/bin/bash
 
-{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+{{ if eq .OS_id "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
 #^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
 
 #==============================================================================
@@ -72,7 +72,7 @@ for package in "${LINUX_PACKAGES[@]}"; do
     info "$package already installed"
     INSTALLED+=("$package")
   else
-    info "Installing $package..."
+    # info "Installing $package..."
     TO_INSTALL+=("$package")
     if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
       success "$package installed"

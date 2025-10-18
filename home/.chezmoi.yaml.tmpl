@@ -1,5 +1,5 @@
-{{- /* File use to customize the chezmoi config file when doing a `chezmoi init`. */ -}}
-{{- /* Use template or trigger prompts to populate values. */ -}}
+{{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
+{{/* Use template or trigger prompts to populate values. */}}
 
 {{- /* Default values */ -}}
 {{- $personal  := false -}} {{/* true if this machine should have personal secrets */}}
@@ -25,10 +25,10 @@
 
 {{- /* Prompts */ -}}
 
-{{-   writeToStdout (printf "\n  chezmoi configuration: \n") -}}
-{{-   writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━") -}}
+{{/* {{-   writeToStdout (printf "\n  chezmoi configuration: \n") -}} */}}
+{{/* {{-   writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━") -}} */}}
 {{-   $personal  := promptBool "  ?  This is a personal installation (should have personal secrets) ? (y/n)" false -}}
-{{-   writeToStdout (printf " ➜ Personal installation: '%s'\n" $personal ) -}}
+{{/* {{-   writeToStdout (printf " ➜ Personal installation '%s'\n" $personal ) -}} */}}
 {{-   $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" false -}}
 {{-   $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" false -}}
 
