@@ -11,7 +11,7 @@
 #              is no work to do.
 #author    	:phenates
 #date         :2025-10-20
-#version      :0.1
+#version      :0.2
 #==============================================================================
 
 set -e # -e: script exit on error
