@@ -3,6 +3,8 @@
 
 {{- /* Default values */ -}}
 {{- $private  := false -}} {{/* true if this machine should have private secrets */}}
+{{- $installZSH := true -}}
+{{- $changeShell := true -}}
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
