@@ -1,0 +1,7 @@
+## Host: use specific SSH options when etablishing a connection with the remote SSH server
+## use: git@github-dotfiles:phenates/dotfiles.git
+
+# github repo dotfiles
+Host github-dotfiles
+	HostName github.com
+	User git

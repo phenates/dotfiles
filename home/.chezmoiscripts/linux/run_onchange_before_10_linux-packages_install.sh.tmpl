@@ -1,0 +1,88 @@
+#!/bin/bash
+
+{{ if eq .OS_id "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+#^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
+
+#==============================================================================
+#description  :chezmoi bash script (with template), running before `chezmoi apply`
+#              to install packages on debian, ubuntu, raspian linux dtistribution.
+#              This script checks if a package is already installed before attempting installation.
+#author		    :phenates
+#date         :2025-10-14
+#version      :0.2
+#==============================================================================
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+set -e # -e: script exit on error
+
+## Variables:
+SCRIPT_NAME=$(basename "$0")
+LINUX_PACKAGES=(
+  curl
+  wget
+  git
+  unzip
+  man-db
+  eza
+  jq
+  tree
+  openssh-client
+  fontconfig
+  zsh
+  guake
+)
+
+## Log (enhanced with colors and symbols):
+header() {
+  echo -e "\n\033[1;35m⮞ $*\033[0m"
+  echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+}
+
+info() { echo -e "\033[1;36m  ℹ️  $*\033[0m"; }
+
+success() { echo -e "\033[1;32m  ✅  $*\033[0m"; }
+
+warning() { echo -e "\033[1;33m  ⚠️  WARNING: $*\033[0m"; }
+
+error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
+
+step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
+
+## Main
+header "chezmoi: Linux packages installation"
+
+# Update package list
+step "Updating package list..."
+if {{ $sudo }} apt update -qq 2>/dev/null; then
+  success "Package list updated"
+else
+  error "Failed to update package list"
+  exit 1
+fi
+
+# Install packages if not already installed
+step "Installing package..."
+for package in "${LINUX_PACKAGES[@]}"; do
+  # step "$package: checking and installing package..."
+  if dpkg -l | grep -q "^ii  $package "; then
+    info "$package already installed"
+  else
+    # info "Installing $package..."
+    if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
+      success "$package installed"
+    else
+      error "Failed to install $package"
+      exit 1
+    fi
+  fi
+done
+
+echo ""
+success "Linux packages installation completed! 🎉"
+echo ""
+
+{{ end -}}

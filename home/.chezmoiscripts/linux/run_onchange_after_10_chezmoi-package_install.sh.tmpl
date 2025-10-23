@@ -1,0 +1,113 @@
+#!/bin/bash
+
+{{ if eq .OS_id "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+#^^^ chezmoi script running template condition, must be the first line after the shebang ^^^
+
+#==============================================================================
+#description  :chezmoi bash script (with template), running after `chezmoi apply`
+#              Install chezmoi package (to benefit of autocompleting) and remove
+#              the binary file downloaded during installation.
+#author		    :phenates
+#date         :2025-10-17
+#version      :0.2 
+#==============================================================================
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+set -e # -e: exit on error
+
+## Variables:
+PACKAGE_URL={{ .chezmoi_package }}
+TEMP_DEB="/tmp/chezmoi_package.deb"
+
+## Log (enhanced with colors and symbols):
+header() {
+  echo -e "\n\033[1;35m⮞ $*\033[0m"
+  echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+}
+
+info() { echo -e "\033[1;36m  ℹ️  $*\033[0m"; }
+
+success() { echo -e "\033[1;32m  ✅  $*\033[0m"; }
+
+warning() { echo -e "\033[1;33m  ⚠️  WARNING: $*\033[0m"; }
+
+error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
+
+step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
+
+## Cleanup on exit
+trap 'rm -f "$TEMP_DEB"' EXIT
+
+## Helper function: download file
+download_file() {
+  local url="$1"
+  local output="$2"
+  
+  if command -v wget &>/dev/null; then
+    wget -q -O "$output" "$url"
+  elif command -v curl &>/dev/null; then
+    curl -fsSL -o "$output" "$url"
+  else
+    return 1
+  fi
+}
+
+## Main
+header "chezmoi: Replace chezmoi binary file by the package .deb"
+
+# Validation: Check PACKAGE_URL
+if [[ -z "$PACKAGE_URL" ]]; then
+  error "PACKAGE_URL is not defined"
+  exit 1
+fi
+
+# Validation: Check download tool availability
+if ! command -v wget &>/dev/null && ! command -v curl &>/dev/null; then
+  error "Neither wget nor curl is installed"
+  error "Please install one of them: sudo apt install wget"
+  exit 1
+fi
+
+# Install chezmoi package
+# step "Downloading chezmoi .deb from: $PACKAGE_URL"
+if ! download_file "$PACKAGE_URL" "$TEMP_DEB"; then
+  error "Failed to download package  from: $PACKAGE_URL"
+  exit 1
+fi
+success "Package downloaded successfully from: $PACKAGE_URL"
+
+# step "Installing chezmoi apt package..."
+if {{ $sudo }} apt install -qq -y "$TEMP_DEB" > /dev/null 2>&1; then
+  success "Chezmoi apt package installed"
+else
+  error "Failed to install package"
+  exit 1
+fi
+
+# Remove chezmoi binary
+step "Cleaning up binary installation..."
+if [[ -f "$HOME/.local/bin/chezmoi" ]]; then
+  rm -f "$HOME/.local/bin/chezmoi"
+  success "Chezmoi binary file removed"
+else
+  info "No binary file found in $HOME/.local/bin (skipped)"
+fi
+
+# Remove install.sh script
+step "Removing install.sh script..."
+if [[ -f "$HOME/install.sh" ]]; then
+  rm -f "$HOME/install.sh"
+  success "install.sh file removed"
+else
+  info "No install.sh file found (skipped)"
+fi
+
+echo ""
+success "Replacing Binary with Package completed! 🎉"
+echo ""
+
+{{ end -}}

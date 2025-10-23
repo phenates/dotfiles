@@ -1,0 +1,21 @@
+install.sh
+README.md
+
+!.oh-my-zsh/plugins
+!.oh-my-zsh/plugins/**
+.oh-my-zsh/cache/**
+.oh-my-zsh/templates/**
+.oh-my-zsh/custom/themes/powerlevel10k/**/*.zwc
+
+{{ if not .private }}
+.ssh
+.ssh/**
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+
+{{ end }}

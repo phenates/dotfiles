@@ -1,0 +1,21 @@
+# Aliases
+
+alias zshconfig="chezmoi edit ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+alias ls="eza --icons=auto"
+alias l="eza --all --long --header --icons=auto"
+alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
+alias lll="eza --all --long --header --tree --color=always --icons=auto"
+
+alias ..='cd ..'
+
+alias sys='systemctl'
+
+alias upgrade="sudo apt update && sudo apt upgrade"
+
+{{ if .is_WSL -}}
+# WSL aliases
+# WSl not access to the windows agent ssh, here command run the windows exectable
+alias ssh-add="ssh-add.exe"
+{{- end }}

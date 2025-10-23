@@ -1,0 +1,65 @@
+{{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
+{{/* Use template or trigger prompts to populate values. */}}
+
+{{- /* Default values */ -}}
+{{- $private  := false -}} {{/* true if this machine should have private secrets */}}
+{{- $work := false -}}{{/* true if this machine is a work machine */}}
+{{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
+{{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
+{{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
+{{- $debug_hooks := true -}}{{/* Add debug print for hook */}}
+
+
+{{- /* OS infos */ -}}
+{{- $OS_ID := .chezmoi.os -}}
+{{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
+{{-   $OS_ID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+{{- $is_WSL := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
+{{-     $is_WSL = true -}}
+{{-   end -}}
+{{- end -}}
+
+
+{{- /* Prompts */ -}}
+{{-   writeToStdout (printf "\n⮞  chezmoi configuration\n") -}}
+{{-   writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
+{{-   $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (y/n)" false -}}
+{{-   writeToStdout (printf "  ➜ Private installation '%s | quote' \n" $private ) -}}
+{{-   $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" true -}}
+{{-   $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" true -}}
+
+{{- /* Hook commands */ -}}
+{{- if $private -}}
+hooks:
+  read-source-state:
+    pre:
+      script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
+{{ "\n" }}{{- /* Add line after the directives */ -}}
+{{- end -}}
+
+{{- /* Data */ -}}
+data:
+  name: "phenates"
+  email: "phen4tes@gmail.com"
+  OS_id: {{ $OS_ID | quote }}
+  is_WSL: {{ $is_WSL }}
+  signingKey: ""
+  chezmoi_package: "https://github.com/twpayne/chezmoi/releases/download/v{{ .chezmoi.version.version }}/chezmoi_{{ .chezmoi.version.version }}_linux_amd64.deb"
+  private: {{ $private  }}
+  installZSH: {{ $installZSH }}
+  changeShell: {{ $changeShell }}
+
+edit:
+  command: "nano"
+
+bitwarden:
+  unlock: "auto"
+
+git:
+  autoCommit: true
+  autoPush: true
+

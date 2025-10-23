@@ -1,0 +1,77 @@
+{{ if .installZSH }}
+
+".oh-my-zsh":
+    type: "archive"
+    url: "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.*",
+        "*/templates",
+        "*/themes",
+    ]
+
+".oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
+    type: "archive"
+    url: "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.editorconfig",
+        "*/.gitattributes",
+        "*/.github",
+        "*/.gitignore",
+    ]
+
+".oh-my-zsh/custom/themes/powerlevel10k":
+    type: "archive"
+    url: "https://github.com/romkatv/powerlevel10k/archive/{{ (gitHubLatestRelease "romkatv/powerlevel10k").TagName }}.tar.gz"
+    exact: true
+    stripComponents: 1
+
+{{- $fontDir := "" }}
+{{- if eq .chezmoi.os "darwin" }}
+{{-   $fontDir = "Library/Fonts" }}
+{{- else if eq .chezmoi.os "linux" }}
+{{-   $fontDir = ".local/share/fonts" }}
+{{- end }}
+"{{ $fontDir }}":
+    type: "archive"
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
+    exact: true
+    refreshPeriod: "168h"
+    include: ["MesloLGSNerdFont-*"]
+
+{{ end }}
+
+{{ if .private }}
+
+".local/bin/shell-script":
+    type: "archive"
+    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.gitignore",
+        "*/README.md"
+    ]
+
+{{ end }}
+
+".local/bin":
+    type: "archive"
+    url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
+    exact: true
+    stripComponents: 1
+    exclude: [
+        "*/.github",
+        "*/.travis.yml",
+        "*/CONTRIBUTING.md",
+        "*/LICENSE.md",
+        "*/Makefile",
+        "*/README.md",
+        "*/neofetch.1"
+    ]
