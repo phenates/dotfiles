@@ -25,7 +25,6 @@
 
 
 {{- /* Prompts */ -}}
-{{- Color_Bleu := "\033[1;35m" -}}
 {{- writeToStdout (printf "\n⮞  chezmoi configuration\n") -}}
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
 {{- $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (y/n)" false -}}
