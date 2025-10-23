@@ -1,0 +1,25 @@
+# Shell functions sourced by `~/.bashrc` and `~/.zshrc`.
+
+# Sysadmin
+# -----------------------------------------------------------------------------
+
+# upup: Keeps all packages up to date.
+function upup() {
+    if ! [[ "$OSTYPE" =~ ^darwin ]]; then
+        if command -v apt &> /dev/null; then
+            echo 'Updating packages with apt...'
+            apt update          # update list of available packages
+            apt full-upgrade    # upgrade the system by removing/installing/upgrading packages
+            apt autoremove      # remove unnecessary/unused packages
+            apt clean
+            apt autoclean
+        fi
+
+        if command -v apt-get &> /dev/null; then
+            echo 'Updating packages with apt-get...'
+            apt-get update
+            apt-get upgrade
+            apt-get dist-upgrade
+        fi
+    fi
+}

@@ -111,8 +111,16 @@ fi
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-if [ -f $HOME/.sh_aliases ]; then
-    . $HOME/.sh_aliases
+# ls='ls --color=auto'
+
+# Load alias definitions from separate configuration file.
+if [ -f "$HOME"/.sh_aliases ]; then
+    . "$HOME"/.sh_aliases
+fi
+
+# Load functions declarations from separate configuration file.
+if [ -f "$HOME"/.sh_functions ]; then
+    . "$HOME"/.sh_functions
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

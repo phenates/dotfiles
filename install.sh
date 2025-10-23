@@ -13,8 +13,7 @@
 set -eu # StrictMode, e:exit on non-zero status code; u:prevent undefined variable
 
 ## Variables:
-SCRIPT_NAME=$(basename "$0")
-CMD_OPTION="-- init --apply phenates"
+GITHUB_USERNAME="phenates"
 
 ## Log (enhanced with colors and symbols):
 header() {
@@ -90,14 +89,14 @@ NEXT_CMD=$(whiptail \
   3>&1 1>&2 2>&3)
 
 if [ "$NEXT_CMD" = "1" ]; then
-  info "Running: chezmoi init phenates"
-  $chezmoi init phenates
+  info "Running: chezmoi init $GITHUB_USERNAME"
+  $chezmoi init "$GITHUB_USERNAME"
 elif [ "$NEXT_CMD" = "2" ]; then
-  info "Running: chezmoi init --apply phenates"
-  $chezmoi init --apply phenates
+  info "Running: chezmoi init --apply $GITHUB_USERNAME"
+  $chezmoi init --apply "$GITHUB_USERNAME"
 elif [ "$NEXT_CMD" = "3" ]; then
-  info "Running: chezmoi init --apply phenates"
-  $chezmoi init --apply phenates --one-shot
+  info "Running: chezmoi init --apply $GITHUB_USERNAME"
+  $chezmoi init --apply "$GITHUB_USERNAME" --one-shot
 else
   info "Quit selected, exiting."
   exit 0

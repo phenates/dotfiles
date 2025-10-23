@@ -7,7 +7,7 @@
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
-{{- $debug_hooks := true -}}{{/* Add debug print for hook */}}
+{{- $debug_hooks := false -}}{{/* Add debug print for hook */}}
 
 
 {{- /* OS infos */ -}}
@@ -25,21 +25,21 @@
 
 
 {{- /* Prompts */ -}}
-{{-   writeToStdout (printf "\n⮞  chezmoi configuration\n") -}}
-{{-   writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
-{{-   $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (y/n)" false -}}
-{{-   writeToStdout (printf "  ➜ Private installation '%s | quote' \n" $private ) -}}
-{{-   $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" true -}}
-{{-   $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" true -}}
+{{- Color_Bleu := "\033[1;35m" -}}
+{{- writeToStdout (printf "\n⮞  chezmoi configuration\n") -}}
+{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
+{{- $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (y/n)" false -}}
+{{- writeToStdout (printf "  ➜ Private installation '%s | quote' \n" $private ) -}}
+{{/* {{- $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" true -}} */}}
+{{/* {{- $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" true -}} */}}
 
 {{- /* Hook commands */ -}}
-{{- if $private -}}
+{{ if $private }}
 hooks:
   read-source-state:
     pre:
       script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
-{{ "\n" }}{{- /* Add line after the directives */ -}}
-{{- end -}}
+{{ end }}
 
 {{- /* Data */ -}}
 data:
