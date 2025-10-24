@@ -6,24 +6,27 @@
 # upup: Keeps all packages up to date.
 function upup() {
     if ! [[ "$OSTYPE" =~ ^darwin ]]; then
-        SUDO=""
-        if [[ $EUID -ne 0]]; then
-            $SUDO="sudo "
+        if [[ "$EUID" -ne 0 ]]; then
+            if command -v apt &> /dev/null; then
+                echo '\n-> Updating packages with apt...'
+                sudo apt update          # update list of available packages
+                echo '\n-> Full-upgrade packages with apt...'
+                sudo apt full-upgrade    # upgrade the system by removing/installing/upgrading packages
+                echo '\n-> Autoremove packages with apt...'
+                sudo apt autoremove      # remove unnecessary/unused packages
+                echo '\n-> Clean packages with apt...'
+                sudo apt clean
+                echo '\n-> Autoclean packages with apt...'
+                sudo apt autoclean
+            elif command -v apt-get &> /dev/null; then
+                echo '\n-> Updating packages with apt-get...'
+                sudo apt-get update
+                echo '\n-> Upgrading packages with apt-get...'
+                sudo apt-get upgrade
+                echo '\n-> Dist-upgrading packages with apt-get...'
+                sudo apt-get dist-upgrade
+            fi
         fi
-        if command -v apt &> /dev/null; then
-            echo 'Updating packages with apt...'
-            "$SUDO"apt update          # update list of available packages
-            "$SUDO"apt full-upgrade    # upgrade the system by removing/installing/upgrading packages
-            "$SUDO"apt autoremove      # remove unnecessary/unused packages
-            "$SUDO"apt clean
-            "$SUDO"apt autoclean
-        fi
-
-        if command -v apt-get &> /dev/null; then
-            echo 'Updating packages with apt-get...'
-            "$SUDO"apt-get update
-            "$SUDO"apt-get upgrade
-            "$SUDO"apt-get dist-upgrade
-        fi
+        
     fi
 }
