@@ -2,14 +2,14 @@
 
 #==============================================================================
 #description  :Utility fonctions for chezmoi scripts
-#usage		    :Source this files in scripts: source "{{ .chezmoi.sourceDir -}}/scripts/utils.sh"
+#usage		    :Source this files in scripts: source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 #version      :0.1
 #date         :2025-10-24
 #==============================================================================
 
 ## Log (enhanced with colors and symbols)
 header() {
-  echo -e "\033[1;35m⮞⮞⮞⮞  $*\033[0m"
+  echo -e "\033[1;35m⮞  $*\033[0m"
   echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 }
 
