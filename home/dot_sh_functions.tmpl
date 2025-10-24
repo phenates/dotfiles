@@ -6,20 +6,24 @@
 # upup: Keeps all packages up to date.
 function upup() {
     if ! [[ "$OSTYPE" =~ ^darwin ]]; then
+        SUDO=""
+        if [[ $EUID -ne 0]]; then
+            $SUDO="sudo "
+        fi
         if command -v apt &> /dev/null; then
             echo 'Updating packages with apt...'
-            apt update          # update list of available packages
-            apt full-upgrade    # upgrade the system by removing/installing/upgrading packages
-            apt autoremove      # remove unnecessary/unused packages
-            apt clean
-            apt autoclean
+            "$SUDO"apt update          # update list of available packages
+            "$SUDO"apt full-upgrade    # upgrade the system by removing/installing/upgrading packages
+            "$SUDO"apt autoremove      # remove unnecessary/unused packages
+            "$SUDO"apt clean
+            "$SUDO"apt autoclean
         fi
 
         if command -v apt-get &> /dev/null; then
             echo 'Updating packages with apt-get...'
-            apt-get update
-            apt-get upgrade
-            apt-get dist-upgrade
+            "$SUDO"apt-get update
+            "$SUDO"apt-get upgrade
+            "$SUDO"apt-get dist-upgrade
         fi
     fi
 }
