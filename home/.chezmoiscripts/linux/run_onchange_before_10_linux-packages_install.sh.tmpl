@@ -36,6 +36,8 @@ LINUX_PACKAGES=(
   guake
 )
 
+# recuperation sous .chezmoidata.yaml: {{ .pac | sortAlpha | uniq | join " " }}
+
 ## Log (enhanced with colors and symbols):
 header() {
   echo -e "\n\033[1;35m⮞ $*\033[0m"
