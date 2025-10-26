@@ -2,23 +2,17 @@
 #!/bin/bash
 
 #==============================================================================
-#description  :chezmoi bash script (with template), running before `chezmoi apply`
-#              to install packages on debian, ubuntu, raspian linux dtistribution.
-#              This script checks if a package is already installed before attempting installation.
-#author		    :phenates
-#date         :2025-10-14
-#version      :0.2
+#description  :chezmoi bash script, running before `chezmoi apply`.
+#              Install packages on linux dtistribution, and checks if a package
+#              is already installed before attempting installation.
+#version      :0.4
+#date         :2025-10-25
 #==============================================================================
-
-set -e # -e: script exit on error
 
 # Source utility functions
 source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 
-{{ $sudo := "sudo " -}}
-{{ if eq .chezmoi.username "root" -}}
-{{   $sudo = "" -}}
-{{ end -}}
+set -e # -e: script exit on error
 
 ## Variables:
 SCRIPT_NAME=$(basename "$0")
@@ -38,6 +32,11 @@ LINUX_PACKAGES=(
 )
 
 # recuperation sous .chezmoidata.yaml: {{/* .pac | sortAlpha | uniq | join " " */}}
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
 
 ## Main
 header "chezmoi: Linux packages installation"

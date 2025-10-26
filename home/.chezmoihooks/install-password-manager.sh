@@ -9,10 +9,12 @@
 #              chezmoi executes this hook every time any command reads the source
 #              state so the hook should terminate as quickly as possible if there
 #              is no work to do.
-#author    	:phenates
-#date         :2025-10-20
-#version      :0.2
+#version      :0.3
+#date         :2025-10-25
 #==============================================================================
+
+# Source utility functions
+# source "../.scripts/utils.sh"
 
 set -e # -e: script exit on error
 
