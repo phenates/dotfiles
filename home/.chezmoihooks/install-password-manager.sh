@@ -14,7 +14,7 @@
 #==============================================================================
 
 # Source utility functions
-source "../.scripts/utils.sh"
+source "£HOME/.local/share/chezmoi/home/.scripts/utils.sh"
 
 set -e # -e: script exit on error
 
