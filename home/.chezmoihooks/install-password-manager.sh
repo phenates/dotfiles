@@ -14,7 +14,7 @@
 #==============================================================================
 
 # Source utility functions
-# source "../.scripts/utils.sh"
+source "../.scripts/utils.sh"
 
 set -e # -e: script exit on error
 
@@ -44,7 +44,7 @@ step() { echo -e "\n\033[1;34m  ➜  $* \033[0m"; }
 
 
 # exit immediately if password-manager-binary is already in $PATH
-type $INSTALL_DIR/bw >/dev/null 2>&1 && exit
+command -v "$INSTALL_DIR/bw" >/dev/null 2>&1 && exit
 
 ## Main
 header "chezmoi: Private mode selected \n \
