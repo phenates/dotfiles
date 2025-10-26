@@ -14,7 +14,7 @@
 #==============================================================================
 
 # Source utility functions
-source "£HOME/.local/share/chezmoi/home/.scripts/utils.sh"
+source "$HOME/.local/share/chezmoi/home/.scripts/utils.sh"
 
 set -e # -e: script exit on error
 
@@ -27,20 +27,20 @@ TEMP_DIR="/tmp/bitwarden_install"
 BITWARDEN_BINARY_PATH="$INSTALL_DIR/$BITWARDEN_BINARY_NAME"
 
 ## Log (enhanced with colors and symbols):
-header() {
-  echo -e "\n\033[1;35m⮞ $*\033[0m"
-  echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-}
+# header() {
+#   echo -e "\n\033[1;35m⮞ $*\033[0m"
+#   echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+# }
 
-info() { echo -e "\033[1;36m  ℹ️  $* \033[0m"; }
+# info() { echo -e "\033[1;36m  ℹ️  $* \033[0m"; }
 
-success() { echo -e "\033[1;32m  ✅  $* \033[0m"; }
+# success() { echo -e "\033[1;32m  ✅  $* \033[0m"; }
 
-warning() { echo -e "\033[1;33m  ⚠️  WARNING: $* \033[0m"; }
+# warning() { echo -e "\033[1;33m  ⚠️  WARNING: $* \033[0m"; }
 
-error() { echo -e "\033[1;31m  ❌  ERROR: $* \033[0m" >&2; }
+# error() { echo -e "\033[1;31m  ❌  ERROR: $* \033[0m" >&2; }
 
-step() { echo -e "\n\033[1;34m  ➜  $* \033[0m"; }
+# step() { echo -e "\n\033[1;34m  ➜  $* \033[0m"; }
 
 
 # exit immediately if password-manager-binary is already in $PATH
