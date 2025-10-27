@@ -59,7 +59,6 @@ case "$(uname -s)" in
       fi
       
       # Verify SHA256 checksum
-      local DOWNLOADED_SHA256
       DOWNLOADED_SHA256=$(sha256sum "$TEMP_DIR/$BIT_BIN_CMD.zip" | cut -d' ' -f1)
       if [ "$DOWNLOADED_SHA256" != "$BIT_BIN_SHA256" ]; then
         error "Checksum verification failed!"
