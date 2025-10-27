@@ -66,15 +66,15 @@ case "$(uname -s)" in
         error "Got: $DOWNLOADED_SHA256"
         exit 1
       fi
-      success "Binary file downloaded and verified successfully from: \
+      success "Binary file downloaded and verified successfully from:_n \
       $BIT_BIN_URL"
 
       ## Unzip password manager binary
       if ! sudo unzip -qq -d "$INSTALL_DIR" "$TEMP_DIR/$BIT_BIN_CMD.zip" ; then
-        error "Failed to unzip binary package to: \n $INSTALL_DIR"
+        error "Failed to unzip binary package to: $INSTALL_DIR"
         exit 1
       fi
-      success "Package unzipped successfully to: \n $INSTALL_DIR"
+      success "Package unzipped successfully to: $INSTALL_DIR"
 
       # Set secure permissions (only root and owner can access)
       if ! sudo chown root:root "$BIT_BIN_PATH" || \
@@ -123,11 +123,11 @@ case "$(uname -s)" in
         fi
       fi
       info "Using server URL: $URL"
-      if ! "$BIT_BIN_PATH" config server "$URL" 1> /dev/null ; then
+      if ! "$BIT_BIN_PATH" config server "$URL" >/dev/null 2>&1 ; then
         error "Failed to set server URL"
         exit 1
       fi
-      success "Server URL set successfully"
+      success "Server URL set successfully to: ~/.config/Bitwarden CLI/data.json"
 
       ## Login to Bitwarden account
       step "Login to your Bitwarden account"
@@ -169,16 +169,10 @@ case "$(uname -s)" in
       
       # Clear sensitive variables
       unset SESSION_KEY EMAIL PASS
-      
 
-      # SESSION_KEY=$(bw login --raw "$EMAIL" "$PASSWORD") # si justifiable
-      # export BW_SESSION="$SESSION_KEY"
-
-      # SESSION_KEY=$(echo "$SESSION_KEY" | \
-      #               awk -F' BW_SESSION="' '{print $2}' | \
-      #               awk -F'"' '{print $1}' | \
-      #               xargs) # trim whitespace
-      # info "BW_SESSION session key: $SESSION_KEY"
+      echo ""
+      success "Bitwarden CLI installation & configuration completed! 🎉"
+      echo ""
       ;;
   *)
       echo "unsupported OS"
