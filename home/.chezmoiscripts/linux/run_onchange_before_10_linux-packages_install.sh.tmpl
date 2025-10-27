@@ -41,6 +41,13 @@ LINUX_PACKAGES=(
 ## Main
 header "chezmoi: Linux packages installation"
 
+## Check requiered package
+step "Tools validation..."
+if ! require_tools apt; then
+  exit 1
+fi
+success "Requiered tools available"
+
 # Update package list
 step "Updating package list..."
 if {{ $sudo }} apt update -qq 2>/dev/null; then

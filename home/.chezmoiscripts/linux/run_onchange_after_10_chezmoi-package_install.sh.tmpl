@@ -15,8 +15,9 @@ source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 set -e # -e: exit on error
 
 ## Variables:
-PACKAGE_URL={{ .chezmoi_package }}
-TEMP_DEB="/tmp/chezmoi_package.deb"
+# PACKAGE_URL={{ .chezmoi_package }}
+PACKAGE_URL={{ gitHubLatestReleaseAssetURL "twpayne/chezmoi" (printf "chezmoi_%s_%s_%s.deb" .chezmoi.version.version .chezmoi.os .chezmoi.arch) }}
+TEMP_DIR=$(mktemp -d -t chezmoi-bin.XXXX)
 
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -24,53 +25,32 @@ TEMP_DEB="/tmp/chezmoi_package.deb"
 {{ end -}}
 
 ## Cleanup on exit
-trap 'rm -f "$TEMP_DEB"' EXIT
-
-## Helper function: download file
-download_file() {
-  local url="$1"
-  local output="$2"
-  
-  if command -v wget &>/dev/null; then
-    wget -q -O "$output" "$url"
-  elif command -v curl &>/dev/null; then
-    curl -fsSL -o "$output" "$url"
-  else
-    return 1
-  fi
-}
+trap 'rm -f "$TEMP_DIR"' EXIT
 
 ## Main
 header "chezmoi: Replace chezmoi binary file by the package .deb"
 
-# Validation: Check PACKAGE_URL
-if [[ -z "$PACKAGE_URL" ]]; then
-  error "PACKAGE_URL is not defined"
+## Check requiered package
+step "Tools validation..."
+if ! require_tools wget apt; then
   exit 1
 fi
+success "Requiered tools available"
 
-# Validation: Check download tool availability
-if ! command -v wget &>/dev/null && ! command -v curl &>/dev/null; then
-  error "Neither wget nor curl is installed"
-  error "Please install one of them: sudo apt install wget"
+## Install chezmoi package
+step "Downloading chezmoi .deb ..."
+if ! wget -q -O "$TEMP_DIR" "$PACKAGE_URL" ; then
+  error "Failed to download .deb from: $PACKAGE_URL"
   exit 1
 fi
+success ".deb downloaded successfully from:\n $PACKAGE_URL"
 
-# Install chezmoi package
-# step "Downloading chezmoi .deb from: $PACKAGE_URL"
-if ! download_file "$PACKAGE_URL" "$TEMP_DEB"; then
-  error "Failed to download package  from: $PACKAGE_URL"
-  exit 1
-fi
-success "Package downloaded successfully from: $PACKAGE_URL"
-
-# step "Installing chezmoi apt package..."
-if {{ $sudo }} apt install -qq -y "$TEMP_DEB" > /dev/null 2>&1; then
-  success "Chezmoi apt package installed"
-else
+step "Installing .deb with apt..."
+if ! {{ $sudo }} apt install -qq -y "$TEMP_DIR" > /dev/null 2>&1; then
   error "Failed to install package"
   exit 1
 fi
+success "Chezmoi package installed"
 
 # Remove chezmoi binary
 step "Cleaning up binary installation..."
@@ -91,7 +71,7 @@ else
 fi
 
 echo ""
-success "Replacing Binary with Package completed! 🎉"
+success "Replacing Binary with apt package completed! 🎉"
 echo ""
 
 {{ end -}}
