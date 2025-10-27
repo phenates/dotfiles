@@ -149,26 +149,17 @@ case "$(uname -s)" in
         --passwordbox "Enter your master password:" \
         10 50 3>&1 1>&2 2>&3 )
 
-      # Clear password from memory as soon as possible
-      SESSION_KEY=$("$BIT_BIN_PATH" login --raw "$EMAIL" "$PASS") || {
+      # Login & clear password from memory as soon as possible
+      if ! "$BIT_BIN_PATH" login --raw "$EMAIL" "$PASS"; then
         PASS=""  # Clear password
         error "Failed to login to Bitwarden"
         exit 1
-      }
+      fi
       PASS=""  # Clear password
       success "Logged into Bitwarden successfully"
       
-      # Export session key securely
-      if ! SESSION_KEY=$(echo "$SESSION_KEY" | tr -d '[:space:]') || \
-         ! export BW_SESSION="$SESSION_KEY"; then
-        SESSION_KEY=""  # Clear session key
-        error "Failed to export BW_SESSION key"
-        exit 1
-      fi
-      success "BW_SESSION key successfully exported"
-      
       # Clear sensitive variables
-      unset SESSION_KEY EMAIL PASS
+      unset URL EMAIL PASS
 
       echo ""
       success "Bitwarden CLI installation & configuration completed! 🎉"
