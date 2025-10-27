@@ -25,7 +25,7 @@ set -e # -e: script exit on error
 # PASSWORD_MANAGER_NAME="Bitwarden CLI"
 BIT_BIN_CMD="bw"
 BIT_BIN_URL="https://github.com/bitwarden/clients/releases/download/cli-v2025.10.0/bw-linux-2025.10.0.zip"
-INSTALL_DIR="$HOME/.local/bin"
+INSTALL_DIR="/usr/local/bin"
 TEMP_DIR=$(mktemp -d)
 BIT_BIN_PATH="$INSTALL_DIR/$BIT_BIN_CMD"
 
