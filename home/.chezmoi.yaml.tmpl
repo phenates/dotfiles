@@ -12,6 +12,17 @@
 {{- $debug_hooks := false -}}{{/* Add debug print for hook */}}
 
 
+{{- /* Prompts */ -}}
+{{- writeToStdout (bash $HOME/.local/share/chezmoi/home/.script/utils.sh "chezmoi configuration\n") -}}
+{{- writeToStdout (printf "\n⮞  chezmoi':' host configuration\n") -}}
+{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
+{{- $private  := promptBool"  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (yes/no)" -}}
+{{- writeToStdout (printf "    ➜ Answer '%s' \n" $private ) -}}
+{{- $tag_choices := list "homelab" "dev" "personal" "work" -}}
+{{- $tags := promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "dev") -}}
+{{- writeToStdout (printf "    ➜ Answer '%s' \n" $tags ) -}}
+
+
 {{- /* OS infos */ -}}
 {{- $OS_ID := .chezmoi.os -}}
 {{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
@@ -26,14 +37,6 @@
 {{- end -}}
 
 
-{{- /* Prompts */ -}}
-{{- writeToStdout (printf "\n⮞  chezmoi configuration\n") -}}
-{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
-{{- $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (y/n)" false -}}
-{{- writeToStdout (printf "  ➜ Private installation '%s | quote' \n" $private ) -}}
-{{/* {{- $installZSH := promptBool "  ?  Install zsh shell ? (y/n)" true -}} */}}
-{{/* {{- $changeShell := promptBool "  ?  Change default shell to zsh ? (y/n)" true -}} */}}
-
 {{- /* Hook commands */ -}}
 {{ if $private }}
 hooks:
@@ -42,6 +45,7 @@ hooks:
       script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
 {{ end }}
 
+
 {{- /* Data */ -}}
 data:
   name: "phenates"
@@ -49,10 +53,10 @@ data:
   OS_id: {{ $OS_ID | quote }}
   is_WSL: {{ $is_WSL }}
   signingKey: ""
-  chezmoi_package: "https://github.com/twpayne/chezmoi/releases/download/v{{ .chezmoi.version.version }}/chezmoi_{{ .chezmoi.version.version }}_linux_amd64.deb"
   private: {{ $private  }}
   installZSH: {{ $installZSH }}
   changeShell: {{ $changeShell }}
+  tags: {{ $tags | toToml }}
 
 edit:
   command: "nano"
