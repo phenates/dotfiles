@@ -28,7 +28,7 @@ umask 077 # Set strict permissions for new files
 # PASSWORD_MANAGER_NAME="Bitwarden CLI"
 BIT_BIN_CMD="bw"
 BIT_BIN_URL="https://github.com/bitwarden/clients/releases/download/cli-v2025.10.0/bw-linux-2025.10.0.zip"
-BIT_BIN_SHA256="sha256:0544c64d3e9932bb5f2a70e819695ea78186a44ac87a0b1d753e9c55217041d9"  # À remplacer par le vrai SHA256
+BIT_BIN_SHA256="0544c64d3e9932bb5f2a70e819695ea78186a44ac87a0b1d753e9c55217041d9"  # À remplacer par le vrai SHA256
 INSTALL_DIR="/usr/local/bin"
 TEMP_DIR=$(mktemp -d -t bwinstall.XXXX)
 BIT_BIN_PATH="$INSTALL_DIR/$BIT_BIN_CMD"
