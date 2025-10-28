@@ -11,7 +11,7 @@ README.md
 .ssh
 .ssh/**
 {{ else }}
-{{  if not (has "id_homelab".sshKeys) }}
+{{  if not .sshKeys[id_homelab] }}
 .ssh/id_homelab
 {{  end }}
 {{ end }}
