@@ -38,11 +38,9 @@
 
 {{- /* Hook commands */ -}}
 {{ if $private }}
-hooks:
-  read-source-state:
-    pre:
-      script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
+hooks.read-source-state.pre.script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
 {{ end }}
+hooks.init.pre.script: /home/test/.local/share/chezmoi/home/.chezmoihooks/hook-init-pre_header.sh
 
 
 {{- /* Data */ -}}
