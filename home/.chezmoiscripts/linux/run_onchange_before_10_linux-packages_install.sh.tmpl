@@ -30,6 +30,7 @@ LINUX_PACKAGES=(
   zsh
   guake
 )
+LINUX_PACKAGES_2=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
 
 # recuperation sous .chezmoidata.yaml: {{/* .pac | sortAlpha | uniq | join " " */}}
 
@@ -59,8 +60,8 @@ fi
 
 # Install packages if not already installed
 step "Installing package..."
-for package in "${LINUX_PACKAGES[@]}"; do
-  # step "$package: checking and installing package..."
+for package in "${LINUX_PACKAGES_2[@]}"; do
+  step "$package: checking and installing package..."
   if dpkg -l | grep -q "^ii  $package "; then
     info "$package already installed"
   else
