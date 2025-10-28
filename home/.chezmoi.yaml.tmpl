@@ -70,7 +70,9 @@ data:
   installZSH: {{ $installZSH }}
   changeShell: {{ $changeShell }}
   tags: {{ $tags | toToml }}
+{{- if $private -}}
   sshKeys: {{ $sshKeys | toToml }}
+{{- end -}}
 
 edit:
   command: "nano"
