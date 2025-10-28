@@ -10,7 +10,7 @@
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
 {{- $debug_hooks := false -}}{{/* Add debug print for hook */}}
-{{-   $sshKeys := [] -}}
+{{-   $sshKeys := "" -}}
 
 
 {{- /* Prompts */ -}}
