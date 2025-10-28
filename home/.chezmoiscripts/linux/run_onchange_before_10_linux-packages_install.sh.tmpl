@@ -65,7 +65,7 @@ case "{{ .chezmoi.osRelease.id }}" in
           success "$package installed"
         else
           error "Failed to install $package"
-          exit 1
+          # exit 1
         fi
       fi
     done
