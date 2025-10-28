@@ -66,7 +66,7 @@ if [ ! "$(command -v chezmoi)" ]; then
     success "chezmoi installed"
   else
     error "Neither wget nor curl is installed"
-    error "Please install one of them: sudo apt install wget"
+    error "Please install one of them: sudo apt install curl wget"
     exit 1
   fi
 else
