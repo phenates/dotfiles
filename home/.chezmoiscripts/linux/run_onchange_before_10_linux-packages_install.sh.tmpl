@@ -25,6 +25,8 @@ LINUX_PACKAGES=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
 ## Main
 header "chezmoi -> Linux packages installation"
 
+echo "packages: $LINUX_PACKAGES"
+
 case "{{ .chezmoi.osRelease.id }}" in
   debian)
     ## Check requiered package
@@ -64,7 +66,7 @@ case "{{ .chezmoi.osRelease.id }}" in
   *)
     warning "Unsuported distribution"
   ;;
-  
+
 esac
 
 echo ""
