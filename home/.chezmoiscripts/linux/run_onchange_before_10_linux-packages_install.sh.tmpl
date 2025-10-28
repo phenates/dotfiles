@@ -15,7 +15,13 @@ source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 set -e # -e: script exit on error
 
 ## Variables:
-LINUX_PACKAGES=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
+LINUX_PACKAGES=(
+{{- if .packages.linux.core.apt }}
+{{- range .packages.linux.core.apt }}
+  "{{ . }}"
+{{- end }}
+{{- end }}
+)
 
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -47,7 +53,7 @@ case "{{ .chezmoi.osRelease.id }}" in
 
     # Install packages if not already installed
     step "Installing apt package..."
-    for package in "${LINUX_PACKAGES_2[@]}"; do
+    for package in "${LINUX_PACKAGES[@]}"; do
       step "$package: checking and installing..."
       if dpkg -l | grep -q "^ii  $package "; then
         info "$package already installed"
