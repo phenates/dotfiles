@@ -1,5 +1,9 @@
 {
   "files.associations": {
-    // "*.tmpl": "go-template"
+    "install.sh": "shellscript",
+    "*.yaml.tmpl": "helm",
+    ".chezmoi*.yaml": "helm",
+    ".chezmoiignore": "helm",
+    ".chezmoiremove": "helm"
   }
 }

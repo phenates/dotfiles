@@ -1,6 +1,6 @@
 # Neofetch command-line system information
 if [ -f $HOME/.local/bin/neofetch ]; then
-    $HOME/.local/bin/neofetch/neofetch
+    $HOME/.local/bin/neofetch
 fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -115,13 +115,16 @@ fi
 
 # Load alias definitions from separate configuration file.
 if [ -f "$HOME"/.sh_aliases ]; then
+    # shellcheck source=/dev/null
     . "$HOME"/.sh_aliases
 fi
 
 # Load functions declarations from separate configuration file.
 if [ -f "$HOME"/.sh_functions ]; then
+    # shellcheck source=/dev/null
     . "$HOME"/.sh_functions
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# shellcheck source=/dev/null
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

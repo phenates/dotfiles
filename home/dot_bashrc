@@ -97,8 +97,16 @@ fi
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
-if [ -f $HOME/.sh_aliases ]; then
-    . $HOME/.sh_aliases
+# Load alias definitions from separate configuration file.
+if [ -f "$HOME"/.sh_aliases ]; then
+    # shellcheck source=/dev/null
+    . "$HOME"/.sh_aliases
+fi
+
+# Load functions declarations from separate configuration file.
+if [ -f "$HOME"/.sh_functions ]; then
+    # shellcheck source=/dev/null
+    . "$HOME"/.sh_functions
 fi
 
 # enable programmable completion features (you don't need to enable
