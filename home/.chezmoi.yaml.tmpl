@@ -13,10 +13,9 @@
 
 
 {{- /* Prompts */ -}}
-{{- writeToStdout (bash $HOME/.local/share/chezmoi/home/.script/utils.sh "chezmoi configuration\n") -}}
 {{- writeToStdout (printf "\n⮞  chezmoi':' host configuration\n") -}}
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
-{{- $private  := promptBool"  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (yes/no)" -}}
+{{- $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (yes/no)" -}}
 {{- writeToStdout (printf "    ➜ Answer '%s' \n" $private ) -}}
 {{- $tag_choices := list "homelab" "dev" "personal" "work" -}}
 {{- $tags := promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "dev") -}}
