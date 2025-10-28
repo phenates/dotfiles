@@ -10,7 +10,7 @@ README.md
 {{ if not .private }}
 .ssh
 .ssh/**
-{{  if not has "id_homelab".sshKeys }}
+{{  if not (has "id_homelab".sshKeys) }}
 .ssh/id_homelab
 {{  end }}
 {{ end }}
