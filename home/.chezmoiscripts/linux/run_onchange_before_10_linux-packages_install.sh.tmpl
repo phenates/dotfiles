@@ -15,9 +15,11 @@ source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 set -e # -e: script exit on error
 
 ## Variables:
+# LINUX_PACKAGES=( {{/* .packages.linux.core.apt | sortAlpha | uniq | join " " */}} )
+
 LINUX_PACKAGES=(
 {{- if .packages.linux.core.apt }}
-{{- range .packages.linux.core.apt }}
+{{- range .packages.linux.core.apt | sortAlpha | uniq }}
   "{{ . }}"
 {{- end }}
 {{- end }}
