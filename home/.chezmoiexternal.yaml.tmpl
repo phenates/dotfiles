@@ -82,13 +82,16 @@
         "*/neofetch.1"
     ]
 
-".local/bin":
-    type: "archive"
+".local/bin/yazi":  
+    type: "archive-file"
     url: "https://github.com/sxyazi/yazi/releases/download/v25.5.31/yazi-x86_64-unknown-linux-gnu.zip"
-    exact: true
+    executable: true
     stripComponents: 1
-    exclude: [
-        "*/completions",
-        "*/LICENSE",
-        "*/README.md"
-    ]
+    exclude: "yazi"
+
+".local/bin/ya":  
+    type: "archive-file"
+    url: "https://github.com/sxyazi/yazi/releases/download/v25.5.31/yazi-x86_64-unknown-linux-gnu.zip"
+    executable: true
+    stripComponents: 1
+    exclude: "ya"
