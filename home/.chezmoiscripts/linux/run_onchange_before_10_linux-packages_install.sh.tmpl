@@ -25,7 +25,7 @@ LINUX_PACKAGES=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
 ## Main
 header "chezmoi -> Linux packages installation"
 
-case {{ .chezmoi.osRelease.id }} in
+case "{{ .chezmoi.osRelease.id }}" in
   debian)
     ## Check requiered package
     step "Tools validation..."
