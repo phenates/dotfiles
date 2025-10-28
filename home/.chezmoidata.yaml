@@ -3,24 +3,25 @@ packages:
     # Core packages (always installed)
     core:
       apt:
-      - 'curl'
-      - 'wget'
-      - 'git'
-      - 'unzip'
-      - 'man-db'
-      - 'eza'
-      - 'jq'
-      - 'tree'
-      - 'openssh-client'
-      - 'fontconfig'
-      - 'zsh'
-      - 'ffmpeg'
-      - '7zip'
-      - 'poppler-utils'
-      - 'fd-find'
-      - 'ripgrep'
-      - 'fzf'
-      - 'zoxide'
-      - 'xclip'
-      - 'wl-clipboard'
-      - 'xsel'
+        - "curl"
+        - "wget"
+        - "git"
+        - "unzip"
+        - "man-db"
+        - "eza"
+        - "jq" # yazi dependencie
+        - "tree"
+        - "openssh-client"
+        - "fontconfig"
+        - "zsh"
+        - "file" # yazi dependencie
+        # - 'ffmpeg'
+        - "7zip" # yazi dependencie
+        - "poppler-utils" # yazi dependencie
+        - "fd-find" # yazi dependencie
+        - "ripgrep" # yazi dependencie
+        - "fzf" # yazi dependencie
+        - "zoxide" # yazi dependencie
+        - "xclip" # yazi dependencie
+        - "wl-clipboard" # yazi dependencie
+        - "xsel" # yazi dependencie
