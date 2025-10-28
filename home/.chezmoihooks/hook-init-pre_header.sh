@@ -15,3 +15,4 @@ set -euo pipefail # Strict error handling
 
 ## Main
 header "chezmoi: machine configuration"
+
