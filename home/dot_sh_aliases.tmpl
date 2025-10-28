@@ -16,6 +16,19 @@ if command -v 'eza' &> /dev/null; then
     alias lll="eza --all --long --header --tree --color=always --icons=auto"
 fi
 
+# yazi wrapper that provides the ability to change the current working directory when exiting Yazi.
+# Use 'y' instead of yazi to start, and press 'q' to quit with change directory, press 'Q' to quit whitout.
+if command -v 'yazi' &> /dev/null; then
+    function y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+        yazi "$@" --cwd-file="$tmp"
+        IFS= read -r -d '' cwd < "$tmp"
+        [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+        rm -f -- "$tmp"
+    }
+fi
+
+
 
 ## Redefine standard commands to improve their behavior
 # -----------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+{{/* oh-my-zsh, plugins, themes */}}
 {{ if .installZSH }}
 
 ".oh-my-zsh":
@@ -31,12 +32,12 @@
     exact: true
     stripComponents: 1
 
-{{- $fontDir := "" }}
-{{- if eq .chezmoi.os "darwin" }}
-{{-   $fontDir = "Library/Fonts" }}
-{{- else if eq .chezmoi.os "linux" }}
-{{-   $fontDir = ".local/share/fonts" }}
-{{- end }}
+{{-   $fontDir := "" }}
+{{-   if eq .chezmoi.os "darwin" }}
+{{-     $fontDir = "Library/Fonts" }}
+{{-   else if eq .chezmoi.os "linux" }}
+{{-     $fontDir = ".local/share/fonts" }}
+{{-   end }}
 "{{ $fontDir }}":
     type: "archive"
     url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
@@ -46,6 +47,8 @@
 
 {{ end }}
 
+
+{{/* Private github repo */}}
 {{ if .private }}
 
 ".local/bin/shell-script":
@@ -61,6 +64,9 @@
 
 {{ end }}
 
+
+{{/* Binaries packages */}}
+
 ".local/bin":
     type: "archive"
     url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
@@ -74,4 +80,15 @@
         "*/Makefile",
         "*/README.md",
         "*/neofetch.1"
+    ]
+
+".local/bin":
+    type: "archive"
+    url: "https://github.com/sxyazi/yazi/releases/download/v25.5.31/yazi-x86_64-unknown-linux-gnu.zip"
+    exact: true
+    stripComponents: 1
+    exclude: [
+        "*/completions",
+        "*/LICENSE",
+        "*/README.md"
     ]

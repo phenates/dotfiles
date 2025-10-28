@@ -3,14 +3,14 @@
 
 {{- /* Default values */ -}}
 {{- $private  := false -}} {{/* true if this machine should have private secrets */}}
+{{- $tags := list -}}
+{{- $sshKeys := list -}}
 {{- $installZSH := true -}}
 {{- $changeShell := true -}}
-{{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
-{{- $debug_hooks := false -}}{{/* Add debug print for hook */}}
-{{- $sshKeys := list -}}
+
 
 
 {{- /* Prompts */ -}}
@@ -27,12 +27,12 @@
 {{- end -}}
 
 {{- $tag_choices := list "homelab" "dev" "personal" "work" -}}
-{{- $tags := promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices -}}
+{{- $tags = promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices -}}
 {{- writeToStdout (printf "    ➜ '%s' \n\n" $tags ) -}}
 
 {{- if $private -}}
 {{-   $sshKeys_choices := list "id_homelab" "id_github" "id_phenates" -}}
-{{-   $sshKeys := promptMultichoice "  ?  SSH keys to add on this machine" $sshKeys_choices -}}
+{{-   $sshKeys = promptMultichoice "  ?  SSH privates keys to add on this machine" $sshKeys_choices -}}
 {{-   writeToStdout (printf "    ➜ '%s' \n\n" $sshKeys ) -}}
 {{- end -}}
 

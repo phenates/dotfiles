@@ -11,9 +11,15 @@ README.md
 .ssh
 .ssh/**
 {{ else }}
-{{  if not .sshKeys[id_homelab] }}
+{{   if not (has "id_homelab" .sshKeys) }}
 .ssh/id_homelab
-{{  end }}
+{{   end }}
+{{   if not (has "id_github" .sshKeys) }}
+.ssh/id_github
+{{   end }}
+{{   if not (has "id_phenates" .sshKeys) }}
+.ssh/id_phenates
+{{   end }}
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
