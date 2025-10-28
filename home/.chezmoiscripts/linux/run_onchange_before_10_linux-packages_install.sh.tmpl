@@ -15,24 +15,7 @@ source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 set -e # -e: script exit on error
 
 ## Variables:
-SCRIPT_NAME=$(basename "$0")
-LINUX_PACKAGES=(
-  curl
-  wget
-  git
-  unzip
-  man-db
-  eza
-  jq
-  tree
-  openssh-client
-  fontconfig
-  zsh
-  guake
-)
-LINUX_PACKAGES_2=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
-
-# recuperation sous .chezmoidata.yaml: {{/* .pac | sortAlpha | uniq | join " " */}}
+LINUX_PACKAGES=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} )
 
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -42,38 +25,44 @@ LINUX_PACKAGES_2=( {{ .packages.linux.core.apt | sortAlpha | uniq | join " " }} 
 ## Main
 header "chezmoi -> Linux packages installation"
 
-## Check requiered package
-step "Tools validation..."
-if ! require_tools apt; then
-  exit 1
-fi
-success "Requiered tools available"
-
-# Update package list
-step "Updating package list..."
-if {{ $sudo }} apt update -qq 2>/dev/null; then
-  success "Package list updated"
-else
-  error "Failed to update package list"
-  exit 1
-fi
-
-# Install packages if not already installed
-step "Installing package..."
-for package in "${LINUX_PACKAGES_2[@]}"; do
-  step "$package: checking and installing package..."
-  if dpkg -l | grep -q "^ii  $package "; then
-    info "$package already installed"
-  else
-    # info "Installing $package..."
-    if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
-      success "$package installed"
-    else
-      error "Failed to install $package"
+case {{ .chezmoi.osRelease.id }} in
+  debian)
+    ## Check requiered package
+    step "Tools validation..."
+    if ! require_tools apt; then
       exit 1
     fi
-  fi
-done
+    success "Requiered tools available"
+
+    # Update package list
+    step "Updating package list..."
+    if {{ $sudo }} apt update -qq 2>/dev/null; then
+      success "Package list updated"
+    else
+      error "Failed to update package list"
+      exit 1
+    fi
+
+    # Install packages if not already installed
+    step "Installing apt package..."
+    for package in "${LINUX_PACKAGES_2[@]}"; do
+      step "$package: checking and installing..."
+      if dpkg -l | grep -q "^ii  $package "; then
+        info "$package already installed"
+      else
+        # info "Installing $package..."
+        if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
+          success "$package installed"
+        else
+          error "Failed to install $package"
+          exit 1
+        fi
+      fi
+    done
+  ;;
+
+  *)
+    warning "Unsuported distribution"
 
 echo ""
 success "Linux packages installation completed! 🎉"
