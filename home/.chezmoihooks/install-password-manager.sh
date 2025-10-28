@@ -37,7 +37,7 @@ BIT_BIN_PATH="$INSTALL_DIR/$BIT_BIN_CMD"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
 ## Main
-header "chezmoi: Private mode enabled \n \
+header "chezmoi -> Private mode enabled \n \
   Bitwarden CLI installation & configuration"
 
 case "$(uname -s)" in

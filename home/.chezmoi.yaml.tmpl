@@ -13,13 +13,25 @@
 
 
 {{- /* Prompts */ -}}
-{{- writeToStdout (printf "\n⮞  chezmoi':' host configuration\n") -}}
-{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n") -}}
-{{- $private  := promptBool "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ? (yes/no)" -}}
-{{- writeToStdout (printf "    ➜ Answer '%s' \n" $private ) -}}
+{{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
+{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
+
+{{- $private_choices := list "Yes" "No" -}}
+{{- $private  := promptChoice "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ?" -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $private ) -}}
+{{- if eq $private "Yes" -}}
+{{-   $private = true -}}
+{{- else -}}
+{{-   $private = false -}}
+{{- end -}}
+
 {{- $tag_choices := list "homelab" "dev" "personal" "work" -}}
 {{- $tags := promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "dev") -}}
-{{- writeToStdout (printf "    ➜ Answer '%s' \n" $tags ) -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $tags ) -}}
+
+{{- $sshKeys_choices := list "id_homelab" "id_github" "id_phenates" -}}
+{{- $sshKeys := promptMultichoice "  ?  SSH keys to add on this machine" $sshKeys_choices () -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $sshKeys ) -}}
 
 
 {{- /* OS infos */ -}}
@@ -37,11 +49,8 @@
 
 
 {{- /* Hook commands */ -}}
-hooks:
-  init:
-    pre:
-      script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/hook-init-pre_header.sh
 {{ if $private }}
+hooks:
   read-source-state:
     pre:
       script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
@@ -55,10 +64,11 @@ data:
   OS_id: {{ $OS_ID | quote }}
   is_WSL: {{ $is_WSL }}
   signingKey: ""
-  private: {{ $private  }}
+  private: {{ $private }}
   installZSH: {{ $installZSH }}
   changeShell: {{ $changeShell }}
   tags: {{ $tags | toToml }}
+  sshKeys: {{ $sshKeys | toToml }}
 
 edit:
   command: "nano"

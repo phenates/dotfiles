@@ -27,7 +27,7 @@ TEMP_DIR=$(mktemp -t chezmoi-XXXX.deb)
 trap 'rm -f "$TEMP_DIR"' EXIT
 
 ## Main
-header "chezmoi: Replace chezmoi binary file by the package .deb"
+header "chezmoi -> Replace chezmoi binary file by the package .deb"
 
 ## Check requiered package
 step "Tools validation..."

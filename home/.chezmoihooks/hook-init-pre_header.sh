@@ -14,5 +14,5 @@ source "$HOME/.local/share/chezmoi/home/.scripts/utils.sh"
 set -euo pipefail # Strict error handling
 
 ## Main
-header "chezmoi: machine configuration"
+header "chezmoi -> machine configuration"
 
