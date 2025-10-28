@@ -10,6 +10,9 @@ README.md
 {{ if not .private }}
 .ssh
 .ssh/**
+{{  if not has "id_homelab".sshKeys }}
+.ssh/id_homelab
+{{  end }}
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}

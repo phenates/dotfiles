@@ -1,0 +1,17 @@
+packages:
+  linux:
+    
+    # Core packages (always installed)
+    core:
+      apt:
+      - 'curl'
+      - 'wget'
+      - 'git'
+      - 'unzip'
+      - 'man-db'
+      - 'eza'
+      - 'jq'
+      - 'tree'
+      - 'openssh-client'
+      - 'fontconfig'
+      - 'zsh'
