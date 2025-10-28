@@ -1,6 +1,5 @@
 packages:
   linux:
-    
     # Core packages (always installed)
     core:
       apt:
@@ -15,9 +14,13 @@ packages:
       - 'openssh-client'
       - 'fontconfig'
       - 'zsh'
-      - 'poppler'
-      - 'fd'
+      - 'ffmpeg'
+      - '7zip'
+      - 'poppler-utils'
+      - 'fd-find'
+      - 'ripgrep'
       - 'fzf'
+      - 'zoxide'
       - 'xclip'
       - 'wl-clipboard'
       - 'xsel'

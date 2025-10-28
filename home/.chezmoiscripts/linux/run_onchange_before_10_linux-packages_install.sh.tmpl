@@ -17,14 +17,6 @@ set -e # -e: script exit on error
 ## Variables:
 # LINUX_PACKAGES=( {{/* .packages.linux.core.apt | sortAlpha | uniq | join " " */}} )
 
-LINUX_PACKAGES=(
-{{- if .packages.linux.core.apt }}
-{{- range .packages.linux.core.apt | sortAlpha | uniq }}
-  "{{ . }}"
-{{- end }}
-{{- end }}
-)
-
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
 {{   $sudo = "" -}}
@@ -36,7 +28,15 @@ header "chezmoi -> Linux packages installation"
 echo "packages: $LINUX_PACKAGES"
 
 case "{{ .chezmoi.osRelease.id }}" in
-  debian)
+  debian | ubuntu)
+    LINUX_PACKAGES=(
+    {{- if .packages.linux.core.apt }}
+    {{- range .packages.linux.core.apt | sortAlpha | uniq }}
+      "{{ . }}"
+    {{- end }}
+    {{- end }}
+    )
+
     ## Check requiered package
     step "Tools validation..."
     if ! require_tools apt; then
