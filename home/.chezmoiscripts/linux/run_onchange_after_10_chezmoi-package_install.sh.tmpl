@@ -15,7 +15,6 @@ source "{{ .chezmoi.sourceDir -}}/.scripts/utils.sh"
 set -e # -e: exit on error
 
 ## Variables:
-# PACKAGE_URL={{ .chezmoi_package }}
 PACKAGE_URL={{ gitHubLatestReleaseAssetURL "twpayne/chezmoi" (printf "chezmoi_%s_%s_%s.deb" .chezmoi.version.version .chezmoi.os .chezmoi.arch) }}
 TEMP_DIR=$(mktemp -t chezmoi-XXXX.deb)
 
