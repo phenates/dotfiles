@@ -76,7 +76,9 @@ fi
 # Init and apply dotfiles with chezmoi
 step "Initializing and applying dotfiles with chezmoi..."
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188
-# script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
+script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
+
+info "script_dir: $script_dir"
 
 NEXT_CMD=$(whiptail \
   --menu "Command to run:" \
