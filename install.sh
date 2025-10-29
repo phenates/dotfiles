@@ -59,10 +59,10 @@ if [ ! "$(command -v chezmoi)" ]; then
   chezmoi="$bin_dir/chezmoi"
   info "chezmoi not found, installing it to $bin_dir"
   if [ "$(command -v curl)" ]; then
-    sh -c "$(curl -fsSL https://git.io/chezmoi)" -- -b "$bin_dir"
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$bin_dir"
     success "chezmoi installed"
   elif [ "$(command -v wget)" ]; then
-    sh -c "$(wget -qO- https://git.io/chezmoi)" -- -b "$bin_dir"
+    sh -c "$(wget -qO- get.chezmoi.io)" -- -b "$bin_dir"
     success "chezmoi installed"
   else
     error "Neither wget nor curl is installed"
