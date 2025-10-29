@@ -40,7 +40,7 @@ case "{{ .chezmoi.osRelease.id }}" in
     {{- end }}
 
     {{- if (has "core" .tags) }}
-    LINUX_PACKAGES=(
+    LINUX_PACKAGES_old=(
     {{-   if .packages.linux.apt.core }}
     {{-   range .packages.linux.apt.core | sortAlpha | uniq }}
       "{{ . }}"
