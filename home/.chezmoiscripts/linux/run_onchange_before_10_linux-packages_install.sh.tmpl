@@ -30,13 +30,12 @@ case "{{ .chezmoi.osRelease.id }}" in
   debian | ubuntu)
     
     {{- range $tag := .tags }}
-    info "Tag: {{ $tag }}"
-    {{- if hasKey $.packages.linux.apt $tag }}
-    info "Package has key: {{ $tag }}"
-    {{- range (index $.packages.linux.apt $tag) | sortAlpha | uniq }}
+    {{-   if hasKey $.packages.linux.apt $tag }}
+    info "Packages include from {{ $tag }} tag will be installed."
+    {{-     range (index $.packages.linux.apt $tag) | sortAlpha | uniq }}
     LINUX_PACKAGES+=("{{ . }}")
-    {{- end }}
-    {{- end }}
+    {{-     end }}
+    {{-   end }}
     {{- end }}
 
     {{- if (has "core" .tags) }}

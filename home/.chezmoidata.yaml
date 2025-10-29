@@ -9,21 +9,23 @@ packages:
         - "unzip"
         - "man-db"
         - "eza"
-        - "jq" # yazi dependencie
         # - "tree"
         - "openssh-client"
         - "fontconfig"
         - "zsh"
-        - "file" # yazi dependencie
-        # - 'ffmpeg'
-        - "7zip" # yazi dependencie
-        - "poppler-utils" # yazi dependencie
-        - "fd-find" # yazi dependencie
-        - "ripgrep" # yazi dependencie
-        - "fzf" # yazi dependencie
-        - "zoxide" # yazi dependencie
-        - "xclip" # yazi dependencie
-        - "wl-clipboard" # yazi dependencie
-        - "xsel" # yazi dependencie
+
       core+:
+        - "file" # yazi dependencie: for file type detection
+        - "7zip" # yazi dependencie: for archive extraction and preview
+        - "jq" # yazi dependencie: for JSON preview
+        - "poppler-utils" # yazi dependencie: for PDF preview
+        - "fd-find" # yazi dependencie: for file searching
+        - "ripgrep" # yazi dependencie: for file content searching
+        - "fzf" # yazi dependencie: for quick file subtree navigation
+        - "zoxide" # yazi dependencie: for historical directories navigation
+        # - 'ffmpeg' # yazi dependencie: for video thumbnails
+        # - "resvg" # yazi dependencie: for SVG preview
+        - "xclip" # yazi dependencie: for Linux clipboard support
+        - "wl-clipboard" # yazi dependencie: for Linux clipboard support
+        - "xsel" # yazi dependencie: for Linux clipboard support
         - "bat"
