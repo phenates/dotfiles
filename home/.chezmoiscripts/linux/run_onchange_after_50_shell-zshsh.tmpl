@@ -16,12 +16,11 @@ set -e # -e: exit on error
 ## Main
 header "chezmoi -> zsh shell"
 
+# Display infos
 step "zsh installation"
 info "zsh installed by Linux packages install script."
 info "oh-my-zsh (framework, plugins, theme) traited as external sources from .chezmoiexternal files."
 info "Nerd font traited as external sources from .chezmoiexternal files."
-
-
 
 # Change default shell to zsh
 {{ if .changeShell }}
