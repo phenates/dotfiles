@@ -8,31 +8,31 @@
 
 {{- define "header" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "\n%s⮞  chezmoi -> %s%s\n" "\033[1;34m" $text "\033[0m") -}}
-{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
+{{- output (printf "\n%s%s⮞  chezmoi -> %s%s\n" $bold $blue $text $reset) -}}
+{{- output (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
 {{- end -}}
 
 {{- define "step" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "%s➜  %s%s\n" "\033[1;36m" $text "\033[0m") -}}
+{{- output (printf "%s%s➜  %s%s\n" $bold $cyan $text $reset) -}}
 {{- end -}}
 
 {{- define "info" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "%s  ℹ  %s%s\n" "\033[1;32m" $text "\033[0m") -}}
+{{- output (printf "%s%s  ℹ  %s%s\n" $bold $green $text $reset) -}}
 {{- end -}}
 
 {{- define "success" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "%s  ✓  %s%s\n" "\033[1;32m" $text "\033[0m") -}}
+{{- output (printf "%s%s  ✓  %s%s\n" $bold $green $text $reset) -}}
 {{- end -}}
 
 {{- define "warn" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "%s  ⚠  %s%s\n" "\033[1;33m" $text "\033[0m") -}}
+{{- output (printf "%s%s  ⚠  %s%s\n" $bold $yellow $text $reset) -}}
 {{- end -}}
 
 {{- define "error" -}}
 {{- $text := . -}}
-{{- writeToStdout (printf "%s  ✗  %s%s\n" "\033[1;31m" $text "\033[0m") -}}
+{{- output (printf "%s%s  ✗  %s%s\n" $bold $blue $text $reset) -}}
 {{- end -}}
