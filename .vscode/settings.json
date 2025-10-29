@@ -6,5 +6,11 @@
     ".chezmoi*.yaml": "helm",
     ".chezmoiignore": "helm",
     ".chezmoiremove": "helm"
-  }
+  },
+  "shellcheck.exclude": [
+    "1054",
+    "1036",
+    "1056",
+    "1083"
+  ]
 }
