@@ -29,7 +29,7 @@ case "{{ .chezmoi.osRelease.id }}" in
   debian | ubuntu)
     
     {{- range $tag := .tags }}
-    info "Tag présent: {{ $tag }}"
+    info "Tag: {{ $tag }}"
     {{- if hasKey $.packages.linux.apt $tag }}
     {{- range (index $.packages.linux.apt $tag) | sortAlpha | uniq }}
     LINUX_PACKAGES+=("{{ . }}")
