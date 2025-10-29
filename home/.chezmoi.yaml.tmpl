@@ -14,12 +14,11 @@
 
 
 {{- /* Prompts */ -}}
-{{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
-{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
+{{- template "header" "host configuration" -}}
 
 {{- $private_choices := list "Yes" "no" -}}
 {{- $private  := promptChoice "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ?" $private_choices -}}
-{{- writeToStdout (printf "    ➜ '%s' \n\n" $private ) -}}
+{{- template "success" (printf "Selected: %s" $private) -}}
 {{- if eq $private "Yes" -}}
 {{-   $private = true -}}
 {{- else -}}
@@ -28,12 +27,12 @@
 
 {{- $tag_choices := list "core" "core+" "dev" "sysAdmin" "personal" "work" -}}
 {{- $tags = promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "core") -}}
-{{- writeToStdout (printf "    ➜ '%s' \n\n" $tags ) -}}
+{{- template "success" (printf "Selected tags: %s" $tags) -}}
 
 {{- if $private -}}
 {{-   $sshKeys_choices := list "id_homelab" "id_github" "id_phenates" -}}
 {{-   $sshKeys = promptMultichoice "  ?  SSH privates keys to add on this machine" $sshKeys_choices -}}
-{{-   writeToStdout (printf "    ➜ '%s' \n\n" $sshKeys ) -}}
+{{-   template "success" (printf "Selected SSH keys: %s" $sshKeys) -}}
 {{- end -}}
 
 
