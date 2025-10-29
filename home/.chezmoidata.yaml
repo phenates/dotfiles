@@ -1,8 +1,8 @@
 packages:
   linux:
-    # Core packages (always installed)
-    core:
-      apt:
+    apt:
+      # Core packages (always installed)
+      core:
         - "curl"
         - "wget"
         - "git"
@@ -10,7 +10,7 @@ packages:
         - "man-db"
         - "eza"
         - "jq" # yazi dependencie
-        - "tree"
+        # - "tree"
         - "openssh-client"
         - "fontconfig"
         - "zsh"

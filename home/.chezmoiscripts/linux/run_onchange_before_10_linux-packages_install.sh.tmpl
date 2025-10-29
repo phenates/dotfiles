@@ -27,13 +27,27 @@ header "chezmoi -> Linux packages installation"
 
 case "{{ .chezmoi.osRelease.id }}" in
   debian | ubuntu)
+    
+    {{- range $tag := .tags }}
+    info "Tag présent: {{ $tag }}"
+    {{- if hasKey $.packages.linux.apt $tag }}
+    {{- range (index $.packages.linux.apt $tag) | sortAlpha | uniq }}
+    LINUX_PACKAGES+=("{{ . }}")
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+    {{- if (has "core" .tags) }}
     LINUX_PACKAGES=(
-    {{- if .packages.linux.core.apt }}
-    {{- range .packages.linux.core.apt | sortAlpha | uniq }}
+    {{-   if .packages.linux.apt.core }}
+    {{-   range .packages.linux.apt.core | sortAlpha | uniq }}
       "{{ . }}"
-    {{- end }}
-    {{- end }}
+    {{-   end }}
+    {{-   end }}
     )
+    {{- end }}
+    
+    
 
     ## Check requiered package
     step "Tools validation..."
@@ -43,7 +57,7 @@ case "{{ .chezmoi.osRelease.id }}" in
     success "Requiered tools available"
 
     # Update package list
-    step "Updating package list..."
+    step "Updating apt package list..."
     if {{ $sudo }} apt update -qq 2>/dev/null; then
       success "Package list updated"
     else

@@ -1,6 +1,7 @@
 {{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
 {{/* Use template or trigger prompts to populate values. */}}
 
+
 {{- /* Default values */ -}}
 {{- $private  := false -}} {{/* true if this machine should have private secrets */}}
 {{- $tags := list -}}
@@ -10,7 +11,6 @@
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
-
 
 
 {{- /* Prompts */ -}}
@@ -26,8 +26,8 @@
 {{-   $private = false -}}
 {{- end -}}
 
-{{- $tag_choices := list "homelab" "dev" "personal" "work" -}}
-{{- $tags = promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices -}}
+{{- $tag_choices := list "core" "core+" "dev" "sysAdmin" "personal" "work" -}}
+{{- $tags = promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "core") -}}
 {{- writeToStdout (printf "    ➜ '%s' \n\n" $tags ) -}}
 
 {{- if $private -}}

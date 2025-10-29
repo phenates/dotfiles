@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "install.sh": "shellscript",
+    "*.sh.tmpl": "shellscript",
     "*.yaml.tmpl": "helm",
     ".chezmoi*.yaml": "helm",
     ".chezmoiignore": "helm",
