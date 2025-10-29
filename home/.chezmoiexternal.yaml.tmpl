@@ -1,6 +1,4 @@
-{{/* oh-my-zsh, plugins, themes */}}
 {{ if .installZSH }}
-
 ".oh-my-zsh":
     type: "archive"
     url: "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
@@ -12,78 +10,4 @@
         "*/templates",
         "*/themes",
     ]
-
-".oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-    type: "archive"
-    url: "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
-    exact: true
-    stripComponents: 1
-    refreshPeriod: "168h"
-    exclude: [
-        "*/.editorconfig",
-        "*/.gitattributes",
-        "*/.github",
-        "*/.gitignore",
-    ]
-
-".oh-my-zsh/custom/themes/powerlevel10k":
-    type: "archive"
-    url: "https://github.com/romkatv/powerlevel10k/archive/{{ (gitHubLatestRelease "romkatv/powerlevel10k").TagName }}.tar.gz"
-    exact: true
-    stripComponents: 1
-
-{{-   $fontDir := "" }}
-{{-   if eq .chezmoi.os "darwin" }}
-{{-     $fontDir = "Library/Fonts" }}
-{{-   else if eq .chezmoi.os "linux" }}
-{{-     $fontDir = ".local/share/fonts" }}
-{{-   end }}
-"{{ $fontDir }}":
-    type: "archive"
-    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
-    exact: true
-    refreshPeriod: "168h"
-    include: ["MesloLGSNerdFont-*"]
-
 {{ end }}
-
-
-{{/* Private github repo */}}
-{{ if .private }}
-
-".local/bin/shell-script":
-    type: "archive"
-    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
-    exact: true
-    stripComponents: 1
-    refreshPeriod: "168h"
-    exclude: [
-        "*/.gitignore",
-        "*/README.md"
-    ]
-
-{{ end }}
-
-
-{{/* Binaries packages */}}
-
-".local/bin/neofetch":
-    type: "archive-file"
-    url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
-    executable: true
-    stripComponents: 1
-    path: "neofetch"
-
-".local/bin/yazi":  
-    type: "archive-file"
-    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
-    executable: true
-    stripComponents: 1
-    path: "yazi"
-
-".local/bin/ya":  
-    type: "archive-file"
-    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
-    executable: true
-    stripComponents: 1
-    path: "ya"

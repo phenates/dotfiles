@@ -1,0 +1,39 @@
+{{/* Private github repo */}}
+{{ if .private }}
+".local/bin/shell-script":
+    type: "archive"
+    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.gitignore",
+        "*/README.md"
+    ]
+{{ end }}
+
+
+{{/* Binaries packages */}}
+
+".local/bin/neofetch":
+    type: "archive-file"
+    url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
+    executable: true
+    stripComponents: 1
+    path: "neofetch"
+
+{{ if (has "core+" .tags) }}
+".local/bin/yazi":  
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
+    executable: true
+    stripComponents: 1
+    path: "yazi"
+
+".local/bin/ya":  
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
+    executable: true
+    stripComponents: 1
+    path: "ya"
+{{ end }}
