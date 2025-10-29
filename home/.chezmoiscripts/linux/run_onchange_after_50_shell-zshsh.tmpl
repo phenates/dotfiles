@@ -17,18 +17,16 @@ set -e # -e: exit on error
 header "chezmoi -> zsh shell"
 
 step "zsh installation"
-echo ""
 info "zsh installed by Linux packages install script."
 info "oh-my-zsh (framework, plugins, theme) traited as external sources from .chezmoiexternal files."
 info "Nerd font traited as external sources from .chezmoiexternal files."
-echo ""
 
 
 
 # Change default shell to zsh
 {{ if .changeShell }}
 step "Change default shell to zsh..."
-if [[ -ne "$SHELL" "*/zsh" ]]; then
+if [[ "$SHELL" != "*/zsh" ]]; then
   chsh -s $(which zsh)
   if [ $? -eq 0 ]; then
     success "Default shell changed to zsh"
