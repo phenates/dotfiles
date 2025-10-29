@@ -25,3 +25,5 @@ packages:
         - "xclip" # yazi dependencie
         - "wl-clipboard" # yazi dependencie
         - "xsel" # yazi dependencie
+      core+:
+        - "bat"
