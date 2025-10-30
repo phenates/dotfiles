@@ -18,7 +18,8 @@
       "type": "title",
       "key": "", // Title module has no key by default, so that icon is not displayed
       "format": "{user-name}@{host-name}",
-      "fqdn": true
+      "fqdn": true,
+      "separate": false
     },
     "users",
     "datetime",
