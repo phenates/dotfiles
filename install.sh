@@ -31,11 +31,10 @@ error() { printf "\033[1;31m  ❌  ERROR: %s\n\033[0m" "$*" >&2; }
 
 step() { printf "\n\033[1;34m  ➜  %s\n\033[0m" "$*"; }
 
-prompt() { printf "\033[1;34m  ❓  %s\n\033[0m" "$*"; }
+prompt() { printf "\n\033[1;33m  ❓  %s\n\033[0m" "$*"; }
 
 ## Main
-header "chezmoi dotfiles manager \n \
-  install, init and apply dotfiles"
+header "chezmoi -> install, init and apply dotfiles"
 
 # Check if chezmoi is already installed, if not install it
 step "Checking for chezmoi installation..."
@@ -66,11 +65,11 @@ script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 
 info "Script dir.: $script_dir"
 
-prompt "Select an command:\n"
-printf "  1) chezmoi init %s\n" "$GITHUB_USERNAME"
-printf "  2) chezmoi init %s --apply\n" "$GITHUB_USERNAME"
-printf "  3) chezmoi init %s --one-shot\n" "$GITHUB_USERNAME"
-printf "  4) Quit\n"
+prompt "Select an command:"
+printf "    1) chezmoi init %s\n" "$GITHUB_USERNAME"
+printf "    2) chezmoi init %s --apply\n" "$GITHUB_USERNAME"
+printf "    3) chezmoi init %s --one-shot\n" "$GITHUB_USERNAME"
+printf "    4) Quit\n"
 printf "  Enter choice (1-4): "
 read -r NEXT_CMD
 
