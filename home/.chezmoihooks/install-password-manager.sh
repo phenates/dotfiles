@@ -44,7 +44,7 @@ case "$(uname -s)" in
   Linux)
       ## Check requiered package
       step "Tools validation..."
-      if ! require_tools wget unzip whiptail; then
+      if ! require_tools wget unzip; then
         exit 1
       fi
       success "Requiered tools available"
@@ -104,24 +104,31 @@ case "$(uname -s)" in
         success "Temporary files removed successfully"
       fi
 
-      ## Configure Bitwarden URL server 
-      step "Configuring Bitwarden server URL..."    
-      URL=$(whiptail \
-        --title "Bitwarden configuration" \
-        --inputbox "Enter the server URL: \n(default: https://vault.bitwarden.eu)" \
-        10 50 3>&1 1>&2 2>&3 \
-        "https://")
-      
-      if [ -z "$URL" ]; then
-        URL="https://vault.bitwarden.eu"
-      else
-        URL=$(echo "$URL" | xargs) # trim whitespace 
-        # Valid URL format
-        if ! echo "$URL" | grep -E -q '^https?://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$' ; then
-          warning "Invalid URL format. Using default URL."
+      ## Configure Bitwarden URL server
+      step "Configuring Bitwarden server URL..."
+
+      # Prompt with validation loop
+      while true; do
+        printf "  Enter the Bitwarden server URL (default: https://vault.bitwarden.eu): "
+        read -r URL
+
+        # Use default if empty
+        if [ -z "$URL" ]; then
           URL="https://vault.bitwarden.eu"
+          break
         fi
-      fi
+
+        # Trim whitespace
+        URL=$(echo "$URL" | xargs)
+
+        # Validate URL format (must start with http:// or https://)
+        if echo "$URL" | grep -E -q '^https?://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$'; then
+          break
+        else
+          warning "Invalid URL format. Please enter a valid URL (e.g., https://vault.bitwarden.eu)"
+        fi
+      done
+
       info "Using server URL: $URL"
       if ! "$BIT_BIN_PATH" config server "$URL" >/dev/null 2>&1 ; then
         error "Failed to set server URL"
@@ -131,35 +138,18 @@ case "$(uname -s)" in
 
       ## Login to Bitwarden account
       step "Login to your Bitwarden account"
-      # Account email
-      EMAIL=$(whiptail \
-        --title "Bitwarden login" \
-        --inputbox "Enter your email address:" \
-        10 50 3>&1 1>&2 2>&3 )
-      
-      # Validate email format
-      if ! echo "$EMAIL" | grep -E -q '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'; then
-        error "Invalid email format"
-        exit 1
-      fi
+      info "Please enter your Bitwarden credentials when prompted..."
 
-      # Account password
-      PASS=$(whiptail \
-        --title "Bitwarden login" \
-        --passwordbox "Enter your master password:" \
-        10 50 3>&1 1>&2 2>&3 )
-
-      # Login & clear password from memory as soon as possible
-      if ! "$BIT_BIN_PATH" login --raw "$EMAIL" "$PASS"; then
-        PASS=""  # Clear password
+      # Use bw login --raw which handles credential prompting itself
+      # This is more secure as credentials are never stored in shell variables
+      if ! "$BIT_BIN_PATH" login --raw; then
         error "Failed to login to Bitwarden"
         exit 1
       fi
-      PASS=""  # Clear password
       success "Logged into Bitwarden successfully"
-      
+
       # Clear sensitive variables
-      unset URL EMAIL PASS
+      unset URL
 
       echo ""
       success "Bitwarden CLI installation & configuration completed! 🎉"
