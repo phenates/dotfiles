@@ -1,34 +1,64 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "small"
+  },
+  "display": {
+    "separator": ": ",
+    "constants": [
+      "─────────────────" // {$1}, used in Custom module
+    ],
+    "key": {
+      "type": "string"
+    }
+  },
   "modules": [
-    "title",
-    "separator",
-    "os",
+    {
+      "type": "title",
+      "keyIcon": "",
+      "key": "Title", // Title module has no key by default, so that icon is not displayed
+      "format": "{user-name}@{host-name}"
+    },
+    {
+      "type": "custom", // HardwareStart
+      // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
+      "format": "┌{$1} {#1} Hardware {#} {$1}┐"
+    },
     "host",
+    "cpu",
+    "cpuusage",
+    "gpu",
+    "disk",
+    "memory",
+    {
+      "type": "custom", // SoftwareStart
+      "format": "├{$1} {#1} Software {#} {$1}┤"
+    },
+    "os",
     "kernel",
     "uptime",
     "packages",
-    "shell",
-    "display",
-    "de",
-    "wm",
-    "wmtheme",
-    "theme",
-    "icons",
-    "font",
-    "cursor",
-    "terminal",
-    "terminalfont",
-    "cpu",
-    "gpu",
-    "memory",
-    "swap",
-    "disk",
-    "localip",
-    "battery",
-    "poweradapter",
-    "locale",
-    "break",
-    "colors"
+    {
+      "type": "custom", // SoftwareStart
+      "format": "├{$1} {#1} Network {#} {$1}┤"
+    },
+    "host",
+    {
+      "type": "localip",
+      "compact": true
+    },
+    {
+      "type": "publicip",
+      "timeout": 1000
+    },
+    {
+      "type": "wifi",
+      "format": "{ssid}"
+    },
+    "netio",
+    {
+      "type": "custom", // InformationEnd
+      "format": "└{$1}──────────────────────{$1}┘"
+    }
   ]
 }
