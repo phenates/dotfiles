@@ -10,17 +10,27 @@
     ],
     "key": {
       "type": "string",
-      "paddingLeft": 2
+      "paddingLeft": 1
+    },
+    // "color": {
+    //   "keys": "blue", // Key color
+    //   "title": "red" // Title color
+    // },
+    "percent": {
+      "type": 9, // 1=number, 2=bar, 3=both, 9=colored number
+      "color": {
+        "green": "green",
+        "yellow": "light_yellow",
+        "red": "light_red"
+      }
     }
   },
   "modules": [
-    {
-      "type": "title",
-      "key": "", // Title module has no key by default, so that icon is not displayed
-      "format": "{user-name}@{host-name}",
-      "fqdn": true,
-      "separate": false
-    },
+    // {
+    //   "type": "title",
+    //   "key": "", // Title module has no key by default, so that icon is not displayed
+    //   "format": "{user-name}@{host-name}"
+    // },
     "users",
     "datetime",
     "break",
