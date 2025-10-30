@@ -121,10 +121,5 @@ if ! shopt -oq posix; then
 fi
 
 # Custom part.:
-export PATH='/home/debian/bash_script:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games'
 bind -s 'set completion-ignore-case on'
 PS1="\[\e[38;5;34m\]\u\[\e[38;5;244m\]@\[\e[38;5;214m\]\h \[\e[38;5;129m\]\w \[\033[0m\]$ "
-alias ..='cd ..'
-alias ll='ls -lah'
-alias sys='systemctl'
-###alias chezmoi-cd='cd ~/.local/share/chezmoi/'
