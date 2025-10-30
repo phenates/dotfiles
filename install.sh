@@ -70,32 +70,35 @@ printf "    1) chezmoi init %s\n" "$GITHUB_USERNAME"
 printf "    2) chezmoi init %s --apply\n" "$GITHUB_USERNAME"
 printf "    3) chezmoi init %s --one-shot\n" "$GITHUB_USERNAME"
 printf "    4) Quit\n"
-printf "  Enter choice (1-4): "
-read -r NEXT_CMD
-printf ""
 
-case "$NEXT_CMD" in
-  1)
-    info "Running: chezmoi init $GITHUB_USERNAME"
-    exec $chezmoi init "$GITHUB_USERNAME"
-    ;;
-  2)
-    info "Running: chezmoi init $GITHUB_USERNAME --apply"
-    exec $chezmoi init "$GITHUB_USERNAME" --apply
-    ;;
-  3)
-    info "Running: chezmoi init $GITHUB_USERNAME --one-shot"
-    exec $chezmoi init "$GITHUB_USERNAME" --one-shot
-    ;;
-  4|"")
-    info "Quit selected, exiting."
-    exit 0
-    ;;
-  *)
-    error "Invalid option selected"
-    exit 1
-    ;;
-esac
+# Loop until valid input is provided
+while true; do
+  printf "  Enter choice (1-4): "
+  read -r NEXT_CMD
+  printf ""
+
+  case "$NEXT_CMD" in
+    1)
+      info "Running: chezmoi init $GITHUB_USERNAME"
+      exec $chezmoi init "$GITHUB_USERNAME"
+      ;;
+    2)
+      info "Running: chezmoi init $GITHUB_USERNAME --apply"
+      exec $chezmoi init "$GITHUB_USERNAME" --apply
+      ;;
+    3)
+      info "Running: chezmoi init $GITHUB_USERNAME --one-shot"
+      exec $chezmoi init "$GITHUB_USERNAME" --one-shot
+      ;;
+    4|"")
+      info "Quit selected, exiting."
+      exit 0
+      ;;
+    *)
+      warning "Invalid choice '$NEXT_CMD'. Please select 1-4."
+      ;;
+  esac
+done
 
 echo ""
 success "chezmoi completed! 🎉"
