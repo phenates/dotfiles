@@ -21,20 +21,20 @@ header() {
   printf "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\033[0m"
 }
 
-info() { printf "\033[1;36m  ℹ️  %s\033[0m" "$*"; }
+info() { printf "\033[1;36m  ℹ️  %s\n\033[0m" "$*"; }
 
-success() { printf "\033[1;32m  ✅  %s\033[0m" "$*"; }
+success() { printf "\033[1;32m  ✅  %s\n\033[0m" "$*"; }
 
-warning() { printf "\033[1;33m  ⚠️  WARNING: %s\033[0m" "$*"; }
+warning() { printf "\033[1;33m  ⚠️  WARNING: %s\n\033[0m" "$*"; }
 
-error() { printf "\033[1;31m  ❌  ERROR: %s\033[0m" "$*" >&2; }
+error() { printf "\033[1;31m  ❌  ERROR: %s\n\033[0m" "$*" >&2; }
 
-step() { printf "\n\033[1;34m  ➜  %s\033[0m" "$*"; }
+step() { printf "\n\033[1;34m  ➜  %s\n\033[0m" "$*"; }
 
-prompt() { printf "\n\033[1;34m  ❓  %s\033[0m" "$*"; }
+prompt() { printf "\033[1;34m  ❓  %s\n\033[0m" "$*"; }
 
 ## Main
-header "chezmoi dotfiles manager\n \
+header "chezmoi dotfiles manager \n \
   install, init and apply dotfiles"
 
 # Check if chezmoi is already installed, if not install it
