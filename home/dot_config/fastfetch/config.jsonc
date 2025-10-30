@@ -26,7 +26,7 @@
     {
       "type": "custom", // HardwareStart
       // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
-      "format": "┌{$1} {#1} Hardware  Informations {#} {$1}┐"
+      "format": "┌{$1} {#cyan} Hardware Informations {#} {$1}┐"
     },
     {
       "type": "cpu",
@@ -39,7 +39,7 @@
     "memory",
     {
       "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Software Informations{#} {$1}┤"
+      "format": "├{$1} {#1} Software Informations {#} {$1}┤"
     },
     "host",
     "os",
@@ -62,7 +62,7 @@
     },
     {
       "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Network Informations{#} {$1}┤"
+      "format": "├{$1} {#1} Network Informations {#} {$1}┤"
     },
     {
       "type": "title",
