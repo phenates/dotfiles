@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #==============================================================================
 #title            :install.sh
@@ -17,36 +17,21 @@ GITHUB_USERNAME="phenates"
 
 ## Log (enhanced with colors and symbols):
 header() {
-  echo -e "\033[1;35m⮞  $*\033[0m"
-  echo -e "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+  printf "\033[1;35m⮞  %s\033[0m" "$*"
+  printf "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 }
 
-info() { echo -e "\033[1;36m  ℹ️  $*\033[0m"; }
+info() { printf "\033[1;36m  ℹ️  %s\033[0m" "$*"; }
 
-success() { echo -e "\033[1;32m  ✅  $*\033[0m"; }
+success() { printf "\033[1;32m  ✅  %s\033[0m" "$*"; }
 
-warning() { echo -e "\033[1;33m  ⚠️  WARNING: $*\033[0m"; }
+warning() { printf "\033[1;33m  ⚠️  WARNING: %s\033[0m" "$*"; }
 
-error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
+error() { printf "\033[1;31m  ❌  ERROR: %s\033[0m" "$*" >&2; }
 
-step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
+step() { printf "\n\033[1;34m  ➜  %s\033[0m" "$*"; }
 
-ask_yN() {
-  local question="$1"
-  local response
-  
-  echo -e -n "\033[1;33m  ?  $question (y/N): \033[0m"
-  read -r response
-  
-  case "$response" in
-    [yY][eE][sS]|[yY])
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
+prompt() { printf "\n\033[1;34m  ❓  %s\033[0m" "$*"; }
 
 ## Main
 header "chezmoi dotfiles manager\n \
@@ -65,8 +50,7 @@ if [ ! "$(command -v chezmoi)" ]; then
     sh -c "$(wget -qO- get.chezmoi.io)" -- -b "$bin_dir"
     success "chezmoi installed"
   else
-    error "Neither wget nor curl is installed"
-    error "Please install one of them: sudo apt install curl wget"
+    error "To install chezmoi, you must have curl or wget installed."
     exit 1
   fi
 else
@@ -74,35 +58,44 @@ else
 fi
 
 # Init and apply dotfiles with chezmoi
-step "Initializing and applying dotfiles with chezmoi..."
+step "Initializing chezmoi and applying dotfiles..."
+
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188
+# script_dir can be used within --source flag to indicate the chezmoi source directory.
 script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 
-info "script_dir: $script_dir"
+info "Script dir.: $script_dir"
 
-NEXT_CMD=$(whiptail \
-  --menu "Command to run:" \
-  --title "Do you want to init & apply chezmoi ?" \
-  15 60 4 \
-  "1" "Init" \
-  "2" "Init and Apply" \
-  "3" "Init and Apply --one-shot" \
-  "4" "Quit" \
-  3>&1 1>&2 2>&3)
+prompt "Select an command:\n"
+printf "  1) chezmoi init %s\n" "$GITHUB_USERNAME"
+printf "  2) chezmoi init %s --apply\n" "$GITHUB_USERNAME"
+printf "  3) chezmoi init %s --one-shot\n" "$GITHUB_USERNAME"
+printf "  4) Quit\n"
+printf "  Enter choice (1-4): "
+read -r NEXT_CMD
 
-if [ "$NEXT_CMD" = "1" ]; then
-  info "Running: chezmoi init $GITHUB_USERNAME"
-  $chezmoi init "$GITHUB_USERNAME"
-elif [ "$NEXT_CMD" = "2" ]; then
-  info "Running: chezmoi init --apply $GITHUB_USERNAME"
-  $chezmoi init --apply "$GITHUB_USERNAME"
-elif [ "$NEXT_CMD" = "3" ]; then
-  info "Running: chezmoi init --apply $GITHUB_USERNAME"
-  $chezmoi init --apply "$GITHUB_USERNAME" --one-shot
-else
-  info "Quit selected, exiting."
-  exit 0
-fi
+case "$NEXT_CMD" in
+  1)
+    info "Running: chezmoi init $GITHUB_USERNAME"
+    exec $chezmoi init "$GITHUB_USERNAME"
+    ;;
+  2)
+    info "Running: chezmoi init $GITHUB_USERNAME --apply"
+    exec $chezmoi init "$GITHUB_USERNAME" --apply
+    ;;
+  3)
+    info "Running: chezmoi init $GITHUB_USERNAME --one-shot"
+    exec $chezmoi init "$GITHUB_USERNAME" --one-shot
+    ;;
+  4|"")
+    info "Quit selected, exiting."
+    exit 0
+    ;;
+  *)
+    error "Invalid option selected"
+    exit 1
+    ;;
+esac
 
 echo ""
 success "chezmoi completed! 🎉"
