@@ -26,12 +26,11 @@
     }
   },
   "modules": [
-    // {
-    //   "type": "title",
-    //   "key": "", // Title module has no key by default, so that icon is not displayed
-    //   "format": "{user-name}@{host-name}"
-    // },
-    "users",
+    {
+      "type": "title",
+      "key": "User", // Title module has no key by default, so that icon is not displayed
+      "format": "{user-name}@{host-name}"
+    },
     "datetime",
     "break",
     {
@@ -50,7 +49,7 @@
     "memory",
     {
       "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Software Informations {#} {$1}┤"
+      "format": "├{$1} {#cyan} Software Informations {#} {$1}┤"
     },
     "host",
     "os",
@@ -73,7 +72,7 @@
     },
     {
       "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Network Informations {#} {$1}┤"
+      "format": "├{$1} {#cyan} Network Informations {#} {$1}┤"
     },
     {
       "type": "title",
