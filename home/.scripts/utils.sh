@@ -23,6 +23,8 @@ error() { echo -e "\033[1;31m  ❌  ERROR: $*\033[0m" >&2; }
 
 step() { echo -e "\n\033[1;34m  ➜  $*\033[0m"; }
 
+prompt() { printf "\n\033[1;33m  ❓  %s\n\033[0m" "$*"; }
+
 # Check if a command exists and is executable
 command_exists() {
     command -v "$1" >/dev/null 2>&1

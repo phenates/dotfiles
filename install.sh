@@ -72,6 +72,7 @@ printf "    3) chezmoi init %s --one-shot\n" "$GITHUB_USERNAME"
 printf "    4) Quit\n"
 printf "  Enter choice (1-4): "
 read -r NEXT_CMD
+printf ""
 
 case "$NEXT_CMD" in
   1)
