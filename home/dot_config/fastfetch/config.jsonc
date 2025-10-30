@@ -23,33 +23,57 @@
     {
       "type": "custom", // HardwareStart
       // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
-      "format": "┌{$1} {#1} Hardware {#} {$1}┐"
+      "format": "┌{$1} {#1} Hardware  Informations {#} {$1}┐"
     },
-    "host",
-    "cpu",
+    {
+      "type": "cpu",
+      "key": "CPU",
+      "format": "{cores-logical} x {name}"
+    },
     "cpuusage",
     "gpu",
     "disk",
     "memory",
     {
       "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Software {#} {$1}┤"
-    },
-    "os",
-    "kernel",
-    "uptime",
-    "packages",
-    {
-      "type": "custom", // SoftwareStart
-      "format": "├{$1} {#1} Network {#} {$1}┤"
+      "format": "├{$1} {#1} Software Informations{#} {$1}┤"
     },
     "host",
+    "os",
+    "kernel",
+    {
+      "type": "loadavg",
+      "key": "Load Average"
+    },
+    "processes",
+    "uptime",
+    {
+      "type": "packages",
+      "format": "{all}"
+    },
+    "shell",
+    {
+      "type": "terminal",
+      "format": "{pretty-name} {version} {#37}█{#97}█ {#36}█{#96}█ {#35}█{#95}█ {#34}█{#94}█ {#33}█{#93}█ {#32}█{#92}█ {#31}█{#91}█ {#30}█{#90}█"
+    },
+    {
+      "type": "custom", // SoftwareStart
+      "format": "├{$1} {#1} Network Informations{#} {$1}┤"
+    },
+    {
+      "type": "title",
+      "key": "Hostname",
+      "format": "{host-name}"
+    },
     {
       "type": "localip",
-      "compact": true
+      "key": "LAN IP",
+      "showIpv6": true,
+      "showPrefixLen": false
     },
     {
       "type": "publicip",
+      "key": "WAN IP",
       "timeout": 1000
     },
     {
