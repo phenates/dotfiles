@@ -20,6 +20,9 @@
       "key": "Title", // Title module has no key by default, so that icon is not displayed
       "format": "{user-name}@{host-name}"
     },
+    "users",
+    "datetime",
+    "break",
     {
       "type": "custom", // HardwareStart
       // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
@@ -49,7 +52,8 @@
     "uptime",
     {
       "type": "packages",
-      "format": "{all}"
+      "format": "{all}",
+      "combined": true
     },
     "shell",
     {
@@ -76,6 +80,7 @@
       "key": "WAN IP",
       "timeout": 1000
     },
+    "dns",
     {
       "type": "wifi",
       "format": "{ssid}"
