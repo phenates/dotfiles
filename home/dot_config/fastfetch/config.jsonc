@@ -36,8 +36,9 @@
     },
     "datetime",
     "break",
+    // HardwareStart
     {
-      "type": "custom", // HardwareStart
+      "type": "custom",
       // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
       "format": "┌{$1} {#cyan} Hardware Informations {#} {$1}┐"
     },

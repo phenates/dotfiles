@@ -2,6 +2,10 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Fastfetch command-line system information
+if [ -f "$HOME"/.local/bin/fastfetch ]; then
+    "$HOME"/.local/bin/fastfetch
+fi
 
 # If not running interactively, don't do anything
 case $- in
