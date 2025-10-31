@@ -1,7 +1,7 @@
 # dotfiles
 
 [![chezmoi](https://img.shields.io/badge/managed%20with-chezmoi-blue)](https://www.chezmoi.io/)
-[![GitHub last commit](https://img.shields.io/github/last-commit/cearley/dotfiles)](https://github.com/cearley/dotfiles/commits)
+[![GitHub last commit](https://img.shields.io/github/last-commit/cearley/dotfiles)](https://github.com/phenates/dotfiles/commits)
 
 My dotfiles management with [chezmoi](https://www.chezmoi.io).
 
