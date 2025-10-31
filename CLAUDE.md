@@ -91,22 +91,22 @@ install.sh → chezmoi init → prompts → hooks → scripts → apply
 
 Defined in `.chezmoi.yaml.tmpl`:
 
-| Variable | Type | Description | Example |
-|----------|------|-------------|---------|
-| `.name` | string | User name | `phenates` |
-| `.email` | string | Email address | `phen4tes@gmail.com` |
-| `.private` | bool | Private mode flag | `true`/`false` |
-| `.tags` | list | Machine tags | `["core", "dev"]` |
-| `.sshKeys` | list | SSH keys to install | `["id_github", "id_homelab"]` |
-| `.installZSH` | bool | Install ZSH | `true`/`false` |
-| `.changeShell` | bool | Change default shell | `true`/`false` |
-| `.OS_id` | string | OS identifier | `linux-debian` |
-| `.is_WSL` | bool | WSL detection | `true`/`false` |
-| `.chezmoi.os` | string | Operating system | `linux`/`darwin` |
-| `.chezmoi.arch` | string | Architecture | `amd64`/`arm64` |
-| `.chezmoi.hostname` | string | Hostname | `myserver` |
-| `.chezmoi.username` | string | Current user | `phenates` |
-| `.chezmoi.osRelease.id` | string | Distribution ID | `debian`/`fedora` |
+| Variable                | Type   | Description              | Example                       |
+| ----------------------- | ------ | ------------------------ | ----------------------------- |
+| `.name`                 | string | User name                | `phenates`                    |
+| `.email`                | string | Email address            | `phen4tes@gmail.com`          |
+| `.private`              | bool   | Private mode flag        | `true`/`false`                |
+| `.environmentTags`      | list   | Machine environment tags | `["core", "dev"]`             |
+| `.secretsTags`          | list   | SSH keys to install      | `["id_github", "id_homelab"]` |
+| `.installZSH`           | bool   | Install ZSH              | `true`/`false`                |
+| `.changeShell`          | bool   | Change default shell     | `true`/`false`                |
+| `.OS_id`                | string | OS identifier            | `linux-debian`                |
+| `.is_WSL`               | bool   | WSL detection            | `true`/`false`                |
+| `.chezmoi.os`           | string | Operating system         | `linux`/`darwin`              |
+| `.chezmoi.arch`         | string | Architecture             | `amd64`/`arm64`               |
+| `.chezmoi.hostname`     | string | Hostname                 | `myserver`                    |
+| `.chezmoi.username`     | string | Current user             | `phenates`                    |
+| `.chezmoi.osRelease.id` | string | Distribution ID          | `debian`/`fedora`             |
 
 ---
 
@@ -114,14 +114,14 @@ Defined in `.chezmoi.yaml.tmpl`:
 
 ### Chezmoi Prefixes
 
-| Prefix | Purpose | Example | Target |
-|--------|---------|---------|--------|
-| `dot_` | Regular dotfiles | `dot_bashrc` | `~/.bashrc` |
-| `private_dot_` | Sensitive dotfiles | `private_dot_gitconfig.tmpl` | `~/.gitconfig` |
-| `executable_` | Executable files | `executable_script.sh` | Executable script |
-| `run_once_` | Run once scripts | `run_once_install.sh` | One-time execution |
-| `run_onchange_` | Run on change | `run_onchange_packages.sh.tmpl` | When template changes |
-| `.tmpl` | Template files | `dot_sh_aliases.tmpl` | Dynamic content |
+| Prefix          | Purpose            | Example                         | Target                |
+| --------------- | ------------------ | ------------------------------- | --------------------- |
+| `dot_`          | Regular dotfiles   | `dot_bashrc`                    | `~/.bashrc`           |
+| `private_dot_`  | Sensitive dotfiles | `private_dot_gitconfig.tmpl`    | `~/.gitconfig`        |
+| `executable_`   | Executable files   | `executable_script.sh`          | Executable script     |
+| `run_once_`     | Run once scripts   | `run_once_install.sh`           | One-time execution    |
+| `run_onchange_` | Run on change      | `run_onchange_packages.sh.tmpl` | When template changes |
+| `.tmpl`         | Template files     | `dot_sh_aliases.tmpl`           | Dynamic content       |
 
 ### Script Naming Pattern
 
@@ -156,7 +156,7 @@ Files with `.tmpl` extension support Go template syntax with chezmoi functions:
 {{ bitwarden "item" "GitHub Token" }}
 {{- end }}
 
-{{- if has "dev" .tags -}}
+{{- if has "dev" .environmentTags -}}
 # Development tools enabled
 export PATH="$HOME/.local/bin:$PATH"
 {{- end }}
@@ -189,14 +189,14 @@ alias ssh-add='ssh-add.exe'
 
 **Tag-based Inclusion**:
 ```go
-{{- if has "core+" .tags -}}
+{{- if has "core+" .environmentTags -}}
 # Install enhanced tools like yazi
 {{- end -}}
 ```
 
 **Multi-condition**:
 ```go
-{{- if and .private (has "work" .tags) -}}
+{{- if and .private (has "work" .environmentTags) -}}
 # Work-specific private configuration
 {{- end -}}
 ```
@@ -291,12 +291,12 @@ elif command -v pacman &> /dev/null; then
   pkg_manager="pacman"
 fi
 
-# Define packages based on tags
-{{- if has "core" .tags }}
+# Define packages based on environment tags
+{{- if has "core" .environmentTags }}
 packages="git vim curl wget"
 {{- end }}
 
-{{- if has "dev" .tags }}
+{{- if has "dev" .environmentTags }}
 packages="$packages docker nodejs python3"
 {{- end }}
 
@@ -386,7 +386,7 @@ esac
 
 3. **Update `.chezmoiignore`** if conditional
    ```
-   {{ if not (has "dev" .tags) }}
+   {{ if not (has "dev" .environmentTags) }}
    .config/tool/
    {{ end }}
    ```
@@ -394,7 +394,7 @@ esac
 4. **Add installation script** in `.chezmoiscripts/linux/`
    ```bash
    # run_onchange_before_20_install-tool.sh.tmpl
-   {{ if has "dev" .tags -}}
+   {{ if has "dev" .environmentTags -}}
    # Install tool dependencies
    {{ end -}}
    ```
@@ -415,7 +415,7 @@ alias explorer='explorer.exe'
 alias clip='clip.exe'
 {{- end }}
 
-{{- if has "dev" .tags }}
+{{- if has "dev" .environmentTags }}
 alias dc='docker-compose'
 alias k='kubectl'
 {{- end }}
@@ -467,7 +467,7 @@ function upup() {
 
 4. **Update `.chezmoiignore`** conditional
    ```
-   {{ if not (has "id_NAME" .sshKeys) }}
+   {{ if not (has "id_NAME" .secretsTags) }}
    .ssh/id_NAME
    .ssh/id_NAME.pub
    {{ end }}
@@ -476,8 +476,8 @@ function upup() {
 5. **Add to selection prompts** in `.chezmoi.yaml.tmpl`
    ```go
    {{- if $private -}}
-   {{-   $sshKeys_choices := list "id_homelab" "id_github" "id_phenates" "id_NAME" -}}
-   {{-   $sshKeys = promptMultichoice "SSH keys to add" $sshKeys_choices -}}
+   {{-   $secretsTags_choices := list "id_homelab" "id_github" "id_phenates" "id_NAME" -}}
+   {{-   $secretsTags = promptMultichoice "SSH keys to add" $secretsTags_choices -}}
    {{- end -}}
    ```
 
@@ -510,7 +510,7 @@ function upup() {
 4. **Validate with prompts**:
    ```go
    {{- $choice := promptChoice "Question?" (list "Yes" "No") -}}
-   {{- $tags := promptMultichoice "Select tags" (list "core" "dev" "work") -}}
+   {{- $environmentTags := promptMultichoice "Select tags" (list "core" "dev" "work") -}}
    ```
 
 5. **Comment templates**:
@@ -602,7 +602,7 @@ function upup() {
 2. **Shared configuration**: Template files sourced by multiple shells (`.sh_aliases.tmpl`, `.sh_functions.tmpl`)
 3. **Host-specific**: Template conditionals based on `.chezmoi.hostname`
 4. **OS-specific**: Conditionals based on `.chezmoi.os` or `.OS_id`
-5. **Tag-specific**: Conditionals based on `.tags` list
+5. **Tag-specific**: Conditionals based on `.environmentTags` list
 6. **Private settings**: `private_*` files with Bitwarden integration
 
 ---
@@ -894,30 +894,30 @@ alias here='explorer.exe .'
 ### Tag-Based Installation
 
 ```bash
-{{- if has "core" .tags }}
+{{- if has "core" .environmentTags }}
 # Base essentials
 packages="git vim curl wget unzip zip"
 {{- end }}
 
-{{- if has "core+" .tags }}
+{{- if has "core+" .environmentTags }}
 # Enhanced tools
 packages="$packages eza bat fd-find ripgrep"
 # yazi (file manager)
 # fastfetch (system info)
 {{- end }}
 
-{{- if has "dev" .tags }}
+{{- if has "dev" .environmentTags }}
 # Development tools
 packages="$packages build-essential nodejs npm python3 python3-pip"
 # docker, docker-compose
 {{- end }}
 
-{{- if has "sysAdmin" .tags }}
+{{- if has "sysAdmin" .environmentTags }}
 # System administration
 packages="$packages htop ncdu tmux net-tools"
 {{- end }}
 
-{{- if has "devOps" .tags }}
+{{- if has "devOps" .environmentTags }}
 # DevOps tools
 # kubectl, helm, terraform, ansible
 {{- end }}
@@ -970,22 +970,22 @@ chezmoi doctor                   # Check for issues
 
 ### Important Files
 
-| File | Purpose |
-|------|---------|
-| `install.sh` | Bootstrap installation script |
-| `.chezmoi.yaml.tmpl` | Main configuration with prompts |
-| `.chezmoiexternal.yaml.tmpl` | External dependencies (oh-my-zsh, plugins) |
-| `.chezmoiignore` | Conditional ignore patterns |
-| `.chezmoihooks/install-password-manager.sh` | Install Bitwarden CLI |
-| `.scripts/utils.sh` | Shared utility functions |
-| `dot_bashrc` | Bash shell configuration |
-| `dot_zshrc` | Zsh shell configuration |
-| `dot_sh_aliases.tmpl` | Shell aliases (bash + zsh) |
-| `dot_sh_functions.tmpl` | Shell functions (bash + zsh) |
-| `dot_config/fastfetch/config.jsonc` | System info display |
-| `dot_config/yazi/yazi.toml` | File manager config |
-| `private_dot_gitconfig.tmpl` | Git configuration |
-| `dot_ssh/config` | SSH host configuration |
+| File                                        | Purpose                                    |
+| ------------------------------------------- | ------------------------------------------ |
+| `install.sh`                                | Bootstrap installation script              |
+| `.chezmoi.yaml.tmpl`                        | Main configuration with prompts            |
+| `.chezmoiexternal.yaml.tmpl`                | External dependencies (oh-my-zsh, plugins) |
+| `.chezmoiignore`                            | Conditional ignore patterns                |
+| `.chezmoihooks/install-password-manager.sh` | Install Bitwarden CLI                      |
+| `.scripts/utils.sh`                         | Shared utility functions                   |
+| `dot_bashrc`                                | Bash shell configuration                   |
+| `dot_zshrc`                                 | Zsh shell configuration                    |
+| `dot_sh_aliases.tmpl`                       | Shell aliases (bash + zsh)                 |
+| `dot_sh_functions.tmpl`                     | Shell functions (bash + zsh)               |
+| `dot_config/fastfetch/config.jsonc`         | System info display                        |
+| `dot_config/yazi/yazi.toml`                 | File manager config                        |
+| `private_dot_gitconfig.tmpl`                | Git configuration                          |
+| `dot_ssh/config`                            | SSH host configuration                     |
 
 ### Variables Reference
 
@@ -1000,8 +1000,8 @@ chezmoi doctor                   # Check for issues
 {{ .changeShell }}               # Change default shell (bool)
 
 # Lists
-{{ .tags }}                      # Machine tags (list)
-{{ .sshKeys }}                   # SSH keys to install (list)
+{{ .environmentTags }}           # Machine environment tags (list)
+{{ .secretsTags }}                   # SSH keys to install (list)
 
 # System information
 {{ .OS_id }}                     # OS identifier (e.g., linux-debian)
@@ -1033,7 +1033,7 @@ content
 {{- end -}}
 
 # Multi-condition
-{{- if and .private (has "work" .tags) -}}
+{{- if and .private (has "work" .environmentTags) -}}
 content
 {{- end -}}
 
@@ -1043,7 +1043,7 @@ content
 {{- end -}}
 
 # Tag check
-{{- if has "dev" .tags -}}
+{{- if has "dev" .environmentTags -}}
 content
 {{- end -}}
 

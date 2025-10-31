@@ -29,15 +29,15 @@
     stripComponents: 2
     path: "bin/fastfetch"
 
-{{ if (has "core+" .tags) }}
-"yazi":  
+{{ if (has "core+" .environmentTags) }}
+"yazi":
     type: "archive-file"
     url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
     executable: true
     stripComponents: 1
     path: "yazi"
 
-"ya":  
+"ya":
     type: "archive-file"
     url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
     executable: true

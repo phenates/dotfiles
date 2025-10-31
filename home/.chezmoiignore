@@ -11,13 +11,13 @@ README.md
 .ssh
 .ssh/**
 {{ else }}
-{{   if not (has "id_homelab" .sshKeys) }}
+{{   if not (has "id_homelab" .secretsTags) }}
 .ssh/id_homelab
 {{   end }}
-{{   if not (has "id_github" .sshKeys) }}
+{{   if not (has "id_github" .secretsTags) }}
 .ssh/id_github
 {{   end }}
-{{   if not (has "id_phenates" .sshKeys) }}
+{{   if not (has "id_phenates" .secretsTags) }}
 .ssh/id_phenates
 {{   end }}
 {{ end }}

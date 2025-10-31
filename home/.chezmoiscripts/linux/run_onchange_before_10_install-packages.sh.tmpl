@@ -129,8 +129,8 @@ case "{{ .chezmoi.osRelease.id }}" in
         ;;
 esac
 
-# Collect packages based on tags
-{{- range $tag := .tags }}
+# Collect packages based on environment tags
+{{- range $tag := .environmentTags }}
 {{-   if hasKey (index $.packages.linux $pkgManager) $tag }}
 info "Packages from {{ $tag }} tag will be included."
 {{-     range (index $.packages.linux $pkgManager $tag) | sortAlpha | uniq }}

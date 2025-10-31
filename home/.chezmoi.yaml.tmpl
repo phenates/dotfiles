@@ -4,8 +4,8 @@
 
 {{- /* Default values */ -}}
 {{- $private  := false -}} {{/* true if this machine should have private secrets */}}
-{{- $tags := list -}}
-{{- $sshKeys := list -}}
+{{- $environmentTags := list -}}
+{{- $secretsTags := list -}}
 {{- $installZSH := true -}}
 {{- $changeShell := true -}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
@@ -27,13 +27,13 @@
 {{- end -}}
 
 {{- $tag_choices := list "core" "core+" "dev" "sysAdmin" "devOps" "personal" "work" -}}
-{{- $tags = promptMultichoice "  ?  Tags list for this machine (e.g., dev, homelab, work)" $tag_choices (list "core") -}}
-{{- writeToStdout (printf "    ➜ '%s' \n\n" $tags ) -}}
+{{- $environmentTags = promptMultichoice "  ?  Select environments tags for this machine (e.g., core, dev,... )" $tag_choices (list "core") -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags ) -}}
 
 {{- if $private -}}
-{{-   $sshKeys_choices := list "id_homelab" "id_github" "id_phenates" -}}
-{{-   $sshKeys = promptMultichoice "  ?  SSH privates keys to add on this machine" $sshKeys_choices -}}
-{{-   writeToStdout (printf "    ➜ '%s' \n\n" $sshKeys ) -}}
+{{-   $secretsTags_choices := list "id_homelab" "id_github" "id_phenates" -}}
+{{-   $secretsTags = promptMultichoice "  ?  Select secrets tags to populate on this machine (e.g., id_github, ... )" $secretsTags_choices -}}
+{{-   writeToStdout (printf "    ➜ '%s' \n\n" $secretsTags ) -}}
 {{- end -}}
 
 
@@ -70,8 +70,8 @@ data:
   private: {{ $private }}
   installZSH: {{ $installZSH }}
   changeShell: {{ $changeShell }}
-  tags: {{ $tags | toToml }}
-  sshKeys: {{ $sshKeys | toToml }}
+  environmentTags: {{ $environmentTags | toToml }}
+  secretsTags: {{ $secretsTags | toToml }}
 
 edit:
   command: "nano"
