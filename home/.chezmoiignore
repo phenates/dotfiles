@@ -1,12 +1,16 @@
 install.sh
 README.md
 
+
+## oh-my-zsh
 !.oh-my-zsh/plugins
 !.oh-my-zsh/plugins/**
 .oh-my-zsh/cache/**
 .oh-my-zsh/templates/**
 .oh-my-zsh/custom/themes/powerlevel10k/**/*.zwc
 
+
+## Secrets
 {{ if not .private }}
 .ssh
 .ssh/**
@@ -22,6 +26,8 @@ README.md
 {{   end }}
 {{ end }}
 
+
+## OS detection
 {{ if ne .chezmoi.os "linux" }}
 
 {{ end }}
@@ -29,3 +35,10 @@ README.md
 {{ if ne .chezmoi.os "windows" }}
 
 {{ end }}
+
+
+## Claude
+.claude/*
+!.claude/CLAUDE.md
+!.claude/commands/
+!.claude/agents/
