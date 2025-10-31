@@ -38,18 +38,19 @@ header "chezmoi -> install, init and apply dotfiles"
 
 # Check if chezmoi is already installed, if not install it
 step "Checking for chezmoi installation..."
-if [ ! "$(command -v chezmoi)" ]; then
+if ! command -v chezmoi >/dev/null 2>&1; then
   bin_dir="$HOME/.local/bin"
   chezmoi="$bin_dir/chezmoi"
   info "chezmoi not found, installing it to $bin_dir"
-  if [ "$(command -v curl)" ]; then
+
+  if command -v curl >/dev/null 2>&1; then
     sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$bin_dir"
     success "chezmoi installed"
-  elif [ "$(command -v wget)" ]; then
+  elif command -v wget >/dev/null 2>&1; then
     sh -c "$(wget -qO- get.chezmoi.io)" -- -b "$bin_dir"
     success "chezmoi installed"
   else
-    error "To install chezmoi, you must have curl or wget installed."
+    error "To install chezmoi, you must have curl or wget installed."      
     exit 1
   fi
 else
@@ -62,6 +63,7 @@ step "Initializing chezmoi and applying dotfiles..."
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188
 # script_dir can be used within --source flag to indicate the chezmoi source directory.
 script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
+script_dir="$(cd -P -- "$(dirname -- "$0")" && pwd -P)" # CC correction for local execution only
 
 info "Script dir.: $script_dir"
 
@@ -99,7 +101,3 @@ while true; do
       ;;
   esac
 done
-
-echo ""
-success "chezmoi completed! 🎉"
-echo ""
