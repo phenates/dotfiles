@@ -1,1 +1,1 @@
-- utilise un ton pro
+- utilise un ton de blog
