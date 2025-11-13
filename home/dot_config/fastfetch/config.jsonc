@@ -1,0 +1,108 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "auto",
+    "padding": {
+      "top": 5
+    }
+  },
+  "display": {
+    "separator": ": ",
+    "constants": [
+      "─────────────────" // {$1}, used in Custom module
+    ],
+    "key": {
+      "type": "string",
+      "paddingLeft": 1
+    },
+    // "color": {
+    //   "keys": "blue", // Key color
+    //   "title": "red" // Title color
+    // },
+    "percent": {
+      "type": 9, // 1=number, 2=bar, 3=both, 9=colored number
+      "color": {
+        "green": "green",
+        "yellow": "light_yellow",
+        "red": "light_red"
+      }
+    }
+  },
+  "modules": [
+    {
+      "type": "title",
+      "key": "User", // Title module has no key by default, so that icon is not displayed
+      "format": "{user-name}@{host-name}"
+    },
+    "datetime",
+    "break",
+    // HardwareStart
+    {
+      "type": "custom",
+      // {#1} is equivalent to `\u001b[1m`. {#} is equivalent to `\u001b[m`
+      "format": "┌{$1} {#cyan} Hardware Informations {#} {$1}┐"
+    },
+    {
+      "type": "cpu",
+      "key": "CPU",
+      "format": "{cores-logical} x {name}"
+    },
+    "cpuusage",
+    "gpu",
+    "disk",
+    "memory",
+    {
+      "type": "custom", // SoftwareStart
+      "format": "├{$1} {#cyan} Software Informations {#} {$1}┤"
+    },
+    "host",
+    "os",
+    "kernel",
+    {
+      "type": "loadavg",
+      "key": "Load Average"
+    },
+    "processes",
+    "uptime",
+    {
+      "type": "packages",
+      "format": "{all}",
+      "combined": true
+    },
+    "shell",
+    {
+      "type": "terminal",
+      "format": "{pretty-name} {version} {#37}█{#97}█ {#36}█{#96}█ {#35}█{#95}█ {#34}█{#94}█ {#33}█{#93}█ {#32}█{#92}█ {#31}█{#91}█ {#30}█{#90}█"
+    },
+    {
+      "type": "custom", // SoftwareStart
+      "format": "├{$1} {#cyan} Networks Informations {#} {$1}┤"
+    },
+    {
+      "type": "title",
+      "key": "Hostname",
+      "format": "{host-name}"
+    },
+    {
+      "type": "localip",
+      "key": "LAN IP",
+      "showIpv6": true,
+      "showPrefixLen": false
+    },
+    {
+      "type": "publicip",
+      "key": "WAN IP",
+      "timeout": 1000
+    },
+    "dns",
+    {
+      "type": "wifi",
+      "format": "{ssid}"
+    },
+    "netio",
+    {
+      "type": "custom", // InformationEnd
+      "format": "└{$1}─────────────────────────{$1}┘"
+    }
+  ]
+}

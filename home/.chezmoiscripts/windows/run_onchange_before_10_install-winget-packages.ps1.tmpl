@@ -1,0 +1,180 @@
+{{- if eq .chezmoi.os "windows" -}}
+<#
+.SYNOPSIS
+    Chezmoi PowerShell script running before `chezmoi apply`
+
+.DESCRIPTION
+    Install packages on Windows using winget, and checks if a package
+    is already installed before attempting installation.
+
+.NOTES
+    File Name   : run_onchange_before_10_install-winget-packages.ps1.tmpl
+    Version     : 0.1
+    Date        : 2025-11-06
+#>
+
+#Requires -RunAsAdministrator
+
+# Import utility functions
+. "{{ .chezmoi.sourceDir -}}/.utils/utils.ps1"
+
+# Strict error handling
+$ErrorActionPreference = "Stop"
+
+## Functions
+
+function Update-Winget {
+    try {
+        Write-Step "Updating winget to latest version..."
+
+        # Get current version
+        $versionOutput = winget --version 2>$null
+        if ($versionOutput) {
+            Write-Info "Current winget version: $versionOutput"
+        }
+
+        # Using Microsoft.WinGet.Client PowerShell module, and Repair-WinGetPackageManager CmdLet
+        # Install/Update Microsoft.WinGet.Client module
+        Write-Info "Installing/Updating Microsoft.WinGet.Client PowerShell module..."
+        if (-not (Get-Module -ListAvailable -Name Microsoft.WinGet.Client)) {
+            Install-Module -Name Microsoft.WinGet.Client -Force -Scope CurrentUser -AllowClobber
+            Write-Success "Microsoft.WinGet.Client module installed"
+        } else {
+            Update-Module -Name Microsoft.WinGet.Client -Force
+            Write-Success "Microsoft.WinGet.Client module updated"
+        }
+
+        # Repair/Update WinGet using the PowerShell module
+        Write-Info "Updating/Repairing WinGet to latest version..."
+        Repair-WinGetPackageManager -Force -Latest
+
+        # Verify new version
+        $newVersionOutput = winget --version 2>$null
+        if ($newVersionOutput) {
+            Write-Success "Winget updated to version: $newVersionOutput"
+        }
+
+        return $true
+    }
+    catch {
+        Write-Warning "Failed to update winget: $_"
+        Write-Info "Continuing with current version"
+        return $true  # Don't fail the script if winget update fails
+    }
+}
+
+function Update-WingetSource {
+    try {
+        Write-Step "Updating winget source..."
+        winget source update --disable-interactivity | Out-Null
+        Write-Success "Winget source updated"
+        return $true
+    }
+    catch {
+        Write-Error "Failed to update winget source: $_"
+        return $false
+    }
+}
+
+function Install-WingetPackage {
+    param([string]$PackageId)
+
+    try {
+        Write-Step "$PackageId : installing..."
+        
+        # Check if package is already installed
+        $installed = winget list --id $PackageId --exact --disable-interactivity 2>$null
+        if ($LASTEXITCODE -eq 0 -and $installed -match $PackageId) {
+            Write-Info "$PackageId already installed"
+            return $true
+        }
+
+        # Install package
+        $result = winget install --id $PackageId --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity 2>&1
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "$PackageId installed"
+            return $true
+        }
+        else {
+            Write-Error "Failed to install $PackageId : $result"
+            return $false
+        }
+    }
+    catch {
+        Write-Error "Failed to install $PackageId : $_"
+        return $false
+    }
+}
+
+## Main
+Write-Header "chezmoi -> Windows packages installation"
+
+# Packages list to install
+$WINDOWS_PACKAGES = @()
+
+# Collect packages based on environment tags
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.windows "winget") $tag }}
+Write-Info "Packages from {{ $tag }} tag will be installed..."
+{{-     range (index $.packages.windows "winget" $tag) | sortAlpha | uniq }}
+$WINDOWS_PACKAGES += "{{ . }}"
+{{-     end }}
+{{-   end }}
+{{- end }}
+
+# Remove duplicates
+$WINDOWS_PACKAGES = $WINDOWS_PACKAGES | Select-Object -Unique | Sort-Object
+
+Write-Info "Packages to install: $($WINDOWS_PACKAGES -join ', ')"
+
+# Check required package manager
+Write-Step "Tools validation..."
+if (-not (Assert-RequiredTools @("winget"))) {
+    Write-Error "Winget is not available. Please install Windows Package Manager."
+    exit 1
+}
+Write-Success "Required tools available"
+
+# Update winget itself to latest version
+if (-not (Update-Winget)) {
+    Write-Warning "Could not update winget, but continuing anyway"
+}
+
+# Update winget source
+if (-not (Update-WingetSource)) {
+    exit 1
+}
+
+# Install packages if not already installed
+Write-Step "Installing packages..."
+$failedPackages = @()
+
+foreach ($package in $WINDOWS_PACKAGES) {
+    if (-not (Install-WingetPackage $package)) {
+        $failedPackages += $package
+    }
+}
+
+Write-Host ""
+if ($failedPackages.Count -eq 0) {
+    Write-Success "Windows packages installation completed!"
+}
+else {
+    Write-Warning "Installation completed with some failures"
+    Write-Warning "Failed packages: $($failedPackages -join ', ')"
+}
+Write-Host ""
+
+# Check available updates
+Write-Step "Checking for available updates..."
+$upgradeList = winget upgrade --disable-interactivity 2>&1 | Out-String
+$updateCount = ($upgradeList -split "`n" | Where-Object { $_ -match '^\S+.*\S+.*\S+.*\S+' -and $_ -notmatch '^Name' -and $_ -notmatch '^-+' }).Count
+if ($updateCount -gt 0) {
+    Write-Info "$updateCount package(s) available for update"
+} else {
+    Write-Info "All packages are up to date"
+}
+Write-Host ""
+
+{{ end -}}

@@ -1,0 +1,21 @@
+[user]
+    name = {{ .name }}
+    email = {{ .email }}
+#    signingKey = {{ .chezmoi.homeDir }}/.ssh/id_rsa.pub
+
+[core]
+    editor = {{ .chezmoi.config.edit.command }}
+
+{{/* On private mode, change the remote URL to use token authentication URL for github dotfiles repo */}}
+{{ if .private }}
+# Private mode: use token auth URL for github dotfiles repo 
+[url "https://phenates:{{ (bitwardenFields "item" "d971dd9a-2f9b-4e08-b0cb-66d5fe63108d").githubDotfilesToken.value }}@github.com/phenates/dotfiles.git"]
+        insteadOf = https://github.com/phenates/dotfiles.git
+        pushInsteadOf = https://github.com/phenates/dotfiles.git
+{{ end }}
+
+# Uncomment the following lines to use SSH instead of HTTPS for all GitHub repositories
+#[url "ssh://git@github.com/"]
+#	insteadOf = https://github.com/
+#[url "ssh://git@github.com/"]
+#	pushInsteadOf = https://github.com/

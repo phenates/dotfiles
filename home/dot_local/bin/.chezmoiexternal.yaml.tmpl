@@ -1,0 +1,47 @@
+{{ if eq .chezmoi.os "linux" }}
+
+{{/* Binaries packages */}}
+"neofetch":
+    type: "archive-file"
+    url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
+    executable: true
+    stripComponents: 1
+    path: "neofetch"
+
+"fastfetch":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "fastfetch-cli/fastfetch" (printf "fastfetch-%s-%s.zip" .chezmoi.os .chezmoi.arch) }}"
+    executable: true
+    stripComponents: 2
+    path: "bin/fastfetch"
+
+{{   if (has "core+" .environmentTags) }}
+"yazi":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
+    executable: true
+    stripComponents: 1
+    path: "yazi"
+
+"ya":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" (printf "yazi-x86_64-unknown-linux-gnu.zip") }}"
+    executable: true
+    stripComponents: 1
+    path: "ya"
+{{   end }}
+
+{{/* Private github repo */}}
+{{   if .private }}
+"shell-script":
+    type: "archive"
+    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
+    exact: true
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.gitignore",
+        "*/README.md"
+    ]
+{{   end }}
+{{ end }}

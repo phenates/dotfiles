@@ -1,0 +1,149 @@
+{{- if eq .chezmoi.os "windows" -}}
+<#
+.SYNOPSIS
+    Chezmoi PowerShell script running after `chezmoi apply`
+
+.DESCRIPTION
+    Configure Windows Explorer, hidden file, file extension, full path.
+
+.NOTES
+    File Name   : run_onchange_after_60_configure-explorer.ps1.tmpl
+    Version     : 0.1
+    Date        : 2025-11-06
+#>
+
+#Requires -RunAsAdministrator
+
+# Import utility functions
+. "{{ .chezmoi.sourceDir -}}/.utils/utils.ps1"
+
+# Strict error handling
+$ErrorActionPreference = "Stop"
+
+# Refresh environment variables to detect newly installed pwsh.exe
+# $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+## Main
+Write-Header "chezmoi -> Windows Configuration"
+
+# Windows Explorer configuration
+Write-Step "Windows Explorer configuration"
+
+# Config hidden file (expecting val 1 or 2)
+try {
+    $HidenFile = (Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name 'Hidden' -ErrorAction Stop).Hidden
+    if ($HidenFile -eq 2) {
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name 'Hidden' -Value 1
+        Write-Success "Show hidden files enabled"
+    } else {
+        Write-Info "Show hidden files already enabled"
+    }
+}
+catch {
+    Write-Warning "Failed to configure hidden files visibility: $_"
+}
+
+# Config hidden files extension (expecting val 1 or 0)
+try {
+    $HidenFileExt = (Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name 'HideFileExt' -ErrorAction Stop).HideFileExt
+    if ($HidenFileExt -eq 1) {
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name 'HideFileExt' -Value 0
+        Write-Success "Show files extension enabled"
+    } else {
+        Write-Info "Show files extension already enabled"
+    }
+}
+catch {
+    Write-Warning "Failed to configure file extensions visibility: $_"
+}
+
+# Config full path in title bar (expecting val 1 or 0)
+try {
+    $FullPath = (Get-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState -Name 'FullPath' -ErrorAction Stop).FullPath
+    if ($FullPath -eq 0) {
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState -Name 'FullPath' -Value 1
+        Write-Success "Show full path in title bar enabled"
+    } else {
+        Write-Info "Show full path in title bar already enabled"
+    }
+}
+catch {
+    Write-Warning "Failed to configure full path in title bar: $_"
+}
+
+# PowerShell Profile configuration
+Write-Step "PowerShell Profile configuration"
+Write-Info "Creating hard links to sync PowerShell profiles across different environments"
+Write-Info "Target: PowerShell 7+ profile → VSCode and Windows PowerShell 5.1 profiles"
+
+$PowerShellProfile = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+$WindowsPowerShellProfile = "$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+$VSCodeProfile = "$HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1"
+
+# Create hard link for VS Code profile (PowerShell 7+)
+Write-Info "Create hard link for VS Code profile to PowerShell profile..."
+if (Test-Path $PowerShellProfile -PathType Leaf) {
+    try {
+        if (Test-Path $VSCodeProfile) {
+            $item = Get-Item $VSCodeProfile
+            if ($item.LinkType -eq "HardLink") {
+                Write-Info "VSCode profile already exists as hard link"
+            } else {
+                Write-Warning "VSCode profile exists but is not a hard link, recreating..."
+                Remove-Item $VSCodeProfile -Force
+                New-Item -ItemType HardLink -Path $VSCodeProfile -Value $PowerShellProfile -Force | Out-Null
+                Write-Success "VSCode profile recreated as hard link"
+            }
+        } else {
+            # Ensure directory exists
+            $vsCodeDir = Split-Path $VSCodeProfile -Parent
+            if (-not (Test-Path $vsCodeDir)) {
+                New-Item -ItemType Directory -Path $vsCodeDir -Force | Out-Null
+            }
+
+            New-Item -ItemType HardLink -Path $VSCodeProfile -Value $PowerShellProfile -Force | Out-Null
+            Write-Success "VSCode profile created as hard link"
+        }
+    }
+    catch {
+        Write-Warning "Failed to create VSCode profile hard link: $_"
+    }
+} else {
+    Write-Warning "PowerShell 7+ profile not found at: $PowerShellProfile"
+}
+
+# Create hard link for Windows PowerShell profile (legacy PowerShell 5.1)
+Write-Info "Create hard link for Windows PowerShell profile to PowerShell profile..."
+if (Test-Path $PowerShellProfile -PathType Leaf) {
+    try {
+        if (Test-Path $WindowsPowerShellProfile) {
+            $item = Get-Item $WindowsPowerShellProfile
+            if ($item.LinkType -eq "HardLink") {
+                Write-Info "Windows PowerShell profile already exists as hard link"
+            } else {
+                Write-Warning "Windows PowerShell profile exists but is not a hard link, recreating..."
+                Remove-Item $WindowsPowerShellProfile -Force
+                New-Item -ItemType HardLink -Path $WindowsPowerShellProfile -Value $PowerShellProfile -Force | Out-Null
+                Write-Success "Windows PowerShell profile recreated as hard link"
+            }
+        } else {
+            # Ensure directory exists
+            $winPSDir = Split-Path $WindowsPowerShellProfile -Parent
+            if (-not (Test-Path $winPSDir)) {
+                New-Item -ItemType Directory -Path $winPSDir -Force | Out-Null
+            }
+
+            New-Item -ItemType HardLink -Path $WindowsPowerShellProfile -Value $PowerShellProfile -Force | Out-Null
+            Write-Success "Windows PowerShell profile created as hard link"
+        }
+    }
+    catch {
+        Write-Warning "Failed to create Windows PowerShell profile hard link: $_"
+    }
+} else {
+    Write-Warning "PowerShell 7+ profile not found at: $PowerShellProfile"
+}
+
+Write-Host ""
+
+{{ end -}}

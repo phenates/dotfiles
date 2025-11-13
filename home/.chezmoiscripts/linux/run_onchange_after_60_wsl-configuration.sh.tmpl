@@ -1,0 +1,72 @@
+{{- if (and (eq .chezmoi.os "linux") (.is_WSL)) -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running after `chezmoi apply`
+#              Configure WSL-specific settings and symbolic links.
+#              Creates a symbolic link 'MaPomme' pointing to /mnt/e
+#              if the validation directory exists.
+#version      :0.1
+#date         :2025-10-31
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -euo pipefail
+
+## Main
+header "chezmoi -> WSL Configuration"
+
+# Configuration
+LINK_NAME="MaPomme"
+TARGET_DIR="/mnt/e"
+VALIDATION_DIR="/mnt/e/0_My-Notes"
+LINK_PATH="$HOME/$LINK_NAME"
+
+step "Checking WSL mount point availability..."
+
+# Verify that the validation directory exists
+if [[ ! -d "$VALIDATION_DIR" ]]; then
+    warning "Validation directory not found: $VALIDATION_DIR"
+    warning "Skipping symbolic link creation for $LINK_NAME"
+    exit 0
+fi
+
+success "Mount point validated: $TARGET_DIR"
+
+step "Creating symbolic link: $LINK_NAME -> $TARGET_DIR"
+
+# Check if symlink already exists and is correct
+if [[ -L "$LINK_PATH" ]]; then
+    CURRENT_TARGET=$(readlink "$LINK_PATH")
+    if [[ "$CURRENT_TARGET" == "$TARGET_DIR" ]]; then
+        info "Symbolic link already exists and is correct"
+        info "  Link: $LINK_PATH"
+        info "  Target: $TARGET_DIR"
+        exit 0
+    else
+        warning "Existing symlink points to different location: $CURRENT_TARGET"
+        warning "Please manually verify and update if needed"
+        exit 0
+    fi
+fi
+
+# Check if a file or directory exists at the link location
+if [[ -e "$LINK_PATH" ]]; then
+    error "A file or directory already exists at: $LINK_PATH"
+    error "Please remove it manually before running this script"
+    exit 1
+fi
+
+# Create the symbolic link
+if ln -s "$TARGET_DIR" "$LINK_PATH"; then
+    success "Symbolic link created successfully: $LINK_NAME"
+    info "  Link: $LINK_PATH"
+    info "  Target: $TARGET_DIR"
+else
+    error "Failed to create symbolic link"
+    exit 1
+fi
+
+{{ end -}}

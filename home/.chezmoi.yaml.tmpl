@@ -1,0 +1,129 @@
+{{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
+{{/* Use template or trigger prompts to populate values. */}}
+
+
+{{- /* Load previous configuration if exists */ -}}
+{{- $previousConfig := dict -}}
+{{- $configPath := joinPath .chezmoi.homeDir ".config" "chezmoi" "chezmoi.yaml" -}}
+{{- if stat $configPath -}}
+{{-   $previousConfig = include $configPath | fromYaml -}}
+{{- end -}}
+
+{{- /* Default values */ -}}
+{{- $private  := false -}} {{/* true if this machine should have private secrets */}}
+{{- $environmentTags := list -}}
+{{- $secretsTags := list -}}
+{{- $installZSH := true -}}
+{{- $changeShell := true -}}
+{{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
+{{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
+{{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
+
+{{- /* Extract previous values or use hardcoded defaults */ -}}
+{{- $previousPrivate := false -}}
+{{- $previousEnvTags := list "core" -}}
+{{- $previousSecretsTags := list -}}
+
+{{- if hasKey $previousConfig "data" -}}
+{{-   if hasKey $previousConfig.data "private" -}}
+{{-     $previousPrivate = $previousConfig.data.private -}}
+{{-   end -}}
+{{-   if hasKey $previousConfig.data "environmentTags" -}}
+{{-     $previousEnvTags = $previousConfig.data.environmentTags -}}
+{{-   end -}}
+{{-   if hasKey $previousConfig.data "secretsTags" -}}
+{{-     $previousSecretsTags = $previousConfig.data.secretsTags -}}
+{{-   end -}}
+{{- end -}}
+
+{{- /* Convert boolean to choice string for promptChoice */ -}}
+{{- $privateDefault := "no" -}}
+{{- if $previousPrivate -}}
+{{-   $privateDefault = "Yes" -}}
+{{- end -}}
+
+
+{{- /* Prompts */ -}}
+{{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
+{{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
+
+{{- $private_choices := list "Yes" "no" -}}
+{{- $private  := promptChoice "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ?" $private_choices $privateDefault -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $private ) -}}
+{{- if eq $private "Yes" -}}
+{{-   $private = true -}}
+{{- else -}}
+{{-   $private = false -}}
+{{- end -}}
+
+{{- $tag_choices := list "core" "core+" -}} {{/* "dev" "ai" "sysAdmin" "devOps" "personal" "work" */}}
+{{- $environmentTags = promptMultichoice "  ?  Select environments tags for this machine (e.g., core, dev,... )" $tag_choices $previousEnvTags -}}
+{{- writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags ) -}}
+
+{{- if $private -}}
+{{-   $secretsTags_choices := list "id_homelab" "id_github" "id_phenates" -}}
+{{-   $secretsTags = promptMultichoice "  ?  Select secrets tags to populate on this machine (e.g., id_github, ... )" $secretsTags_choices $previousSecretsTags -}}
+{{-   writeToStdout (printf "    ➜ '%s' \n\n" $secretsTags ) -}}
+{{- end -}}
+
+
+{{- /* OS infos */ -}}
+{{- $OS_ID := .chezmoi.os -}}
+{{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
+{{-   $OS_ID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+{{- $is_WSL := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
+{{-     $is_WSL = true -}}
+{{-   end -}}
+{{- end -}}
+
+
+{{- /* Hook commands */ -}}
+{{ if $private }}
+hooks:
+  read-source-state:
+    pre:
+      script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
+{{ end }}
+
+
+{{- /* Data */ -}}
+data:
+  name: "phenates"
+  email: "phen4tes@gmail.com"
+  OS_id: {{ $OS_ID | quote }}
+  is_WSL: {{ $is_WSL }}
+  signingKey: ""
+  private: {{ $private }}
+  installZSH: {{ $installZSH }}
+  changeShell: {{ $changeShell }}
+  environmentTags: {{ $environmentTags | toToml }}
+  secretsTags: {{ $secretsTags | toToml }}
+
+
+{{ if eq .chezmoi.os "linux" -}}
+edit:
+  command: "nano"
+{{ else if eq .chezmoi.os "windows" }}
+{{   if lookPath "code" }}
+edit:
+  command: "code"
+  args: ["--wait"]
+{{   else }}
+edit:
+  command: "notepad"
+{{   end }}
+{{ end }}
+
+
+
+bitwarden:
+  unlock: "auto"
+
+git:
+  autoCommit: true
+  autoPush: true
+

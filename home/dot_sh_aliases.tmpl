@@ -1,0 +1,73 @@
+# ~/.sh_aliases
+# =============================================================================
+# Shell aliases sourced by `~/.bashrc` and `~/.zshrc`.
+
+alias zshconfig="chezmoi edit ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+## Directory browsing
+# -----------------------------------------------------------------------------
+
+# ls inprovement with eza
+if command -v 'eza' &> /dev/null; then
+    alias ls="eza --icons=auto"
+    alias l="eza --all --long --header --icons=auto"
+    alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
+    alias lll="eza --all --long --header --tree --color=always --icons=auto"
+fi
+
+# yazi wrapper that provides the ability to change the current working directory when exiting Yazi.
+# Use 'y' instead of yazi to start, and press 'q' to quit with change directory, press 'Q' to quit whitout.
+if command -v 'yazi' &> /dev/null; then
+    function y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+        yazi "$@" --cwd-file="$tmp"
+        IFS= read -r -d '' cwd < "$tmp"
+        [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+        rm -f -- "$tmp"
+    }
+fi
+
+
+
+## Redefine standard commands to improve their behavior
+# -----------------------------------------------------------------------------
+
+# Makes file commands verbose.
+alias cp='cp -v'
+alias mv='mv -v'
+
+# Displays drives and space in human readable format.
+alias df='df -h'
+
+# Prints disk usage per directory non-recursively, in human readable format.
+alias du='du -h -d1'
+
+
+## Easier navigation
+# -----------------------------------------------------------------------------
+
+# Nagivates up a directory.
+alias ..='cd ..'
+
+# Nagivates up two directories.
+alias ...='cd ../../../'
+
+
+## General aliases
+# -----------------------------------------------------------------------------
+
+# Clears the console screen.
+alias c='clear'
+
+alias sys='systemctl'
+
+
+## Platform specific aliases
+# -----------------------------------------------------------------------------
+
+{{ if .is_WSL -}}
+# WSL 
+# WSl: no access to the windows agent ssh, run the windows exectable instead
+alias ssh-add="ssh-add.exe"
+{{- end }}

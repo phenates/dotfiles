@@ -1,0 +1,167 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running before `chezmoi apply`.
+#              Install packages on linux dtistribution, and checks if a package
+#              is already installed before attempting installation.
+#version      :0.4
+#date         :2025-10-25
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -e # -e: script exit on error
+
+## Variables:
+# Define package manager based on OS distribution
+{{ $pkgManager := "" -}}
+{{- if eq .chezmoi.osRelease.id "debian" "ubuntu" "raspbian" -}}
+{{   $pkgManager = "apt" -}}
+{{- else if eq .chezmoi.osRelease.id "fedora" -}}
+{{   $pkgManager = "dnf" -}}
+{{- else if eq .chezmoi.osRelease.id "arch" -}}
+{{   $pkgManager = "pacman" -}}
+{{- end -}}
+
+# Packages list to install
+LINUX_PACKAGES=()
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+## Functions:
+# Package manager specific functions
+apt_update() {
+    if {{ $sudo }} apt update -qq 2>/dev/null; then
+        success "Package list updated"
+        return 0
+    fi
+    error "Failed to update package list"
+    return 1
+}
+
+apt_install() {
+    local package="$1"
+    if dpkg -l | grep -q "^ii  $package "; then
+        info "$package already installed"
+        return 0
+    else
+        if {{ $sudo }} apt install -qq -y "$package" > /dev/null 2>&1; then
+            success "$package installed"
+            return 0
+        fi
+        error "Failed to install $package"
+        return 1
+    fi
+}
+
+dnf_update() {
+    if {{ $sudo }} dnf check-update -q > /dev/null 2>&1; then
+        success "Package list updated"
+        return 0
+    fi
+    error "Failed to update package list"
+    return 1
+}
+
+dnf_install() {
+    local package="$1"
+    if dnf list installed "$package" &> /dev/null; then
+        info "$package already installed"
+        return 0
+    else
+        if {{ $sudo }} dnf install -y -q "$package" > /dev/null 2>&1; then
+            success "$package installed"
+            return 0
+        fi
+        error "Failed to install $package"
+        return 1
+    fi
+}
+
+pacman_update() {
+    if {{ $sudo }} pacman -Sy --noconfirm > /dev/null 2>&1; then
+        success "Package list updated"
+        return 0
+    fi
+    error "Failed to update package list"
+    return 1
+}
+
+pacman_install() {
+    local package="$1"
+    if pacman -Qi "$package" &> /dev/null; then
+        info "$package already installed"
+        return 0
+    else
+        if {{ $sudo }} pacman -S --noconfirm "$package" > /dev/null 2>&1; then
+            success "$package installed"
+            return 0
+        fi
+        error "Failed to install $package"
+        return 1
+    fi
+}
+
+## Main
+header "chezmoi -> Linux packages installation"
+
+case "{{ .chezmoi.osRelease.id }}" in
+    debian | ubuntu | raspbian)
+        PACKAGE_UPDATE="apt_update"
+        PACKAGE_INSTALL="apt_install"
+        ;;
+    fedora)
+        PACKAGE_UPDATE="dnf_update"
+        PACKAGE_INSTALL="dnf_install"
+        ;;
+    arch)
+        PACKAGE_UPDATE="pacman_update"
+        PACKAGE_INSTALL="pacman_install"
+        ;;
+    *)
+        error "Unsupported distribution"
+        exit 1
+        ;;
+esac
+
+# Collect packages based on environment tags
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.linux $pkgManager) $tag }}
+info "Packages from {{ $tag }} tag will be included."
+{{-     range (index $.packages.linux $pkgManager $tag) | sortAlpha | uniq }}
+LINUX_PACKAGES+=("{{ . }}")
+{{-     end }}
+{{-   end }}
+{{- end }}
+
+# Remove duplicates from LINUX_PACKAGES array
+# readarray -t LINUX_PACKAGES < <(printf '%s\n' "${LINUX_PACKAGES[@]}" | awk '!seen[$0]++' | sort)
+
+## Check required package manager
+step "Tools validation..."
+if ! require_tools {{ $pkgManager }}; then
+    exit 1
+fi
+success "Required tools available"
+
+# Update package list
+step "Updating {{ $pkgManager }} package list..."
+$PACKAGE_UPDATE || exit 1
+
+# Install packages if not already installed
+step "Installing packages..."
+for package in "${LINUX_PACKAGES[@]}"; do
+    step "$package: checking and installing..."
+    $PACKAGE_INSTALL "$package"
+done
+
+echo ""
+success "Linux packages installation completed! 🎉"
+echo ""
+
+{{ end -}}

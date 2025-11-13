@@ -1,0 +1,82 @@
+{{- if eq .OS_id "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running after `chezmoi apply`.
+#              Install chezmoi package (to benefit of autocompleting) and remove
+#              the binary file downloaded during install.sh script.
+#version      :0.3
+#date         :2025-10-25
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -e # -e: exit on error
+
+## Variables:
+PACKAGE_URL={{ gitHubLatestReleaseAssetURL "twpayne/chezmoi" (printf "chezmoi_%s_%s_%s.deb" ((gitHubLatestRelease "twpayne/chezmoi").TagName | trimPrefix "v") .chezmoi.os .chezmoi.arch) }}
+TEMP_DIR=$(mktemp -t chezmoi-XXXX.deb)
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+## Cleanup on exit
+trap 'rm -f "$TEMP_DIR"' EXIT
+
+## Main
+header "chezmoi -> Replace chezmoi binary file by the package .deb"
+info "Package URL: $PACKAGE_URL"
+
+if [[ "$(command -v chezmoi)" == "/usr/bin/chezmoi" ]] ; then
+  info "Chezmoi package already installed"
+  exit 0
+fi
+
+## Check requiered package
+step "Tools validation..."
+if ! require_tools wget apt; then
+  exit 1
+fi
+success "Requiered tools available"
+
+## Install chezmoi package
+step "Downloading chezmoi .deb ..."
+if ! wget -q -O "$TEMP_DIR" "$PACKAGE_URL" ; then
+  error "Failed to download .deb from: $PACKAGE_URL"
+  exit 1
+fi
+success ".deb downloaded successfully from:\n $PACKAGE_URL"
+
+step "Installing .deb with apt..."
+if ! {{ $sudo }} apt install -qq -y "$TEMP_DIR" > /dev/null 2>&1; then
+  error "Failed to install package"
+  exit 1
+fi
+success "Chezmoi package installed"
+
+# Remove chezmoi binary
+step "Cleaning up binary installation..."
+if [[ -f "$HOME/.local/bin/chezmoi" ]]; then
+  rm -f "$HOME/.local/bin/chezmoi"
+  success "Chezmoi binary file removed"
+else
+  info "No binary file found in $HOME/.local/bin (skipped)"
+fi
+
+# Remove install.sh script
+step "Removing install.sh script..."
+if [[ -f "$HOME/install.sh" ]]; then
+  rm -f "$HOME/install.sh"
+  success "install.sh file removed"
+else
+  info "No install.sh file found (skipped)"
+fi
+
+echo ""
+success "Replacing Binary with apt package completed! 🎉"
+echo ""
+
+{{ end -}}

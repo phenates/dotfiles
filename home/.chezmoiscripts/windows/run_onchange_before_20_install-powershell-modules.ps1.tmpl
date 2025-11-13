@@ -1,0 +1,238 @@
+{{- if eq .chezmoi.os "windows" -}}
+<#
+.SYNOPSIS
+    Chezmoi PowerShell script running before `chezmoi apply`
+
+.DESCRIPTION
+    Install PowerShell modules from PowerShell Gallery, and checks if a module
+    is already installed before attempting installation.
+
+.NOTES
+    File Name   : run_onchange_before_20_install-powershell-modules.ps1.tmpl
+    Version     : 0.1
+    Date        : 2025-11-06
+#>
+
+#Requires -RunAsAdministrator
+
+# Import utility functions
+. "{{ .chezmoi.sourceDir -}}/.utils/utils.ps1"
+
+# Strict error handling
+$ErrorActionPreference = "Stop"
+
+# Refresh environment variables to detect newly installed pwsh.exe
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Find pwsh.exe location
+$pwshPath = $null
+if (Get-Command pwsh.exe -ErrorAction SilentlyContinue) {
+    $pwshPath = "pwsh.exe"
+} elseif (Test-Path "C:\Program Files\PowerShell\7\pwsh.exe") {
+    $pwshPath = "C:\Program Files\PowerShell\7\pwsh.exe"
+} else {
+    Write-Error "PowerShell 7+ (pwsh.exe) is required but not found. Please ensure script 10 runs before this script."
+    exit 1
+}
+
+Write-Info "Using PowerShell: $pwshPath"
+
+## Functions
+
+function Update-PowerShellGet {
+    try {
+        Write-Step "Updating PowerShellGet to latest version..."
+
+        # Get current version
+        $currentVersion = (Get-Module -Name PowerShellGet -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version
+        if ($currentVersion) {
+            Write-Info "Current PowerShellGet version: $currentVersion"
+        }
+
+        Write-Info "Updating PowerShellGet..."
+
+        # Install NuGet provider if not present
+        $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+        if (-not $nuget) {
+            Write-Info "Installing NuGet provider..."
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope AllUsers | Out-Null
+            Write-Success "NuGet provider installed"
+        }
+
+        # Update PowerShellGet
+        $result = Install-Module -Name PowerShellGet -Force -AllowClobber -Scope AllUsers -ErrorAction SilentlyContinue
+
+        if ($?) {
+            $newVersion = (Get-Module -Name PowerShellGet -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version
+            Write-Success "PowerShellGet is up to date (version: $newVersion)"
+            return $true
+        }
+        else {
+            Write-Warning "Failed to update PowerShellGet, but continuing with current version"
+            return $true  # Don't fail the script
+        }
+    }
+    catch {
+        Write-Warning "Failed to update PowerShellGet: $_"
+        Write-Info "Continuing with current version"
+        return $true  # Don't fail the script
+    }
+}
+
+function Test-ModuleInstalled {
+    param([string]$ModuleName)
+
+    $module = Get-Module -Name $ModuleName -ListAvailable -ErrorAction SilentlyContinue
+    return ($null -ne $module)
+}
+
+function Install-PowerShellModule {
+    param([string]$ModuleName)
+
+    try {
+        # Check if module is already installed using pwsh.exe
+        $moduleInstalled = & $pwshPath -NoProfile -Command "Get-Module -Name '$ModuleName' -ListAvailable -ErrorAction SilentlyContinue"
+
+        if ($moduleInstalled) {
+            Write-Info "$ModuleName already installed"
+
+            # Check for updates using pwsh.exe
+            Write-Step "$ModuleName : checking for updates..."
+            $installedVersion = & $pwshPath -NoProfile -Command "(Get-Module -Name '$ModuleName' -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version.ToString()"
+
+            try {
+                $onlineVersion = & $pwshPath -NoProfile -Command "(Find-Module -Name '$ModuleName' -ErrorAction SilentlyContinue).Version.ToString()"
+
+                if ($onlineVersion -and ([version]$onlineVersion -gt [version]$installedVersion)) {
+                    Write-Info "$ModuleName : updating from $installedVersion to $onlineVersion..."
+                    & $pwshPath -NoProfile -Command "Update-Module -Name '$ModuleName' -Force -ErrorAction Stop"
+                    Write-Success "$ModuleName updated to version $onlineVersion"
+                }
+                else {
+                    Write-Info "$ModuleName is up to date (version: $installedVersion)"
+                }
+            }
+            catch {
+                Write-Info "$ModuleName : could not check for updates, keeping current version $installedVersion"
+            }
+
+            return $true
+        }
+
+        # Install module using pwsh.exe
+        Write-Step "$ModuleName : installing..."
+        & $pwshPath -NoProfile -Command "Install-Module -Name '$ModuleName' -Scope AllUsers -Force -AllowClobber -SkipPublisherCheck -ErrorAction Stop"
+
+        # Verify installation
+        $moduleVerify = & $pwshPath -NoProfile -Command "Get-Module -Name '$ModuleName' -ListAvailable -ErrorAction SilentlyContinue"
+        if ($moduleVerify) {
+            $version = & $pwshPath -NoProfile -Command "(Get-Module -Name '$ModuleName' -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version.ToString()"
+            Write-Success "$ModuleName installed (version: $version)"
+            return $true
+        }
+        else {
+            Write-Error "Failed to install $ModuleName : module not found after installation"
+            return $false
+        }
+    }
+    catch {
+        Write-Error "Failed to install $ModuleName : $_"
+        return $false
+    }
+}
+
+function Set-PSGalleryTrusted {
+    try {
+        Write-Step "Configuring PowerShell Gallery as trusted repository..."
+
+        $psGallery = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
+
+        if ($psGallery.InstallationPolicy -ne 'Trusted') {
+            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            Write-Success "PowerShell Gallery is now trusted"
+        }
+        else {
+            Write-Info "PowerShell Gallery is already trusted"
+        }
+
+        return $true
+    }
+    catch {
+        Write-Warning "Failed to set PSGallery as trusted: $_"
+        Write-Info "You may be prompted to trust modules during installation"
+        return $true  # Don't fail the script
+    }
+}
+
+## Main
+Write-Header "chezmoi -> PowerShell modules installation"
+
+# Modules list to install
+$POWERSHELL_MODULES = @()
+
+# Collect modules based on environment tags
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.windows "powershellModule") $tag }}
+Write-Info "Modules from {{ $tag }} tag will be installed..."
+{{-     range (index $.packages.windows "powershellModule" $tag) | sortAlpha | uniq }}
+$POWERSHELL_MODULES += "{{ . }}"
+{{-     end }}
+{{-   end }}
+{{- end }}
+
+# Check if there are modules to install
+if ($POWERSHELL_MODULES.Count -eq 0) {
+    Write-Info "No PowerShell modules to install based on current tags"
+    exit 0
+}
+
+# Remove duplicates
+$POWERSHELL_MODULES = $POWERSHELL_MODULES | Select-Object -Unique | Sort-Object
+
+Write-Info "Modules to install: $($POWERSHELL_MODULES -join ', ')"
+
+# Update PowerShellGet
+if (-not (Update-PowerShellGet)) {
+    Write-Warning "Could not update PowerShellGet, but continuing anyway"
+}
+
+# Set PSGallery as trusted
+if (-not (Set-PSGalleryTrusted)) {
+    Write-Warning "Could not set PSGallery as trusted, but continuing anyway"
+}
+
+# Install modules if not already installed
+Write-Step "Installing PowerShell modules..."
+$failedModules = @()
+
+foreach ($module in $POWERSHELL_MODULES) {
+    if (-not (Install-PowerShellModule $module)) {
+        $failedModules += $module
+    }
+}
+
+Write-Host ""
+if ($failedModules.Count -eq 0) {
+    Write-Success "PowerShell modules installation completed !"
+}
+else {
+    Write-Warning "Installation completed with some failures"
+    Write-Warning "Failed modules: $($failedModules -join ', ')"
+}
+Write-Host ""
+
+Write-Step "Installing Meslo Font with NerdFonts PowerShell module..."
+try {
+    & $pwshPath -NoProfile -Command "Import-Module NerdFonts -ErrorAction Stop; Install-NerdFont -Name 'Meslo' -Scope AllUsers -ErrorAction Stop"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Success "Meslo nerd font installed!"
+        Write-Info "Restart Windows Terminal and VS Code to ensure they recognize the font"
+    } else {
+        Write-Warning "Could not install Meslo nerd font, but continuing anyway"
+    }
+} catch {
+    Write-Warning "Could not install Meslo nerd font: $_"
+}
+Write-Host ""
+
+{{ end -}}

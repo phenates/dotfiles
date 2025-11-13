@@ -1,0 +1,41 @@
+{{- if (and (eq .chezmoi.os "linux") (.installZSH)) -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running after `chezmoi apply`
+#              Configure prompts.
+#version      :0.2
+#date         :2025-10-17
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -e # -e: exit on error
+
+## Main
+header "chezmoi -> zsh shell"
+
+# Display infos
+step "zsh installation"
+info "zsh installed by Linux packages install script."
+info "oh-my-zsh (framework, plugins, theme) traited as external sources from .chezmoiexternal files."
+info "Nerd font traited as external sources from .chezmoiexternal files."
+
+# Change default shell to zsh
+{{ if .changeShell }}
+step "Change default shell to zsh..."
+if [[ "$SHELL" != *"zsh"* ]]; then
+  chsh -s $(which zsh)
+  if [ $? -eq 0 ]; then
+    success "Default shell changed to zsh"
+    info "Logout and login or run 'exec zsh && source .zshrc', for the change to take effect."
+  else
+    error "Failed to change default shell to zsh"
+  fi
+else
+  info "zsh already the defoult shell"
+fi
+{{ end }}
+
+{{ end -}}

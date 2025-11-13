@@ -1,0 +1,76 @@
+install.sh
+README.md
+
+
+## oh-my-zsh
+!.oh-my-zsh/plugins
+!.oh-my-zsh/plugins/**
+.oh-my-zsh/cache/**
+.oh-my-zsh/templates/**
+.oh-my-zsh/custom/themes/powerlevel10k/**/*.zwc
+
+
+## OS detection
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/linux/**
+.bashrc
+.nanorc
+.p10k.zsh
+.sh_aliases
+.sh_functions
+.zshrc
+# .oh-my-zsh
+.oh-my-zsh/**
+.config/neofetch
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+.chezmoiscripts/windows
+Documents
+.config/ohmyposh
+AppData/**
+{{ end }}
+
+
+
+
+
+
+## Secrets
+{{ if not .private }}
+.ssh/**
+{{ else }}
+{{   if not (has "id_homelab" .secretsTags) }}
+.ssh/id_homelab
+{{   end }}
+{{   if not (has "id_github" .secretsTags) }}
+.ssh/id_github
+{{   end }}
+{{   if not (has "id_phenates" .secretsTags) }}
+.ssh/id_phenates
+{{   end }}
+{{ end }}
+
+
+## AI
+{{ if has "ai" .environmentTags -}}
+.claude/*
+!.claude/CLAUDE.md
+!.claude/commands/
+!.claude/agents/
+!.claude/skills/
+{{ else }}
+.claude
+.claude/**
+{{ end }}
+
+
+
+
+
+## Claude
+# .claude/*
+# !.claude/CLAUDE.md
+# !.claude/commands/
+# !.claude/agents/
+# !.claude/skills/
