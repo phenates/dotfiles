@@ -1,7 +1,6 @@
 {{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
 {{/* Use template or trigger prompts to populate values. */}}
 
-
 {{- /* Load previous configuration if exists */ -}}
 {{- $previousConfig := dict -}}
 {{- $configPath := joinPath .chezmoi.homeDir ".config" "chezmoi" "chezmoi.yaml" -}}
