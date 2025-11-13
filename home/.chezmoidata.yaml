@@ -9,7 +9,7 @@ packages:
         - "unzip"
         - "man-db"
         - "eza"
-        # - "tree"
+        - "tree"
         - "openssh-client"
         - "fontconfig"
         - "zsh"
