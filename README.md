@@ -1,7 +1,7 @@
 # dotfiles
 
 [![chezmoi](https://img.shields.io/badge/managed%20with-chezmoi-blue)](https://www.chezmoi.io/)
-[![GitHub last commit](https://img.shields.io/github/last-commit/phenates/dotfiles)](https://github.com/phenates/dotfiles/commits)
+[![GitHub last commit](https://img.shields.io/github/last-commit/<Github_User>/dotfiles)](https://github.com/<Github_User>/dotfiles/commits)
 
 My dotfiles management with [chezmoi](https://www.chezmoi.io).
 
@@ -77,7 +77,7 @@ chezmoi doctor                   # Check for issues
 ### Linux
 
 ```bash
-sh -c "$(curl -fsLS https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
+sh -c "$(curl -fsLS https://raw.githubusercontent.com/<Github_User>/dotfiles/master/install.sh)"
 # or if redirect URL exists
 sh -c "$(curl -fsLS https://xxxx-linux.MyDomain.com/)"
 ```
@@ -85,7 +85,7 @@ sh -c "$(curl -fsLS https://xxxx-linux.MyDomain.com/)"
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/phenates/dotfiles/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/<Github_User>/dotfiles/master/install.ps1 | iex
 # or if redirect URL exists
 irm https://xxxx-windows.MyDomain.com/ | iex
 ```
@@ -221,7 +221,7 @@ This allows to maintain a single dotfiles repository while supporting different 
 └──────────┬──────────┘
            │
            ├─> Enable Private mode? [Yes/No]
-           |─> Select Secrets tags? [id_homelab/id_github/id_phenates]
+           |─> Select Secrets tags? [id_xxxx/id_github/id_<user>]
            │
            ▼
 ┌─────────────────────────────────┐
@@ -468,7 +468,7 @@ Defined in `.chezmoi.yaml.tmpl`:
 | `.chezmoi.os`           | string | Operating system         | `linux`/`darwin`              |
 | `.chezmoi.arch`         | string | Architecture             | `amd64`/`arm64`               |
 | `.chezmoi.hostname`     | string | Hostname                 | `myserver`                    |
-| `.chezmoi.username`     | string | Current user             | `phenates`                    |
+| `.chezmoi.username`     | string | Current user             | `<user>`                      |
 | `.chezmoi.osRelease.id` | string | Distribution ID          | `debian`/`fedora`             |
 
 ### File Naming Conventions
