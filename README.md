@@ -29,7 +29,7 @@ Mains features:
 - **Tag-based configuration**: 
     - Type of environments: core, core+, ...
     - Secrets to populates: select secrets whos will be used, SSH_key, Tokens,...
-- **Multi-shell configuration**: Bash, Zsh, Powershell
+- **Shell configuration**: Bash, Zsh, Powershell
 
 ## Cheat-sheet Chezmoi
 
