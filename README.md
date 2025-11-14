@@ -18,6 +18,9 @@ My dotfiles management with [chezmoi](https://www.chezmoi.io).
 9.  [Testing & Validation](#testing--validation)
 10. [Documentation References](#documentation-references)
 
+## TODO
+- [ ] Use powershell chezmoi snippet https://www.chezmoi.io/user-guide/machines/windows/#notes-on-running-elevated-scripts 
+
 ## Project Overview
 
 This is a personal dotfiles repository managed by [chezmoi](https://www.chezmoi.io), designed to manage, bootstrap and maintain differents environments (core, development, system administration,...) across different OS/Distribution (Linux, Windows) and/or machines. The repository contains configuration files, scripts, and automation for this purpose.
