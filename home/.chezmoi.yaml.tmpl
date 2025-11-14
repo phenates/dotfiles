@@ -85,7 +85,12 @@
 hooks:
   read-source-state:
     pre:
+{{   if eq .chezmoi.os "linux" }}
       script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
+{{   else if eq .chezmoi.os "windows" }}
+      command: "powershell.exe"
+      args: ["-ExecutionPolicy", "Bypass", "-File", "{{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.ps1"]
+{{   end }}
 {{ end }}
 
 
