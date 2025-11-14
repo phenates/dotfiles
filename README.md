@@ -7,16 +7,29 @@ My dotfiles management with [chezmoi](https://www.chezmoi.io).
 
 ## Table of Contents
 
-1. [Cheat-sheet](#cheat-sheet-chezmoi)
-2. [Project Overview](#project-overview)
+1. [Project Overview](#project-overview)
+2. [Cheat-sheet](#cheat-sheet-chezmoi)
 3. [Installation & Initialization Flow](#installation--initialization-flow)
 4. [Key features](#key-features)
 5. [Architecture & Key Components](#architecture--key-components)
 6. [Template System](#template-system)
 7. [Scripts & Hooks](#scripts--hooks)
 8. [Development Workflows](#development-workflows)
-9. [Testing & Validation](#testing--validation)
+9.  [Testing & Validation](#testing--validation)
 10. [Documentation References](#documentation-references)
+
+## Project Overview
+
+This is a personal dotfiles repository managed by [chezmoi](https://www.chezmoi.io), designed to manage, bootstrap and maintain differents environments (core, development, system administration,...) across different OS/Distribution (Linux, Windows) and/or machines. The repository contains configuration files, scripts, and automation for this purpose.
+
+Mains features:
+
+- **OS detection**: Linux, Windows Subsystem for Linux, Windows and applying specific configurations
+- **Private mode**: Password manager (Bitwarden CLI) integration for secrets management.
+- **Tag-based configuration**: 
+    - Type of environments: core, core+, ...
+    - Secrets to populates: select secrets whos will be used, SSH_key, Tokens,...
+- **Multi-shell configuration**: Bash, Zsh, Powershell
 
 ## Cheat-sheet Chezmoi
 
@@ -58,19 +71,6 @@ chezmoi state delete-bucket --bucket=scriptState  # Reset script state
 chezmoi state dump               # Show internal state
 chezmoi doctor                   # Check for issues
 ```
-
-## Project Overview
-
-This is a personal dotfiles repository managed by [chezmoi](https://www.chezmoi.io), designed to manage, bootstrap and maintain differents environments (core, development, system administration,...) across different OS/Distribution (Linux, Windows) and/or machines. The repository contains configuration files, scripts, and automation for this purpose.
-
-Mains features:
-
-- **OS detection**: Linux, Windows Subsystem for Linux, Windows and applying specific configurations
-- **Private mode**: Password manager (Bitwarden CLI) integration for secrets management.
-- **Tag-based configuration**: 
-    - Type of environments: core, core+, ...
-    - Secrets to populates: select secrets whos will be used, SSH_key, Tokens,...
-- **Multi-shell configuration**: Bash, Zsh, Powershell
 
 ## Installation & Initialization Flow
 
