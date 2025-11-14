@@ -1,7 +1,7 @@
 # dotfiles
 
 [![chezmoi](https://img.shields.io/badge/managed%20with-chezmoi-blue)](https://www.chezmoi.io/)
-[![GitHub last commit](https://img.shields.io/github/last-commit/<Github_User>/dotfiles)](https://github.com/<Github_User>/dotfiles/commits)
+[![GitHub last commit](https://img.shields.io/github/last-commit/phenates/dotfiles)](https://github.com/<Github_User>/dotfiles/commits)
 
 My dotfiles management with [chezmoi](https://www.chezmoi.io).
 
@@ -77,7 +77,7 @@ chezmoi doctor                   # Check for issues
 ### Linux
 
 ```bash
-sh -c "$(curl -fsLS https://raw.githubusercontent.com/<Github_User>/dotfiles/master/install.sh)"
+sh -c "$(curl -fsLS https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
 # or if redirect URL exists
 sh -c "$(curl -fsLS https://xxxx-linux.MyDomain.com/)"
 ```
@@ -85,7 +85,7 @@ sh -c "$(curl -fsLS https://xxxx-linux.MyDomain.com/)"
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/<Github_User>/dotfiles/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/phenates/dotfiles/master/install.ps1 | iex
 # or if redirect URL exists
 irm https://xxxx-windows.MyDomain.com/ | iex
 ```
