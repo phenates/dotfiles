@@ -24,7 +24,7 @@ $ErrorActionPreference = "Stop"
 # $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 ## Main
-Write-Header "chezmoi -> Windows Configuration"
+Write-Header "chezmoi -> System Configuration"
 
 # Windows Explorer configuration
 Write-Step "Windows Explorer configuration"
@@ -74,14 +74,14 @@ catch {
 # PowerShell Profile configuration
 Write-Step "PowerShell Profile configuration"
 Write-Info "Creating hard links to sync PowerShell profiles across different environments"
-Write-Info "Target: PowerShell 7+ profile → VSCode and Windows PowerShell 5.1 profiles"
+Write-Info "Target: PowerShell 7+ profile -> VSCode and Windows PowerShell 5.1 profiles"
 
 $PowerShellProfile = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 $WindowsPowerShellProfile = "$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
 $VSCodeProfile = "$HOME\Documents\PowerShell\Microsoft.VSCode_profile.ps1"
 
 # Create hard link for VS Code profile (PowerShell 7+)
-Write-Info "Create hard link for VS Code profile to PowerShell profile..."
+Write-Info "Create hard link from PowerShell 7+ profile to VS Code profile..."
 if (Test-Path $PowerShellProfile -PathType Leaf) {
     try {
         if (Test-Path $VSCodeProfile) {
@@ -113,7 +113,7 @@ if (Test-Path $PowerShellProfile -PathType Leaf) {
 }
 
 # Create hard link for Windows PowerShell profile (legacy PowerShell 5.1)
-Write-Info "Create hard link for Windows PowerShell profile to PowerShell profile..."
+Write-Info "Create hard link from PowerShell 7+ profile to Windows PowerShell profile..."
 if (Test-Path $PowerShellProfile -PathType Leaf) {
     try {
         if (Test-Path $WindowsPowerShellProfile) {
