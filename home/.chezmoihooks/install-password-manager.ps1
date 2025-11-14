@@ -38,8 +38,9 @@ $ProgressPreference = 'SilentlyContinue'  # Faster downloads
 #==============================================================================
 $BIT_BIN_CMD = "bw.exe"
 $BIT_BIN_URL = "https://github.com/bitwarden/clients/releases/download/cli-v2025.10.0/bw-windows-2025.10.0.zip"
-$BIT_BIN_SHA256 = "81ad1eb3cc97dbb0ea251f7e23fb7f327fbf2c06f985d621d7974bfb8ef748a1" 
-$INSTALL_DIR = "$env:LOCALAPPDATA\Programs\Bitwarden CLI"
+$BIT_BIN_SHA256 = "81ad1eb3cc97dbb0ea251f7e23fb7f327fbf2c06f985d621d7974bfb8ef748a1"
+# Use Windows standard location that's typically in PATH
+$INSTALL_DIR = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
 $TEMP_DIR = Join-Path $env:TEMP "bwinstall_$(Get-Random)"
 $BIT_BIN_PATH = Join-Path $INSTALL_DIR $BIT_BIN_CMD
 $CONFIG_DIR = "$env:APPDATA\Bitwarden CLI"
@@ -132,19 +133,22 @@ try {
     }
     Write-Success "Binary installed successfully"
 
-    # Add to PATH if not already present
-    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    if ($userPath -notlike "*$INSTALL_DIR*") {
-        Write-Step "Adding to PATH..."
-        [Environment]::SetEnvironmentVariable(
-            "Path",
-            "$userPath;$INSTALL_DIR",
-            "User"
-        )
-        # Update current session PATH
+    # WindowsApps is typically already in PATH, but verify
+    Write-Step "Verifying PATH configuration..."
+    if ($env:Path -notlike "*$INSTALL_DIR*") {
+        Write-Warning "WindowsApps not in current PATH, this is unusual"
+        # Add to current session
         $env:Path = "$env:Path;$INSTALL_DIR"
-        Write-Success "Added to user PATH"
     }
+
+    # Verify bw is now accessible
+    if (-not (Get-Command bw -ErrorAction SilentlyContinue)) {
+        Write-Error "bw command not found in PATH after installation"
+        Write-Info "Install location: $BIT_BIN_PATH"
+        Write-Info "Please restart your terminal or PowerShell session"
+        exit 1
+    }
+    Write-Success "bw command is available in PATH"
 
     # Cleanup temporary files
     Write-Step "Cleaning up temporary files..."
@@ -206,7 +210,7 @@ try {
     }
 
     Write-Host ""
-    Write-Success "Bitwarden CLI installation & configuration completed! 🎉"
+    Write-Success "Bitwarden CLI installation & configuration completed!"
     Write-Host ""
 }
 catch {
