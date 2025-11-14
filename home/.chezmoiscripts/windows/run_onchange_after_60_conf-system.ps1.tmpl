@@ -75,6 +75,7 @@ catch {
 Write-Step "PowerShell Profile configuration"
 Write-Info "Creating hard links to sync PowerShell profiles across different environments"
 Write-Info "Target: PowerShell 7+ profile -> VSCode and Windows PowerShell 5.1 profiles"
+Write-Host ""
 
 $PowerShellProfile = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 $WindowsPowerShellProfile = "$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
@@ -111,6 +112,7 @@ if (Test-Path $PowerShellProfile -PathType Leaf) {
 } else {
     Write-Warning "PowerShell 7+ profile not found at: $PowerShellProfile"
 }
+Write-Host ""
 
 # Create hard link for Windows PowerShell profile (legacy PowerShell 5.1)
 Write-Info "Create hard link from PowerShell 7+ profile to Windows PowerShell profile..."
@@ -143,7 +145,6 @@ if (Test-Path $PowerShellProfile -PathType Leaf) {
 } else {
     Write-Warning "PowerShell 7+ profile not found at: $PowerShellProfile"
 }
-
 Write-Host ""
 
 {{ end -}}
