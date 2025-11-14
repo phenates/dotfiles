@@ -38,7 +38,7 @@ $ProgressPreference = 'SilentlyContinue'  # Faster downloads
 #==============================================================================
 $BIT_BIN_CMD = "bw.exe"
 $BIT_BIN_URL = "https://github.com/bitwarden/clients/releases/download/cli-v2025.10.0/bw-windows-2025.10.0.zip"
-$BIT_BIN_SHA256 = "REPLACE_WITH_ACTUAL_SHA256"  # Replace with actual Windows binary SHA256
+$BIT_BIN_SHA256 = "ab95ac80270563820e64b83bca0f434f1b741f89f4971a779dd589af936ed877" 
 $INSTALL_DIR = "$env:LOCALAPPDATA\Programs\Bitwarden CLI"
 $TEMP_DIR = Join-Path $env:TEMP "bwinstall_$(Get-Random)"
 $BIT_BIN_PATH = Join-Path $INSTALL_DIR $BIT_BIN_CMD
