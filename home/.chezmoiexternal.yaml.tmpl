@@ -1,7 +1,6 @@
 {{ if eq .chezmoi.os "linux" }}
 
 {{/* oh-my-zsh */}}
-{{   if .installZSH }}
 ".oh-my-zsh":
     type: "archive"
     url: "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
@@ -12,5 +11,5 @@
         "*/templates",
         "*/themes",
     ]
-{{   end }}
+
 {{ end }}

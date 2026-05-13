@@ -9,36 +9,15 @@
 {{- end -}}
 
 {{- /* Default values */ -}}
-{{- $private  := false -}} {{/* true if this machine should have private secrets */}}
 {{- $environmentTags := list -}}
-{{- $secretsTags := list -}}
-{{- $installZSH := true -}}
-{{- $changeShell := true -}}
-{{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
-{{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
-{{- $interactive := stdinIsATTY -}}{{/* chezmoiinit functions who returns true if chezmoi's standard input is a TTY */}}
+{{- $interactive := and stdinIsATTY (hasKey $previousConfig "data") -}}{{/* true only on re-init: TTY + existing config */}}
 
 {{- /* Extract previous values or use hardcoded defaults */ -}}
-{{- $previousPrivate := false -}}
 {{- $previousEnvTags := list "core" -}}
-{{- $previousSecretsTags := list -}}
-
 {{- if hasKey $previousConfig "data" -}}
-{{-   if hasKey $previousConfig.data "private" -}}
-{{-     $previousPrivate = $previousConfig.data.private -}}
-{{-   end -}}
 {{-   if hasKey $previousConfig.data "environmentTags" -}}
 {{-     $previousEnvTags = $previousConfig.data.environmentTags -}}
 {{-   end -}}
-{{-   if hasKey $previousConfig.data "secretsTags" -}}
-{{-     $previousSecretsTags = $previousConfig.data.secretsTags -}}
-{{-   end -}}
-{{- end -}}
-
-{{- /* Convert boolean to choice string for promptChoice */ -}}
-{{- $privateDefault := "no" -}}
-{{- if $previousPrivate -}}
-{{-   $privateDefault = "Yes" -}}
 {{- end -}}
 
 
@@ -46,23 +25,13 @@
 {{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
 
-{{- $private_choices := list "Yes" "no" -}}
-{{- $private  := promptChoice "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ?" $private_choices $privateDefault -}}
-{{- writeToStdout (printf "    ➜ '%s' \n\n" $private ) -}}
-{{- if eq $private "Yes" -}}
-{{-   $private = true -}}
+{{- if $interactive -}}
+{{-   $tag_choices := list "core" "core+" -}} {{/* "dev" "ai" "sysAdmin" "devOps" "personal" "work" */}}
+{{-   $environmentTags = promptMultichoice "  ?  Select environments tags for this machine (e.g., core, dev,... )" $tag_choices $previousEnvTags -}}
+{{-   writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags) -}}
 {{- else -}}
-{{-   $private = false -}}
-{{- end -}}
-
-{{- $tag_choices := list "core" "core+" -}} {{/* "dev" "ai" "sysAdmin" "devOps" "personal" "work" */}}
-{{- $environmentTags = promptMultichoice "  ?  Select environments tags for this machine (e.g., core, dev,... )" $tag_choices $previousEnvTags -}}
-{{- writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags ) -}}
-
-{{- if $private -}}
-{{-   $secretsTags_choices := list "id_homelab" "id_github" "id_phenates" -}}
-{{-   $secretsTags = promptMultichoice "  ?  Select secrets tags to populate on this machine (e.g., id_github, ... )" $secretsTags_choices $previousSecretsTags -}}
-{{-   writeToStdout (printf "    ➜ '%s' \n\n" $secretsTags ) -}}
+{{-   $environmentTags = $previousEnvTags -}}
+{{-   writeToStdout (printf "    ➜ environmentTags: %v (auto)\n\n" $environmentTags) -}}
 {{- end -}}
 
 
@@ -80,20 +49,6 @@
 {{- end -}}
 
 
-{{- /* Hook commands */ -}}
-{{ if $private }}
-hooks:
-  read-source-state:
-    pre:
-{{   if eq .chezmoi.os "linux" }}
-      script: {{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.sh
-{{   else if eq .chezmoi.os "windows" }}
-      command: "powershell.exe"
-      args: ["-ExecutionPolicy", "Bypass", "-File", "{{ .chezmoi.workingTree }}/home/.chezmoihooks/install-password-manager.ps1"]
-{{   end }}
-{{ end }}
-
-
 {{- /* Data */ -}}
 data:
   name: "phenates"
@@ -101,11 +56,7 @@ data:
   OS_id: {{ $OS_ID | quote }}
   is_WSL: {{ $is_WSL }}
   signingKey: ""
-  private: {{ $private }}
-  installZSH: {{ $installZSH }}
-  changeShell: {{ $changeShell }}
   environmentTags: {{ $environmentTags | toToml }}
-  secretsTags: {{ $secretsTags | toToml }}
 
 
 {{ if eq .chezmoi.os "linux" -}}
@@ -123,11 +74,6 @@ edit:
 {{ end }}
 
 
-
-bitwarden:
-  unlock: "auto"
-
 git:
   autoCommit: true
   autoPush: true
-

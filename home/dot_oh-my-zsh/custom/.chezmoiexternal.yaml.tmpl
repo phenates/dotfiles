@@ -1,4 +1,4 @@
-{{ if .installZSH }}
+{{ if eq .chezmoi.os "linux" }}
 
 "plugins/zsh-syntax-highlighting":
     type: "archive"

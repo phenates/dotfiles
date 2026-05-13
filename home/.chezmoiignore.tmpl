@@ -36,21 +36,6 @@ AppData/**
 
 
 
-## Secrets
-{{ if not .private }}
-.ssh/**
-{{ else }}
-{{   if not (has "id_homelab" .secretsTags) }}
-.ssh/id_homelab
-{{   end }}
-{{   if not (has "id_github" .secretsTags) }}
-.ssh/id_github
-{{   end }}
-{{   if not (has "id_phenates" .secretsTags) }}
-.ssh/id_phenates
-{{   end }}
-{{ end }}
-
 
 ## AI
 {{ if has "ai" .environmentTags -}}

@@ -31,17 +31,5 @@
     path: "ya"
 {{   end }}
 
-{{/* Private github repo */}}
-{{   if .private }}
-"shell-script":
-    type: "archive"
-    url: "https://github.com/phenates/shell-script/archive/master.tar.gz"
-    exact: true
-    stripComponents: 1
-    refreshPeriod: "168h"
-    exclude: [
-        "*/.gitignore",
-        "*/README.md"
-    ]
-{{   end }}
+
 {{ end }}
