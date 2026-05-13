@@ -21,6 +21,13 @@ info "zsh         — installed via packages script"
 info "oh-my-zsh   — managed as chezmoi external"
 info "Nerd fonts  — managed as chezmoi external"
 
+step "Refreshing font cache..."
+if fc-cache -fv > /dev/null 2>&1; then
+    success "Font cache refreshed"
+else
+    warning "fc-cache failed — fonts may not be available until next login"
+fi
+
 # Change default shell to zsh
 step "Change default shell to zsh..."
 if [[ "$SHELL" != *"zsh"* ]]; then

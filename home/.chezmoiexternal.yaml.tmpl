@@ -56,6 +56,19 @@
         "*/.gitignore",
     ]
 
+# zsh-autosuggestions plugin
+".oh-my-zsh/custom/plugins/zsh-autosuggestions":
+    type: "archive"
+    url: "https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz"
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.editorconfig",
+        "*/.gitattributes",
+        "*/.github",
+        "*/.gitignore",
+    ]
+
 # powerlevel10k theme — pinned to latest release tag via GitHub API
 ".oh-my-zsh/custom/themes/powerlevel10k":
     type: "archive"
