@@ -1,6 +1,37 @@
+{{/* Declares all external sources managed by chezmoi.
+     Downloaded and extracted automatically on `chezmoi apply`.
+     Paths are relative to the home directory (~).
+
+     ── Type ──────────────────────────────────────────────────────────────────
+       "archive"      Extract a full archive into the target directory.
+       "archive-file" Extract a single file from an archive.
+       "file"         Download a single file directly (no extraction).
+
+     ── Common options ────────────────────────────────────────────────────────
+       url            Source URL. Supports chezmoi template functions such as
+                        gitHubLatestReleaseAssetURL "owner/repo" "asset-name"
+                        gitHubLatestRelease "owner/repo"  → .TagName, etc.
+       stripComponents Strip N leading path components when extracting.
+                       Works like `tar --strip-components`.
+                       e.g. archive contains "repo-master/bin/tool"
+                            stripComponents: 2 → extracts as "tool"
+       refreshPeriod  Re-download interval (e.g. "168h" = 7 days).
+                      Without this, chezmoi downloads only once.
+       exact          If true, files present in the target but absent from the
+                      archive are deleted on apply (strict sync).
+       include        Only extract entries matching these glob patterns.
+       exclude        Skip entries matching these glob patterns.
+       executable     Mark the extracted file as executable (chmod +x).
+       path           For "archive-file": path of the file inside the archive.
+*/}}
+
 {{ if eq .chezmoi.os "linux" }}
 
-{{/* oh-my-zsh */}}
+# ── Shell framework ───────────────────────────────────────────────────────────
+
+# oh-my-zsh framework — full archive, refreshed weekly
+# Themes excluded: managed by the powerlevel10k entry below
+# Hidden files excluded: .gitignore, .editorconfig, CI configs, etc.
 ".oh-my-zsh":
     type: "archive"
     url: "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
@@ -11,5 +42,78 @@
         "*/templates",
         "*/themes",
     ]
+
+# zsh-syntax-highlighting plugin
+".oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
+    type: "archive"
+    url: "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
+    stripComponents: 1
+    refreshPeriod: "168h"
+    exclude: [
+        "*/.editorconfig",
+        "*/.gitattributes",
+        "*/.github",
+        "*/.gitignore",
+    ]
+
+# powerlevel10k theme — pinned to latest release tag via GitHub API
+".oh-my-zsh/custom/themes/powerlevel10k":
+    type: "archive"
+    url: "https://github.com/romkatv/powerlevel10k/archive/{{ (gitHubLatestRelease "romkatv/powerlevel10k").TagName }}.tar.gz"
+    stripComponents: 1
+
+
+# ── Fonts ─────────────────────────────────────────────────────────────────────
+
+# Meslo Nerd Font — required by powerlevel10k for icons and glyphs
+# exact: true ensures stale font variants are removed from the target dir
+# include filters to regular-weight variants only (excludes Mono and Propo)
+".local/share/fonts":
+    type: "archive"
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
+    exact: true
+    refreshPeriod: "168h"
+    include: ["MesloLGSNerdFont-*"]
+
+
+# ── Binaries (core) ───────────────────────────────────────────────────────────
+
+# neofetch — system info display (pinned to 7.1.0, upstream project archived)
+# archive-file extracts only the "neofetch" script from the archive
+".local/bin/neofetch":
+    type: "archive-file"
+    url: "https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.zip"
+    executable: true
+    stripComponents: 1
+    path: "neofetch"
+
+# fastfetch — fast system info display, auto-detects latest release and arch
+".local/bin/fastfetch":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "fastfetch-cli/fastfetch" (printf "fastfetch-%s-%s.zip" .chezmoi.os .chezmoi.arch) }}"
+    executable: true
+    stripComponents: 2
+    path: "bin/fastfetch"
+
+
+{{   if has "core+" .environmentTags }}
+# ── Binaries (core+) ──────────────────────────────────────────────────────────
+
+# yazi — terminal file manager + ya CLI companion
+# Both binaries come from the same release archive
+".local/bin/yazi":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" "yazi-x86_64-unknown-linux-gnu.zip" }}"
+    executable: true
+    stripComponents: 1
+    path: "yazi"
+
+".local/bin/ya":
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "sxyazi/yazi" "yazi-x86_64-unknown-linux-gnu.zip" }}"
+    executable: true
+    stripComponents: 1
+    path: "ya"
+{{   end }}
 
 {{ end }}

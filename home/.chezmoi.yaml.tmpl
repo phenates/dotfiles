@@ -1,18 +1,24 @@
-{{/* File use to customize the chezmoi config file when doing a `chezmoi init`. */}}
-{{/* Use template or trigger prompts to populate values. */}}
+{{/* Generates ~/.config/chezmoi/chezmoi.yaml on `chezmoi init`. */}}
+{{/* Re-evaluated on every `chezmoi init` call (not on `chezmoi apply`). */}}
 
-{{- /* Load previous configuration if exists */ -}}
+
+{{- /* ── 1. State: load existing configuration ────────────────────────────── */ -}}
 {{- $previousConfig := dict -}}
 {{- $configPath := joinPath .chezmoi.homeDir ".config" "chezmoi" "chezmoi.yaml" -}}
 {{- if stat $configPath -}}
 {{-   $previousConfig = include $configPath | fromYaml -}}
 {{- end -}}
 
-{{- /* Default values */ -}}
-{{- $environmentTags := list -}}
-{{- $interactive := and stdinIsATTY (hasKey $previousConfig "data") -}}{{/* true only on re-init: TTY + existing config */}}
 
-{{- /* Extract previous values or use hardcoded defaults */ -}}
+{{- /* ── 2. Mode: interactive only on re-init from a TTY ────────────────────── */ -}}
+{{- /* First init (no existing config) → silent, uses defaults.               */ -}}
+{{- /* Re-init from a TTY             → interactive prompts to change settings.*/ -}}
+{{- /* Re-init without TTY (Ansible)  → silent, keeps previous values.        */ -}}
+{{- $interactive := and stdinIsATTY (hasKey $previousConfig "data") -}}
+
+
+{{- /* ── 3. Previous values (or hardcoded defaults on first run) ─────────────── */ -}}
+{{- $environmentTags := list -}}
 {{- $previousEnvTags := list "core" -}}
 {{- if hasKey $previousConfig "data" -}}
 {{-   if hasKey $previousConfig.data "environmentTags" -}}
@@ -21,13 +27,13 @@
 {{- end -}}
 
 
-{{- /* Prompts */ -}}
+{{- /* ── 4. Prompts ─────────────────────────────────────────────────────────── */ -}}
 {{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
 
 {{- if $interactive -}}
-{{-   $tag_choices := list "core" "core+" -}} {{/* "dev" "ai" "sysAdmin" "devOps" "personal" "work" */}}
-{{-   $environmentTags = promptMultichoice "  ?  Select environments tags for this machine (e.g., core, dev,... )" $tag_choices $previousEnvTags -}}
+{{-   $tag_choices := list "core" "core+" -}} {{/* extend here: "dev" "ai" "sysAdmin" "devOps" */}}
+{{-   $environmentTags = promptMultichoice "  ?  Select environment tags for this machine" $tag_choices $previousEnvTags -}}
 {{-   writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags) -}}
 {{- else -}}
 {{-   $environmentTags = $previousEnvTags -}}
@@ -35,12 +41,13 @@
 {{- end -}}
 
 
-{{- /* OS infos */ -}}
+{{- /* ── 5. OS detection ─────────────────────────────────────────────────────── */ -}}
 {{- $OS_ID := .chezmoi.os -}}
 {{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
 {{-   $OS_ID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
 {{- end -}}
 
+{{- /* WSL: used in templates to skip behaviors unavailable under WSL (e.g. chsh) */ -}}
 {{- $is_WSL := false -}}
 {{- if eq .chezmoi.os "linux" -}}
 {{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
@@ -49,31 +56,32 @@
 {{- end -}}
 
 
-{{- /* Data */ -}}
+{{- /* ── 6. YAML output ──────────────────────────────────────────────────────── */ -}}
 data:
   name: "phenates"
   email: "phen4tes@gmail.com"
   OS_id: {{ $OS_ID | quote }}
   is_WSL: {{ $is_WSL }}
-  signingKey: ""
   environmentTags: {{ $environmentTags | toToml }}
 
 
+{{/* Editor used by `chezmoi edit` */}}
 {{ if eq .chezmoi.os "linux" -}}
 edit:
   command: "nano"
-{{ else if eq .chezmoi.os "windows" }}
-{{   if lookPath "code" }}
+{{ else if eq .chezmoi.os "windows" -}}
+{{   if lookPath "code" -}}
 edit:
   command: "code"
   args: ["--wait"]
-{{   else }}
+{{   else -}}
 edit:
   command: "notepad"
-{{   end }}
+{{   end -}}
 {{ end }}
 
 
+{{/* Auto-commit and push source directory changes after each `chezmoi apply` */}}
 git:
   autoCommit: true
   autoPush: true
