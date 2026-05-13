@@ -54,11 +54,12 @@ AppData/**
 {{ end }}
 
 
-# ── WSL — SSH config ──────────────────────────────────────────────────────────
+# ── WSL — SSH directory ───────────────────────────────────────────────────────
 # On WSL, ~/.ssh is a symlink pointing to the Windows .ssh directory
-# (created by run_onchange_after_60_wsl-simlinks.sh).
-# chezmoi must not manage .ssh/config here: the file lives on the Windows side
-# and may already exist. On native Linux, chezmoi manages it normally.
+# (created by run_onchange_after_61_wsl-simlinks.sh).
+# chezmoi must not touch .ssh at all here: the symlink would be replaced by a
+# directory. On native Linux, chezmoi manages .ssh normally.
 {{ if .is_WSL }}
-.ssh/config
+.ssh
+.ssh/**
 {{ end }}
