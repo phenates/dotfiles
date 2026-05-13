@@ -142,7 +142,6 @@ $PACKAGE_UPDATE || exit 1
 # Install packages if not already installed
 step "Installing packages..."
 for package in "${LINUX_PACKAGES[@]}"; do
-    step "$package: checking and installing..."
     $PACKAGE_INSTALL "$package"
 done
 
