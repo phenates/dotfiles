@@ -95,10 +95,6 @@
     stripComponents: 2
     path: "bin/fastfetch"
 
-
-{{   if has "core+" .environmentTags }}
-# ── Binaries (core+) ──────────────────────────────────────────────────────────
-
 # yazi — terminal file manager + ya CLI companion
 # Both binaries come from the same release archive
 ".local/bin/yazi":
@@ -114,6 +110,5 @@
     executable: true
     stripComponents: 1
     path: "ya"
-{{   end }}
 
 {{ end }}
