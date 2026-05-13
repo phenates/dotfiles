@@ -1,0 +1,50 @@
+# keymap.toml — yazi custom keybindings
+# Uses prepend_keymap: adds bindings without overriding built-in defaults.
+#
+# ── Default shortcuts cheat sheet ────────────────────────────────────────────
+#  Navigation       h/j/k/l or arrows   move left/down/up/right
+#                   H / L               go to top / bottom of list
+#                   Enter               open file or enter directory
+#                   Backspace           go to parent directory
+#
+#  Selection        Space               toggle select file
+#                   v                   toggle visual selection mode
+#                   V                   select all in current dir
+#                   Escape              clear selection / cancel
+#
+#  File operations  y                   yank (copy) selected
+#                   x                   cut selected
+#                   p                   paste
+#                   d                   trash (move to trash)
+#                   D                   delete permanently
+#                   a                   create file or directory (ends with / for dir)
+#                   r                   rename
+#                   ;                   run a shell command
+#                   :                   run a shell command (blocking)
+#
+#  Navigation+      z                   jump with zoxide
+#                   Z                   jump with zoxide (cd only)
+#                   f                   filter files in current dir
+#                   /                   search file names
+#                   n / N               next / previous search result
+#
+#  View             .                   toggle hidden files
+#                   s                   sort: next sort mode
+#                   ,                   sort: reverse order
+#                   Tab                 switch between manager panes
+#                   ctrl+s              create a new tab
+#                   ctrl+w              close current tab
+#                   q                   quit
+# ─────────────────────────────────────────────────────────────────────────────
+
+[manager]
+prepend_keymap = [
+    # Open file in $EDITOR
+    { on = ["e"], run = "open --with=default", desc = "Open with default opener" },
+
+    # Fuzzy search files from current dir using fzf, then navigate to result
+    { on = ["ctrl+f"], run = "shell 'yazi \"$(fd --type f --hidden --exclude .git | fzf)\"'", desc = "Fuzzy find file (fzf)" },
+
+    # Copy full path of selected file to clipboard (WSL-aware)
+    { on = ["Y"], run = "shell 'echo -n \"$@\" | xclip -selection clipboard || echo -n \"$@\" | clip.exe'", desc = "Copy path to clipboard" },
+]
