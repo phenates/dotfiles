@@ -61,7 +61,7 @@ create_symlink "${HOME}/homelab" "/mnt/e/4_IT/40_IT-Projets/40.01_Homelab-v2"
 # (see run_once_after_55_wsl-conf.sh — SSH rejects keys on world-writable paths).
 step ".ssh -> Windows .ssh ..."
 
-WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
+WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n') || true
 if [[ -z "${WIN_USER}" ]]; then
     warning "Could not detect Windows username — skipping .ssh symlink"
 else
