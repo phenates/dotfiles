@@ -61,14 +61,14 @@ create_symlink "${HOME}/homelab" "/mnt/e/4_IT/40_IT-Projets/40.01_Homelab-v2"
 # (see run_once_after_55_wsl-conf.sh — SSH rejects keys on world-writable paths).
 step ".ssh -> Windows .ssh ..."
 
-WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n') || true
-if [[ -z "${WIN_USER}" ]]; then
-    warning "Could not detect Windows username — skipping .ssh symlink"
+WIN_HOME=$(wslpath "$(cmd.exe /c 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r\n')" 2>/dev/null) || true
+if [[ -z "${WIN_HOME}" ]]; then
+    warning "Could not detect Windows user profile — skipping .ssh symlink"
 else
-    WIN_SSH_DIR="/mnt/c/Users/${WIN_USER}/.ssh"
+    WIN_SSH_DIR="${WIN_HOME}/.ssh"
     if [[ ! -d "${WIN_SSH_DIR}" ]]; then
         warning "Windows .ssh not found at ${WIN_SSH_DIR} — skipping"
-        info "Create it from PowerShell: New-Item -ItemType Directory \$env:USERPROFILE\\.ssh"
+        info "Create it from PowerShell: New-Item -ItemType Directory -Path \$env:USERPROFILE\\.ssh"
     elif [[ -d "${HOME}/.ssh" && ! -L "${HOME}/.ssh" ]]; then
         if [[ -z "$(ls -A "${HOME}/.ssh")" ]]; then
             rmdir "${HOME}/.ssh"
