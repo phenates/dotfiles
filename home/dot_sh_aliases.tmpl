@@ -65,9 +65,3 @@ alias sys='systemctl'
 
 ## Platform specific aliases
 # -----------------------------------------------------------------------------
-
-{{ if .is_WSL -}}
-# WSL 
-# WSl: no access to the windows agent ssh, run the windows exectable instead
-alias ssh-add="ssh-add.exe"
-{{- end }}

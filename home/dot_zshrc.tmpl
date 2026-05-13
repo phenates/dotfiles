@@ -130,11 +130,11 @@ fi
 # Starts a local WSL ssh-agent and loads all private keys from ~/.ssh.
 # (~/.ssh is a symlink to the Windows .ssh directory)
 # Keys are detected by the presence of a matching .pub file.
-if [ -z "$SSH_AUTH_SOCK" ]; then
-    eval "$(ssh-agent -s)" > /dev/null
+if [ -z "$SSH_AUTH_SOCK" ] && [[ -x /usr/bin/ssh-agent ]]; then
+    eval "$(/usr/bin/ssh-agent -s)" > /dev/null
     for pub in ~/.ssh/*.pub; do
         key="${pub%.pub}"
-        [[ -f "$key" ]] && ssh-add "$key" 2>/dev/null
+        [[ -f "$key" ]] && /usr/bin/ssh-add "$key" 2>/dev/null
     done
 fi
 {{ end -}}
