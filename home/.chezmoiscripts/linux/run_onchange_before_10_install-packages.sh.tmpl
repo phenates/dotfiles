@@ -108,7 +108,7 @@ pacman_install() {
 }
 
 ## Main
-header "chezmoi -> Linux packages installation"
+header "Script - Linux packages installation"
 
 {{ if eq $pkgManager "" -}}
 error "Unsupported distribution: {{ .chezmoi.osRelease.id }}"

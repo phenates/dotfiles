@@ -45,7 +45,7 @@ create_symlink() {
 }
 
 ## Main
-header "chezmoi -> WSL home directory symlinks"
+header "Script - WSL home directory symlinks"
 
 # ── Windows drive mount ───────────────────────────────────────────────────────
 step "MaPomme -> /mnt/e ..."
@@ -70,8 +70,14 @@ else
         warning "Windows .ssh not found at ${WIN_SSH_DIR} — skipping"
         info "Create it from PowerShell: New-Item -ItemType Directory \$env:USERPROFILE\\.ssh"
     elif [[ -d "${HOME}/.ssh" && ! -L "${HOME}/.ssh" ]]; then
-        warning "${HOME}/.ssh is a real directory — skipping to avoid data loss"
-        warning "Manually merge or remove it before the symlink can be created"
+        if [[ -z "$(ls -A "${HOME}/.ssh")" ]]; then
+            rmdir "${HOME}/.ssh"
+            create_symlink "${HOME}/.ssh" "${WIN_SSH_DIR}"
+            info "SSH keys active after WSL restart (umask=077 must be applied first)"
+        else
+            warning "${HOME}/.ssh is a non-empty directory — skipping to avoid data loss"
+            warning "Manually merge or remove it before the symlink can be created"
+        fi
     else
         create_symlink "${HOME}/.ssh" "${WIN_SSH_DIR}"
         info "SSH keys active after WSL restart (umask=077 must be applied first)"

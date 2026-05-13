@@ -14,12 +14,12 @@ source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
 set -e # -e: exit on error
 
 ## Main
-header "chezmoi -> zsh shell"
+header "Script - zsh shell"
 
-step "zsh installation"
-info "zsh installed by Linux packages install script."
-info "oh-my-zsh (framework, plugins, theme) managed as external sources from .chezmoiexternal files."
-info "Nerd font managed as external sources from .chezmoiexternal files."
+step "zsh stack"
+info "zsh          — installed via packages script"
+info "oh-my-zsh   — managed as chezmoi external"
+info "Nerd fonts  — managed as chezmoi external"
 
 # Change default shell to zsh
 step "Change default shell to zsh..."

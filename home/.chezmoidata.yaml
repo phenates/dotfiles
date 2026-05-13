@@ -1,55 +1,74 @@
 packages:
   linux:
     apt:
-      # Core packages (always installed)
       core:
+        # ── Shell & terminal ──────────────────────────────────────────────────
+        - "zsh"
+        - "eza"
+        - "bat"
+
+        # ── Navigation & search ───────────────────────────────────────────────
+        - "fzf"           # yazi dependency: for quick file subtree navigation
+        - "zoxide"        # yazi dependency: for historical directories navigation
+        - "fd-find"       # yazi dependency: for file searching
+        - "ripgrep"       # yazi dependency: for file content searching
+
+        # ── Network & transfers ───────────────────────────────────────────────
         - "curl"
         - "wget"
-        - "git"
-        - "unzip"
-        - "man-db"
-        - "eza"
-        # - "tree"
         - "openssh-client"
+
+        # ── Files & archives ──────────────────────────────────────────────────
+        - "unzip"
+        - "file"          # yazi dependency: for file type detection
+        - "7zip"          # yazi dependency: for archive extraction and preview
+        - "poppler-utils" # yazi dependency: for PDF preview
+        # - "ffmpeg"      # yazi dependency: for video thumbnails
+        # - "resvg"       # yazi dependency: for SVG preview
+
+        # ── Dev tools ────────────────────────────────────────────────────────
+        - "git"
+        - "jq"            # yazi dependency: for JSON preview
+
+        # ── System ───────────────────────────────────────────────────────────
+        - "man-db"
         - "fontconfig"
-        - "zsh"
-        - "file" # yazi binary dependencie: for file type detection
-        - "7zip" # yazi binary dependencie: for archive extraction and preview
-        - "jq" # yazi binary dependencie: for JSON preview
-        - "poppler-utils" # yazi binary dependencie: for PDF preview
-        - "fd-find" # yazi binary dependencie: for file searching
-        - "ripgrep" # yazi binary dependencie: for file content searching
-        - "fzf" # yazi binary dependencie: for quick file subtree navigation
-        - "zoxide" # yazi binary dependencie: for historical directories navigation
-        # - 'ffmpeg' # yazi binary dependencie: for video thumbnails
-        # - "resvg" # yazi binary dependencie: for SVG preview
-        - "xclip" # yazi binary dependencie: for Linux clipboard support
-        - "wl-clipboard" # yazi binary dependencie: for Linux clipboard support
-        - "xsel" # yazi binary dependencie: for Linux clipboard support
-        - "bat"
+
+        # ── Clipboard ────────────────────────────────────────────────────────
+        - "xclip"         # yazi dependency: for Linux clipboard support (X11)
+        - "xsel"          # yazi dependency: for Linux clipboard support (X11 alt)
+        - "wl-clipboard"  # yazi dependency: for Linux clipboard support (Wayland)
 
   windows:
     winget:
       core:
+        # ── Dev tools ────────────────────────────────────────────────────────
         - "twpayne.chezmoi"
         - "Git.Git"
         - "Microsoft.PowerShell"
         - "Microsoft.VisualStudioCode"
-        - "JernejSimoncic.Wget"
+
+        # ── Shell & terminal ──────────────────────────────────────────────────
         - "JanDeDobbeleer.OhMyPosh"
-        # - "Terminal-Icons"
         - "eza-community.eza"
         - "Fastfetch-cli.Fastfetch"
-        - "sxyazi.yazi" # Terminal File Manager
-        - "7zip.7zip" # yazi dependencie: for archive extraction and preview
-        - "jqlang.jq" # yazi dependencie: for JSON preview
-        - "oschwartz10612.Poppler" # yazi dependencie: for PDF preview
-        - "sharkdp.fd" # yazi dependencie: for file searching
-        - "BurntSushi.ripgrep.MSVC" # yazi dependencie: for file content searching
-        - "junegunn.fzf" # yazi dependencie: for quick file subtree navigation
-        - "ajeetdsouza.zoxide" # yazi dependencie: for historical directories navigation
-        # - "ImageMagick.ImageMagick" # yazi dependencie: for image preview
-        # - "Gyan.FFmpeg" # yazi dependencie: for video thumbnails
+
+        # ── Navigation & search ───────────────────────────────────────────────
+        - "junegunn.fzf"                    # yazi dependency: for quick file subtree navigation
+        - "ajeetdsouza.zoxide"              # yazi dependency: for historical directories navigation
+        - "sharkdp.fd"                      # yazi dependency: for file searching
+        - "BurntSushi.ripgrep.MSVC"         # yazi dependency: for file content searching
+
+        # ── Network & transfers ───────────────────────────────────────────────
+        - "JernejSimoncic.Wget"
+
+        # ── File manager (yazi) & dependencies ───────────────────────────────
+        - "sxyazi.yazi"
+        - "7zip.7zip"                       # yazi dependency: for archive extraction and preview
+        - "jqlang.jq"                       # yazi dependency: for JSON preview
+        - "oschwartz10612.Poppler"          # yazi dependency: for PDF preview
+        # - "ImageMagick.ImageMagick"       # yazi dependency: for image preview
+        # - "Gyan.FFmpeg"                   # yazi dependency: for video thumbnails
 
     powershellModule:
       core:

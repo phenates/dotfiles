@@ -16,9 +16,9 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-header()  { echo -e "\n${PURPLE}===== $* =====${NC}"
-            echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"; }
-step()    { echo -e "${BLUE}  -->  $*${NC}"; }
+header()  { echo -e "\n===== $* ====="
+            echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; }
+step()    { echo -e "${BLUE}---->  $*${NC}"; }
 info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[ OK ]${NC}  $*"; }
 warning() { echo -e "${YELLOW}[WARN]${NC}  $*"; }

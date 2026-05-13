@@ -17,7 +17,7 @@ source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
 set -euo pipefail
 
 ## Main
-header "chezmoi -> WSL /etc/wsl.conf configuration"
+header "Script - WSL configuration (/etc/wsl.conf)"
 
 WSL_CONF="/etc/wsl.conf"
 WSL_AUTOMOUNT_OPTIONS="metadata,umask=077,fmask=113"

@@ -27,7 +27,7 @@ TEMP_DIR=$(mktemp -t chezmoi-XXXX.deb)
 trap 'rm -f "$TEMP_DIR"' EXIT
 
 ## Main
-header "chezmoi -> Replace chezmoi binary file by the package .deb"
+header "Script - Replace chezmoi binary file by the package .deb"
 info "Package URL: $PACKAGE_URL"
 
 if [[ "$(command -v chezmoi)" == "/usr/bin/chezmoi" ]] ; then

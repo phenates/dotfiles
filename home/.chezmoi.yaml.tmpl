@@ -28,16 +28,16 @@
 
 
 {{- /* ── 4. Prompts ─────────────────────────────────────────────────────────── */ -}}
-{{- writeToStdout (printf "\n⮞  chezmoi -> host configuration\n") -}}
+{{- writeToStdout (printf "\n===== chezmoi init configuration =====\n") -}}
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
 
 {{- if $interactive -}}
 {{-   $tag_choices := list "core" -}} {{/* extend here: "dev" "ai" "sysAdmin" "devOps" */}}
-{{-   $environmentTags = promptMultichoice "  ?  Select environment tags for this machine" $tag_choices $previousEnvTags -}}
-{{-   writeToStdout (printf "    ➜ '%s' \n\n" $environmentTags) -}}
+{{-   $environmentTags = promptMultichoice "  ?  Select environment for this machine " $tag_choices $previousEnvTags -}}
+{{-   writeToStdout (printf "---->  '%s' \n\n" $environmentTags) -}}
 {{- else -}}
 {{-   $environmentTags = $previousEnvTags -}}
-{{-   writeToStdout (printf "    ➜ environmentTags: %v (auto)\n\n" $environmentTags) -}}
+{{-   writeToStdout (printf "---->  Selected environment: %v (auto)\n\n" $environmentTags) -}}
 {{- end -}}
 
 
