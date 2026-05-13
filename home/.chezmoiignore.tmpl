@@ -19,7 +19,6 @@ README.md
 .sh_aliases
 .sh_functions
 .zshrc
-# .oh-my-zsh
 .oh-my-zsh/**
 .config/neofetch
 {{ end }}
@@ -32,30 +31,12 @@ AppData/**
 {{ end }}
 
 
-
-
-
-
-
-## AI
-{{ if has "ai" .environmentTags -}}
-.claude/*
-!.claude/CLAUDE.md
-!.claude/commands/
-!.claude/agents/
-!.claude/skills/
-{{ else }}
+## Claude
 .claude
 .claude/**
+
+
+## WSL: .ssh is a symlink to Windows .ssh — chezmoi must not manage files inside it
+{{ if .is_WSL }}
+.ssh/config
 {{ end }}
-
-
-
-
-
-## Claude
-# .claude/*
-# !.claude/CLAUDE.md
-# !.claude/commands/
-# !.claude/agents/
-# !.claude/skills/
