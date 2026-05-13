@@ -1,8 +1,26 @@
+{{/* .chezmoiignore.tmpl — controls which files chezmoi applies to the target directory.
+     Evaluated as a Go template on every `chezmoi apply`.
+     Paths are relative to ~ (the home directory).
+
+     Syntax:
+       pattern        Ignore this path (never apply it).
+       !pattern       Un-ignore — force-include even if a parent rule excluded it.
+       glob syntax    Standard gitignore-style globs (* ** ? [range]).
+       {{ if ... }}   Go template conditions — dynamic ignore rules based on OS, tags, etc.
+*/}}
+
+# ── Repo files — never applied to ~ ──────────────────────────────────────────
+# These files live in the dotfiles source repo but have no place in the home dir.
 install.sh
 README.md
 
 
-## oh-my-zsh
+# ── oh-my-zsh ─────────────────────────────────────────────────────────────────
+# oh-my-zsh is managed as an external source (.chezmoiexternal.yaml.tmpl).
+# chezmoi must not touch the bulk of the directory, but the custom plugins
+# and themes sub-tree is explicitly un-ignored so chezmoi can manage it.
+# Compiled zsh files (*.zwc) generated at runtime are excluded to avoid
+# chezmoi detecting spurious diffs on every apply.
 !.oh-my-zsh/plugins
 !.oh-my-zsh/plugins/**
 .oh-my-zsh/cache/**
@@ -10,8 +28,12 @@ README.md
 .oh-my-zsh/custom/themes/powerlevel10k/**/*.zwc
 
 
-## OS detection
+# ── OS-specific files ─────────────────────────────────────────────────────────
+# Scripts and dotfiles that only make sense on their target OS are excluded
+# on all other platforms to avoid applying irrelevant configuration.
+
 {{ if ne .chezmoi.os "linux" }}
+# Not on Linux — ignore all Linux-specific scripts and shell config
 .chezmoiscripts/linux/**
 .bashrc
 .nanorc
@@ -24,6 +46,7 @@ README.md
 {{ end }}
 
 {{ if ne .chezmoi.os "windows" }}
+# Not on Windows — ignore all Windows-specific scripts and app config
 .chezmoiscripts/windows
 Documents
 .config/ohmyposh
@@ -31,12 +54,11 @@ AppData/**
 {{ end }}
 
 
-## Claude
-.claude
-.claude/**
-
-
-## WSL: .ssh is a symlink to Windows .ssh — chezmoi must not manage files inside it
+# ── WSL — SSH config ──────────────────────────────────────────────────────────
+# On WSL, ~/.ssh is a symlink pointing to the Windows .ssh directory
+# (created by run_onchange_after_60_wsl-simlinks.sh).
+# chezmoi must not manage .ssh/config here: the file lives on the Windows side
+# and may already exist. On native Linux, chezmoi manages it normally.
 {{ if .is_WSL }}
 .ssh/config
 {{ end }}
