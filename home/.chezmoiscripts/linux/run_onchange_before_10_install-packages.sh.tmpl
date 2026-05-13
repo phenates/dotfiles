@@ -3,9 +3,9 @@
 
 #==============================================================================
 #description  :chezmoi bash script, running before `chezmoi apply`.
-#              Install packages on linux dtistribution, and checks if a package
+#              Install packages on linux distribution, and checks if a package
 #              is already installed before attempting installation.
-#version      :0.4
+#version      :0.5
 #date         :2025-10-25
 #==============================================================================
 
@@ -110,24 +110,13 @@ pacman_install() {
 ## Main
 header "chezmoi -> Linux packages installation"
 
-case "{{ .chezmoi.osRelease.id }}" in
-    debian | ubuntu | raspbian)
-        PACKAGE_UPDATE="apt_update"
-        PACKAGE_INSTALL="apt_install"
-        ;;
-    fedora)
-        PACKAGE_UPDATE="dnf_update"
-        PACKAGE_INSTALL="dnf_install"
-        ;;
-    arch)
-        PACKAGE_UPDATE="pacman_update"
-        PACKAGE_INSTALL="pacman_install"
-        ;;
-    *)
-        error "Unsupported distribution"
-        exit 1
-        ;;
-esac
+{{ if eq $pkgManager "" -}}
+error "Unsupported distribution: {{ .chezmoi.osRelease.id }}"
+exit 1
+{{ end -}}
+
+PACKAGE_UPDATE="{{ $pkgManager }}_update"
+PACKAGE_INSTALL="{{ $pkgManager }}_install"
 
 # Collect packages based on environment tags
 {{- range $tag := .environmentTags }}
@@ -138,9 +127,6 @@ LINUX_PACKAGES+=("{{ . }}")
 {{-     end }}
 {{-   end }}
 {{- end }}
-
-# Remove duplicates from LINUX_PACKAGES array
-# readarray -t LINUX_PACKAGES < <(printf '%s\n' "${LINUX_PACKAGES[@]}" | awk '!seen[$0]++' | sort)
 
 ## Check required package manager
 step "Tools validation..."

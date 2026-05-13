@@ -1,0 +1,90 @@
+{{- if (and (eq .chezmoi.os "linux") (.is_WSL)) -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running once after `chezmoi apply`.
+#              Configures /etc/wsl.conf:
+#                [user]      default shell user (avoids opening as root)
+#                [automount] umask=077 — removes world-writable bit on Windows
+#                            drive mounts (required for Ansible ansible.cfg)
+#version      :0.1
+#date         :2025-10-31
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -euo pipefail
+
+## Main
+header "chezmoi -> WSL /etc/wsl.conf configuration"
+
+WSL_CONF="/etc/wsl.conf"
+WSL_AUTOMOUNT_OPTIONS="metadata,umask=077,fmask=113"
+REAL_USER="{{ .chezmoi.username }}"
+WSL_RESTART_NEEDED=false
+
+# ── [user] section ────────────────────────────────────────────────────────────
+step "Configuring [user] default..."
+if grep -qF "default = ${REAL_USER}" "${WSL_CONF}" 2>/dev/null; then
+    info "wsl.conf already has default user: ${REAL_USER}"
+else
+    if grep -qF "[user]" "${WSL_CONF}" 2>/dev/null; then
+        if grep -q "^default" "${WSL_CONF}"; then
+            sudo sed -i "s|^default.*|default = ${REAL_USER}|" "${WSL_CONF}"
+        else
+            sudo sed -i "/^\[user\]/a default = ${REAL_USER}" "${WSL_CONF}"
+        fi
+    else
+        printf '\n[user]\ndefault = %s\n' "${REAL_USER}" | sudo tee -a "${WSL_CONF}" > /dev/null
+    fi
+    success "${WSL_CONF} [user] updated"
+    WSL_RESTART_NEEDED=true
+fi
+
+# ── [automount] section ───────────────────────────────────────────────────────
+step "Configuring [automount] options..."
+if grep -qF "umask=077" "${WSL_CONF}" 2>/dev/null; then
+    info "wsl.conf already has the correct automount options"
+else
+    if grep -qF "[automount]" "${WSL_CONF}" 2>/dev/null; then
+        if grep -q "^options" "${WSL_CONF}"; then
+            sudo sed -i "s|^options.*|options = \"${WSL_AUTOMOUNT_OPTIONS}\"|" "${WSL_CONF}"
+        else
+            sudo sed -i "/^\[automount\]/a options = \"${WSL_AUTOMOUNT_OPTIONS}\"" "${WSL_CONF}"
+        fi
+    else
+        printf '\n[automount]\nenabled = true\noptions = "%s"\n' \
+            "${WSL_AUTOMOUNT_OPTIONS}" | sudo tee -a "${WSL_CONF}" > /dev/null
+    fi
+    success "${WSL_CONF} [automount] updated"
+    WSL_RESTART_NEEDED=true
+fi
+
+# ── [network] section ────────────────────────────────────────────────────────
+step "Configuring [network] hostname..."
+if grep -qF "hostname = ${WSL_DISTRO_NAME}" "${WSL_CONF}" 2>/dev/null; then
+    info "wsl.conf already has correct hostname: ${WSL_DISTRO_NAME}"
+else
+    if grep -qF "[network]" "${WSL_CONF}" 2>/dev/null; then
+        if grep -q "^hostname" "${WSL_CONF}"; then
+            sudo sed -i "s|^hostname.*|hostname = ${WSL_DISTRO_NAME}|" "${WSL_CONF}"
+        else
+            sudo sed -i "/^\[network\]/a hostname = ${WSL_DISTRO_NAME}" "${WSL_CONF}"
+        fi
+    else
+        printf '\n[network]\nhostname = %s\n' "${WSL_DISTRO_NAME}" | sudo tee -a "${WSL_CONF}" > /dev/null
+    fi
+    success "${WSL_CONF} [network] updated"
+    WSL_RESTART_NEEDED=true
+fi
+
+# ── Result ────────────────────────────────────────────────────────────────────
+if [[ "${WSL_RESTART_NEEDED}" == "true" ]]; then
+    warning "WSL restart required to apply changes."
+    warning "From PowerShell: wsl --shutdown — then reopen WSL."
+else
+    success "wsl.conf already up to date"
+fi
+
+{{ end -}}

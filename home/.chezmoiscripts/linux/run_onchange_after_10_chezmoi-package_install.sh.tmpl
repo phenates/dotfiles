@@ -35,12 +35,12 @@ if [[ "$(command -v chezmoi)" == "/usr/bin/chezmoi" ]] ; then
   exit 0
 fi
 
-## Check requiered package
+## Check required packages
 step "Tools validation..."
 if ! require_tools wget apt; then
   exit 1
 fi
-success "Requiered tools available"
+success "Required tools available"
 
 ## Install chezmoi package
 step "Downloading chezmoi .deb ..."

@@ -1,0 +1,85 @@
+{{- if (and (eq .chezmoi.os "linux") (.is_WSL)) -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running after `chezmoi apply`.
+#              Creates convenience symlinks in $HOME for quick navigation:
+#                ~/MaPomme  -> /mnt/e            (Windows E: drive)
+#                ~/homelab  -> homelab repo root  (hardcoded path)
+#                ~/.ssh     -> Windows .ssh dir   (shared keys)
+#version      :0.2
+#date         :2025-10-31
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -euo pipefail
+
+## Functions
+
+# Create or update a symlink.
+# Skips if already correct; force-updates if pointing to wrong target;
+# refuses if a real file/directory occupies the link path.
+create_symlink() {
+    local link_path="$1"
+    local link_target="$2"
+
+    if [[ ! -e "${link_target}" ]]; then
+        warning "Target not found: ${link_target} — skipping ${link_path}"
+        return 0
+    fi
+
+    if [[ -L "${link_path}" ]] && [[ "$(readlink "${link_path}")" == "${link_target}" ]]; then
+        info "Already correct: ${link_path} -> ${link_target}"
+        return 0
+    fi
+
+    if [[ -e "${link_path}" && ! -L "${link_path}" ]]; then
+        error "A real file/directory exists at ${link_path} — skipping to avoid data loss"
+        return 1
+    fi
+
+    ln -sfn "${link_target}" "${link_path}"
+    success "Created: ${link_path} -> ${link_target}"
+}
+
+## Main
+header "chezmoi -> WSL home directory symlinks"
+
+# ── Windows drive mount ───────────────────────────────────────────────────────
+step "MaPomme -> /mnt/e ..."
+create_symlink "${HOME}/MaPomme" "/mnt/e"
+
+# ── Homelab repository ────────────────────────────────────────────────────────
+step "homelab -> homelab repo ..."
+create_symlink "${HOME}/homelab" "/mnt/e/4_IT/40_IT-Projets/40.01_Homelab-v2"
+
+# ── Windows .ssh directory ────────────────────────────────────────────────────
+# Shares SSH keys between Windows and WSL without duplication.
+# Note: keys are only usable after the WSL restart that applies umask=077
+# (see run_once_after_55_wsl-conf.sh — SSH rejects keys on world-writable paths).
+step ".ssh -> Windows .ssh ..."
+
+WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
+if [[ -z "${WIN_USER}" ]]; then
+    warning "Could not detect Windows username — skipping .ssh symlink"
+else
+    WIN_SSH_DIR="/mnt/c/Users/${WIN_USER}/.ssh"
+    if [[ ! -d "${WIN_SSH_DIR}" ]]; then
+        warning "Windows .ssh not found at ${WIN_SSH_DIR} — skipping"
+        info "Create it from PowerShell: New-Item -ItemType Directory \$env:USERPROFILE\\.ssh"
+    elif [[ -d "${HOME}/.ssh" && ! -L "${HOME}/.ssh" ]]; then
+        warning "${HOME}/.ssh is a real directory — skipping to avoid data loss"
+        warning "Manually merge or remove it before the symlink can be created"
+    else
+        create_symlink "${HOME}/.ssh" "${WIN_SSH_DIR}"
+        info "SSH keys active after WSL restart (umask=077 must be applied first)"
+    fi
+fi
+
+echo ""
+success "WSL symlinks configuration complete!"
+echo ""
+
+{{ end -}}
