@@ -1,0 +1,8 @@
+# Theme
+--theme="Solarized (dark)"
+
+# Style
+--style="full"
+
+# Paging
+--paging=auto
