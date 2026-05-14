@@ -7,10 +7,54 @@
     editor = {{ .chezmoi.config.edit.command }}
 
 [init]
-	defaultBranch = master
+    defaultBranch = master
 
-# Uncomment the following lines to use SSH instead of HTTPS for all GitHub repositories
-#[url "ssh://git@github.com/"]
-#	insteadOf = https://github.com/
-#[url "ssh://git@github.com/"]
-#	pushInsteadOf = https://github.com/
+
+# ── SSH URL rewriting ─────────────────────────────────────────────────────────
+# Global rewrites (disabled). Uncomment to use SSH for all GitHub repos.
+#[url "git@github.com:"]
+#    insteadOf = https://github.com/
+#[url "git@github.com:"]
+#    pushInsteadOf = https://github.com/
+
+# Targeted rewrite for the chezmoi source repo only.
+# Required for chezmoi autoPush (no HTTPS credential helper configured).
+# Requires an active ssh-agent with a loaded GitHub key.
+[url "git@github.com:phenates/dotfiles"]
+    insteadOf = https://github.com/phenates/dotfiles
+
+# ── Push ──────────────────────────────────────────────────────────────────────
+[push]
+    # Automatically create the upstream tracking branch on first push.
+    # Replaces the need to type: git push -u origin <branch>
+    autoSetupRemote = true
+
+    # Only push the current branch (safer than pushing all matching branches).
+    default = current
+
+
+# ── Pull ──────────────────────────────────────────────────────────────────────
+[pull]
+    # Merge on pull (default git behavior). Set to "true" to rebase instead.
+    rebase = false
+
+
+# ── Fetch ─────────────────────────────────────────────────────────────────────
+[fetch]
+    # Remove remote-tracking branches that no longer exist on the remote.
+    prune = true
+
+
+# ── Diff ──────────────────────────────────────────────────────────────────────
+[diff]
+    # Histogram algorithm produces more readable diffs than the default Myers.
+    algorithm = histogram
+
+    # Show moved lines in a different color (requires Git 2.17+).
+    colorMoved = default
+
+
+# ── Merge ─────────────────────────────────────────────────────────────────────
+[merge]
+    # Show base in conflict markers (diff3 style) — easier to resolve conflicts.
+    conflictstyle = diff3

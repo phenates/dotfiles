@@ -5,30 +5,6 @@
 alias zshconfig="chezmoi edit ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-## Directory browsing
-# -----------------------------------------------------------------------------
-
-# ls inprovement with eza
-if command -v 'eza' &> /dev/null; then
-    alias ls="eza --icons=auto"
-    alias l="eza --all --long --header --icons=auto"
-    alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
-    alias lll="eza --all --long --header --tree --color=always --icons=auto"
-fi
-
-# yazi wrapper that provides the ability to change the current working directory when exiting Yazi.
-# Use 'y' instead of yazi to start, and press 'q' to quit with change directory, press 'Q' to quit whitout.
-if command -v 'yazi' &> /dev/null; then
-    function y() {
-        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-        yazi "$@" --cwd-file="$tmp"
-        IFS= read -r -d '' cwd < "$tmp"
-        [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
-        rm -f -- "$tmp"
-    }
-fi
-
-
 
 ## Redefine standard commands to improve their behavior
 # -----------------------------------------------------------------------------
@@ -62,6 +38,38 @@ alias c='clear'
 
 alias sys='systemctl'
 
+
+## Directory browsing
+# -----------------------------------------------------------------------------
+
+# ls inprovement with eza
+if command -v 'eza' &> /dev/null; then
+    alias ls="eza --icons=auto"
+    alias l="eza --all --long --header --icons=auto"
+    alias ll="eza --all --long --header --tree --level=2 --color=always --icons=auto"
+    alias lll="eza --all --long --header --tree --color=always --icons=auto"
+fi
+
+# yazi wrapper that provides the ability to change the current working directory when exiting Yazi.
+# Use 'y' instead of yazi to start, and press 'q' to quit with change directory, press 'Q' to quit whitout.
+if command -v 'yazi' &> /dev/null; then
+    function y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+        yazi "$@" --cwd-file="$tmp"
+        IFS= read -r -d '' cwd < "$tmp"
+        [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+        rm -f -- "$tmp"
+    }
+fi
+
+
+# bat, cat clone with syntax highlighting and Git integration
+if command -v 'bat' &> /dev/null; then
+    alias cat="bat"
+elif command -v 'batcat' &> /dev/null; then
+    alias bat="batcat"
+    alias cat="batcat"
+fi
 
 ## Platform specific aliases
 # -----------------------------------------------------------------------------
