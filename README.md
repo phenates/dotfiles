@@ -1,843 +1,544 @@
 # dotfiles
 
 [![chezmoi](https://img.shields.io/badge/managed%20with-chezmoi-blue)](https://www.chezmoi.io/)
-[![GitHub last commit](https://img.shields.io/github/last-commit/phenates/dotfiles)](https://github.com/<Github_User>/dotfiles/commits)
+[![GitHub last commit](https://img.shields.io/github/last-commit/phenates/dotfiles)](https://github.com/phenates/dotfiles/commits)
 
-My dotfiles management with [chezmoi](https://www.chezmoi.io).
+Personal dotfiles managed with [chezmoi](https://www.chezmoi.io), targeting Linux (including WSL2) and Windows environments.
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Cheat-sheet](#cheat-sheet-chezmoi)
-3. [Installation & Initialization Flow](#installation--initialization-flow)
-4. [Key features](#key-features)
-5. [Architecture & Key Components](#architecture--key-components)
-6. [Template System](#template-system)
-7. [Scripts & Hooks](#scripts--hooks)
-8. [Development Workflows](#development-workflows)
-9.  [Testing & Validation](#testing--validation)
-10. [Documentation References](#documentation-references)
+2. [Installation](#installation)
+3. [Chezmoi Cheat-sheet](#chezmoi-cheat-sheet)
+4. [Initialization Flow](#initialization-flow)
+5. [Key Features](#key-features)
+6. [Architecture](#architecture)
+7. [Template System](#template-system)
+8. [Scripts Reference](#scripts-reference)
+9. [Development Workflows](#development-workflows)
+10. [References](#references)
 
-## TODO
-- [ ] Use powershell chezmoi snippet https://www.chezmoi.io/user-guide/machines/windows/#notes-on-running-elevated-scripts 
+---
 
 ## Project Overview
 
-This is a personal dotfiles repository managed by [chezmoi](https://www.chezmoi.io), designed to manage, bootstrap and maintain differents environments (core, development, system administration,...) across different OS/Distribution (Linux, Windows) and/or machines. The repository contains configuration files, scripts, and automation for this purpose.
+Single dotfiles repository managing configuration across Linux, WSL2 and Windows — without secrets or external password managers.
 
-Mains features:
+**What it manages:**
 
-- **OS detection**: Linux, Windows Subsystem for Linux, Windows and applying specific configurations
-- **Private mode**: Password manager (Bitwarden CLI) integration for secrets management.
-- **Tag-based configuration**: 
-    - Type of environments: core, core+, ...
-    - Secrets to populates: select secrets whos will be used, SSH_key, Tokens,...
-- **Shell configuration**: Bash, Zsh, Powershell
+- **Packages** — apt (Linux) and winget + PowerShell modules (Windows), organized by environment tag
+- **Shell** — zsh with oh-my-zsh, powerlevel10k, syntax highlighting, autosuggestions, fzf, zoxide
+- **Terminal tools** — fastfetch, yazi (file manager), eza, bat, fd, ripgrep
+- **WSL2 integration** — `/etc/wsl.conf` configuration, home symlinks (Windows drives, SSH keys), SSH agent bridge
+- **Git** — `.gitconfig` template per OS
+- **VS Code** — file associations for chezmoi template files
 
-## Cheat-sheet Chezmoi
+---
 
-```bash
-# Initialization
-chezmoi init <repo>              # Initialize from repository
-chezmoi init <repo> --apply      # Init + apply
-chezmoi init <repo> --one-shot   # Init + apply + cleanup
-  
-# Daily usage
-chezmoi apply                    # Apply changes to home directory
-chezmoi diff                     # Show differences
-chezmoi update                   # Pull from git + apply
-chezmoi status                   # Show status
-  
-# Editing
-chezmoi edit <file>              # Edit source file
-chezmoi add <file>               # Add file to source
-chezmoi cd                       # Change to source directory
-  
-# Information
-chezmoi data                     # Show template data
-chezmoi managed                  # List managed files
-chezmoi source-path <file>       # Show source file for target
-chezmoi target-path <file>       # Show target path for source
-  
-# Template testing
-chezmoi execute-template         # Test templates (stdin)
-chezmoi cat <file>               # Show rendered file content
-  
-# Debugging
-chezmoi apply --dry-run          # Preview changes
-chezmoi apply --verbose          # Verbose output
-chezmoi apply --debug            # Debug mode
-chezmoi verify                   # Verify external sources
-  
-# Advanced
-chezmoi state delete-bucket --bucket=scriptState  # Reset script state
-chezmoi state dump               # Show internal state
-chezmoi doctor                   # Check for issues
-```
+## Installation
 
-## Installation & Initialization Flow
-
-### Linux
+### Linux / WSL2
 
 ```bash
 sh -c "$(curl -fsLS https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
-# or if redirect URL exists
-sh -c "$(curl -fsLS https://xxxx-linux.MyDomain.com/)"
+
+# or
+
+sh -c "$(wget -qO- https://raw.githubusercontent.com/phenates/dotfiles/master/install.sh)"
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
 irm https://raw.githubusercontent.com/phenates/dotfiles/master/install.ps1 | iex
-# or if redirect URL exists
-irm https://xxxx-windows.MyDomain.com/ | iex
 ```
 
-**Note**: If you encounter execution policy errors, you can bypass it for the installation:
+> If execution policy blocks the script:
+>
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser Unrestricted
+> ```
 
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser Unrestricted
-# Then run the installation command again
+---
+
+## Chezmoi Cheat-sheet
+
+```bash
+# ── Init ─────────────────────────────────────────────────────────────────────
+chezmoi init phenates                # Clone repo, generate config
+chezmoi init phenates --apply        # Clone + apply
+chezmoi init phenates --one-shot     # Clone + apply + remove source dir
+chezmoi init --force                 # Re-run init prompts (re-init)
+chezmoi init --force --apply         # Re-init + apply immediately
+
+# ── Daily ────────────────────────────────────────────────────────────────────
+chezmoi apply                        # Apply source to home (autoCommit: true → auto git commit + push)
+chezmoi apply --dry-run              # Preview without applying
+chezmoi apply --verbose              # Show each file operation
+chezmoi apply --debug                # Full debug output
+chezmoi apply --exclude scripts      # Apply files only, skip scripts
+chezmoi apply --include scripts      # Run scripts only, skip files
+chezmoi apply --keep-going           # Continue on errors
+chezmoi update                       # git pull + apply
+chezmoi diff                         # Show pending changes (source vs target)
+chezmoi diff ~/.zshrc                # Diff for a specific file
+chezmoi status                       # File-level status (A/M/D)
+
+# ── Source editing ────────────────────────────────────────────────────────────
+chezmoi edit ~/.zshrc                # Open source file in $EDITOR
+chezmoi edit --apply ~/.zshrc        # Edit + apply immediately
+chezmoi add ~/.config/tool/conf      # Add file to source state
+chezmoi re-add ~/.zshrc              # Update source from current target
+chezmoi forget ~/.zshrc              # Remove from source (keeps target)
+chezmoi remove ~/.zshrc              # Remove from source AND target
+chezmoi cd                           # cd to source directory
+chezmoi git -- status                # Run git in source directory
+chezmoi git -- log --oneline -10     # Git log in source directory
+chezmoi merge ~/.zshrc               # 3-way merge source/target/last-applied
+
+# ── Inspection ────────────────────────────────────────────────────────────────
+chezmoi data                         # All template variables (JSON)
+chezmoi data | grep -i wsl           # Filter template variables
+chezmoi dump-config                  # Show effective chezmoi config
+chezmoi managed                      # List all managed files
+chezmoi managed --include files      # List managed files only
+chezmoi unmanaged                    # List unmanaged files in home
+chezmoi cat ~/.zshrc                 # Show rendered file content
+chezmoi source-path ~/.zshrc         # Source path for a given target
+chezmoi target-path home/dot_zshrc  # Target path for a given source
+
+# ── Templates ────────────────────────────────────────────────────────────────
+chezmoi execute-template             # Render template from stdin
+chezmoi execute-template '{{ .chezmoi.os }}'  # Render inline expression
+
+# ── Externals ────────────────────────────────────────────────────────────────
+chezmoi verify                       # Verify external sources checksums
+chezmoi apply --refresh-externals    # Force re-download all externals
+
+# ── State ────────────────────────────────────────────────────────────────────
+chezmoi state dump                                        # Dump internal DB
+chezmoi state delete-bucket --bucket scriptState          # Reset run_onchange_ state
+chezmoi state delete-bucket --bucket entryState           # Reset run_once_ state
+
+# ── Maintenance ──────────────────────────────────────────────────────────────
+chezmoi upgrade                      # Upgrade chezmoi itself
+chezmoi doctor                       # Check environment for issues
+chezmoi purge                        # Remove chezmoi config + state (not dotfiles)
+chezmoi archive --output=dotfiles.tar.gz  # Export source state as archive
+chezmoi completion zsh               # Generate zsh completion script
 ```
 
-### Initialization Flow
+---
 
-1. **Install chezmoi binary**
-   1. Run install commands (see [Installation](#-installation)) corresponding to `install.sh` script for Linux and `install.ps1` for Windows, that installing chezmoi binary (Linux: `~/.local/bin/chezmoi`, Windows: `$HOME\bin\chezmoi.exe`)
-   2. Choose witch chezmoi command to execute next or quit
+## Initialization Flow
 
-2. **Chezmoi init with interactive prompts:** chezmoi host configuration
-   - Private mode: enable or not the private mode (install password manager and populate secrets (see ???))
-   - Environments tags: select environment tags (conditionning dotfiles application and packages installations)
-   - Secrets tags: If Private mode enable, select witch secrets will be populated
+```
+1. install.sh / install.ps1
+   └── Downloads chezmoi binary → runs: chezmoi init --apply phenates
 
-3. **Execute hooks (hooks.read-source-state.pre):** If Private mode enable, installing password manager
+2. chezmoi init  (.chezmoi.yaml.tmpl evaluated)
+   ├── Detects OS, distribution, WSL
+   ├── On re-init from TTY: prompts for environment tags
+   └── Generates ~/.config/chezmoi/chezmoi.yaml
 
-4. **Run before scripts:** packages installation, shell configure, ...
+3. chezmoi apply
+   ├── run_once_before_00     → Prerequisites check
+   ├── run_onchange_before_10 → Packages installation (apt / winget)
+   ├── External downloads     → oh-my-zsh, plugins, fonts, binaries (.chezmoiexternal.yaml.tmpl)
+   ├── File application       → Dotfiles deployed to ~
+   ├── run_onchange_after_10 → Replace chezmoi binary with .deb (Linux)
+   ├── run_onchange_after_40 → Passwordless sudo (Linux)
+   ├── run_onchange_after_50 → zsh as default shell + font cache refresh
+   ├── run_once_after_60    → /etc/wsl.conf configuration (WSL only)
+   └── run_onchange_after_61 → Home symlinks: MaPomme, homelab, .ssh (WSL only)
+```
 
-5. **Apply dotfiles** to home directory
+---
 
-6. **Run after scripts**
-
-## Key features
+## Key Features
 
 ### Environment Tags
 
-**Environment tags** provide a flexible system for deploying different sets of configuration files, packages installation and external files based on the role or purpose of a machine.
-This allows to maintain a single dotfiles repository while supporting different machine configurations (minimal server, developer workstation, AI development machine, etc.).
+Tags selected at `chezmoi init` time control which packages and tools are deployed.
 
-#### Environment Tags Diagram
+| Tag    | Description                                                       |
+| ------ | ----------------------------------------------------------------- |
+| `core` | Base shell environment — all packages, zsh stack, yazi, fastfetch |
 
-```
-  ┌─────────────────────┐
-  │    User Prompt      │
-  │   (chezmoi init)    │
-  └──────────┬──────────┘
-             │
-             ├─> Select environments tags for this machine? ([x] core; [ ] core+; ...)
-             |
-             ▼
-┌─────────────────────────────────────────────┐
-│        Template Processing/Rendering        |
-|              (chezmoi apply)                │
-| Templates access tags via: .environmentTags |             
-└────────────────────────┬────────────────────┘
-                         │
-         ┌───────────────┼───────────────┐
-         ▼               ▼               ▼
-┌────────────────┐ ┌────────────────┐ ┌──────────────────────┐
-│ 3A. PACKAGE    │ │ 3B. FILE       │ │ 3C. EXTERNAL         │
-│ INSTALLATION   │ │ FILTERING      │ │ DOWNLOADS            │
-│                │ │                │ │                      │
-│ .scripts       │ │ .chezmoiignore │ │ .chezmoiexternal     │
-│ - Lookup pkgs  │ │ evaluates      │ │ downloads binaries   │
-│ - Install      │ │ conditions     │ │ if tag matches       │
-│                │ │                │ │                      │
-└────────────────┘ └────────────────┘ └──────────────────────┘
-         │               │               │
-         └───────────────┼───────────────┘
-                         ▼
-┌──────────────────────────────────────────────────────────────┐
-│                  Applied Environmant                         │
-│                                                              │
-│  Packages installed: curl, wget, git, eza, file, 7zip, ...   │
-│  Files deployed: Only those not ignored by .chezmoiignore    │
-│  Binaries available: ~/.local/bin/yazi, ~/.local/bin/ya      │
-└──────────────────────────────────────────────────────────────┘
-```
+**Extending with a new tag:**
 
-#### How Environment Works
+1. Add packages to `.chezmoidata.yaml`:
 
-| File                                            | Purpose                                         |
-| ----------------------------------------------- | ----------------------------------------------- |
-| `home/.chezmoi.yaml.tmpl`                       | Main configuration template (prompts, settings) |
-| `home/.chezmoidata.yaml`                        | Package database                                |
-| `home/.chezmoiignore.tmpl`                      | Files to ignore based on tags                   |
-| `home/dot_local/bin/.chezmoiexternal.yaml.tmpl` | External binaries to download                   |
-
-#### Adding a New Environment
-
-1. **Define the tag in `.chezmoidata.yaml`**:
    ```yaml
    packages:
      linux:
        apt:
-         dev:  # ← New tag
+         dev:
            - gcc
            - make
-           - cmake
-     windows:
-       winget:
-         dev:  # ← New tag
-           - Microsoft.VisualStudio.2022.Community
    ```
 
-2. **Add to available choices in `.chezmoi.yaml.tmpl`**:
+2. Expose in `.chezmoi.yaml.tmpl`:
+
    ```go
-   {{- $tag_choices := list "core" "core+" "dev" -}}
+   {{- $tag_choices := list "core" "dev" -}}
    ```
 
-3. **(Optional) Add conditional file rules in `.chezmoiignore.tmpl`**:
+3. Optionally filter files in `.chezmoiignore.tmpl`:
+
    ```go
    {{ if not (has "dev" .environmentTags) }}
-   .config/vscode
+   .config/dev-tool/
    {{ end }}
    ```
 
-4. **Reinitialize chezmoi**:
-   ```bash
-   chezmoi init --force
-   ```
+4. Re-init: `chezmoi init --force`
 
-### Private mode and Secrets management
+---
 
-**Private mode** enables secure management of sensitive dotfiles (SSH keys, API tokens, credentials) with [Bitwarden](https://bitwarden.com/) as a secrets vault. When enabled, chezmoi templates can fetch secrets from your Bitwarden vault at apply time, ensuring that **no sensitive data is ever stored in the repository**.
+### WSL2 Integration
 
-**Security Considerations**, sensitive data (secrets) MUST be in Bitwarden, Never Hardcode
+Specific configuration applied automatically when `is_WSL` is `true`:
 
-#### Private mode Diagram
+| Script                                       | Purpose                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `run_once_after_60_wsl-conf.sh.tmpl`         | Configures `/etc/wsl.conf`: default user, automount (`metadata,umask=077`), hostname |
+| `run_onchange_after_61_wsl-simlinks.sh.tmpl` | Creates home symlinks: `~/MaPomme → /mnt/e`, `~/homelab`, `~/.ssh → Windows .ssh`    |
 
-```
-┌─────────────────────┐
-│     User Promp      │
-│   (chezmoi init)    │
-└──────────┬──────────┘
-           │
-           ├─> Enable Private mode? [Yes/No]
-           |─> Select Secrets tags? [id_xxxx/id_github/id_<user>]
-           │
-           ▼
-┌─────────────────────────────────┐
-│    install-password-manager     │
-│         (chezmoi hook)          │
-│  - Downloads Bitwarden CLI      │
-│  - Prompts for BW server URL &  |
-|    login                        │
-└──────────┬──────────────────────┘
-           │
-           ▼
-┌─────────────────────────────────┐
-│  Template Processing/Rendering  │
-│         (chezmoi apply)         │
-│  - Fetches secrets from BW      │
-│  - Populates templates          │
-│  - Applies file permissions     │
-└──────────┬──────────────────────┘
-           │
-           ▼
-┌─────────────────────────────────┐
-│       Applied Secrets           │
-│  ~/.gitconfig (with token)      │
-│  ~/.ssh/id_* (keys)             │
-└─────────────────────────────────┘
-```
-
-#### How Private Mode Works
-
-| File                                          | Purpose                                         |
-| --------------------------------------------- | ----------------------------------------------- |
-| `home/.chezmoi.yaml.tmpl`                     | Main configuration template (prompts, settings) |
-| `home/.chezmoiignore.tmpl`                    | Files to ignore based on secrets tags           |
-| `home/.chezmoihooks/install-password-manager` | Password manager installation script            |
-| `home/dot_ssh/private_id_*.tmpl`              | Dotfile with secrets settlement exemple         |
-| `home/private_dot_gitconfig.tmpl`             | Git config with GitHub token                    |
-
-- **Configuration File**
-
-Private mode is configured in chezmoi config file `home/.chezmoi.yaml.tmpl` and generate two user prompts during chezmoi init:
-
-  - Enable Private mode: [Yes/No] to enable the mode
-
-```go
-{{- /* Default values */ -}}
-{{- $private  := false -}} {{/* true if this machine should have private secrets */}}
-
-{{- /* Interactive prompt during chezmoi init */ -}}
-{{- $private_choices := list "Yes" "no" -}}
-{{- $private  := promptChoice "  ?  Enable Private mode on this machine (install bitwarden_cli and populate secrets) ?" $private_choices $privateDefault -}}
-{{- if eq $private "Yes" -}}
-{{-   $private = true -}}
-{{- else -}}
-{{-   $private = false -}}
-{{- end -}}
-
-data:
-  private: {{ $private }}
-```
-
-  - Select Secrets tags: [Multichoice] to select wich secrets should be populate, if Private mode enable
-
-```go
-{{- if $private -}}
-{{-   $secretsTags_choices := list "SSH_id_xxxx" "Token_yyyy" "Password_zzzz" -}}
-{{-   $secretsTags = promptMultichoice "  ?  Select secrets tags to populate on this machine (e.g., id_github, ... )" $secretsTags_choices $previousSecretsTags -}}
-{{-   writeToStdout (printf "    ➜ '%s' \n\n" $secretsTags ) -}}
-{{- end -}}
-```
-
-- **Password Manager Installation**
-
-If Private mode is enable, the chezmoi hook (read-source-state) will run `.chezmoihooks/install-password-manager` script to install Bitwarden CLI and prompt for configures the Bitwarden server URL and login to your Bitwarden vault.
-
-- **Conditional File Inclusion**
-
-Private mode affects which files get applied via [home/.chezmoiignore.tmpl](home/.chezmoiignore.tmpl):
-
-```shell
-{{- if not .private }}
-# Ignore ALL ssh files if not in private mode
-.ssh/**
-{{- else }}
-# In private mode, only ignore specific SSH keys based on secretsTags
-{{-   if not (has "SSH_id_xxxx" .secretsTags) }}
-.ssh/id_xxxx*
-.ssh/authorized_keys
-{{-   end }}
-{{-   if not (has "Token_yyyy" .secretsTags) }}
-App/Token_yyyy*
-{{-   end }}
-{{- end }}
-```
-
-- **Secrets Settlement**
-
-Chezmoi will fetch secrets from Bitwarden and populate your dotfiles templates
-File: `home/dot_ssh/private_id_xxxx.tmpl`
-
-```go
-{{- if .private -}}
-{{-     (bitwarden "item" "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx").sshKey.privateKey -}}
-{{- end -}}
-```
-
-#### Adding New Secrets
-
-1. Create a new Bitwarden item
-2. Copy the item UUID
-3. Create a new template file (e.g., `private_dot_app-xxx_token.tmpl`)
-4. Add template logic:
-   ```go
-   {{- if .private -}}
-   {{-     (bitwardenFields "item" "NEW-UUID").tokenField.value -}}
-   {{- end -}}
-   ```
-5. Modifi `home/.chezmoi.yaml.tmpl` to add new tag in secretsTags_choices list   
-6. Configure .chezmoiigore for conditional file inclusion:
-   ```go
-   {{-   if not (has "Token_yyyy" .secretsTags) }}
-   .app-xxx_token
-   {{-   end }}
-   ```
-
-#### File Permissions
-
-**Use `private_` prefix** for sensitive files → `0600` (owner read/write only)
-
-#### Bitwarden Template Functions
-
-```go
-{{/* Returns the full Bitwarden item object */}}
-{{ bitwarden "item" "UUID" }}
-
-{{/* Returns the value of a custom field named 'fieldName' */}}
-{{ (bitwardenFields "item" "UUID").fieldName.value }}
-
-{{/* Returns key from Bitwarden SSH Key item */}}
-{{ (bitwarden "item" "UUID").sshKey.privateKey }}
-{{ (bitwarden "item" "UUID").sshKey.publicKey }}
-```
-
-#### Bitwarden CLI Commands
+**SSH agent** (`.zshrc.tmpl`, WSL only): starts a local `ssh-agent` and loads all private keys from `~/.ssh` (detected via `.pub` counterparts).
 
 ```bash
-# Login to Bitwarden (creates session)
-bw login
-
-# Lock vault (requires master password to unlock)
-bw lock
-
-# Unlock vault (stores session key)
-bw unlock
-
-# Set session key in environment (for automation)
-export BW_SESSION="session_key_here"
-
-# List items
-bw list items  --pretty
-
-# Get specific item
-bw get item [UUID|itemName] --pretty
-
-# Edit item
-bw edit item <UUID>
+# On WSL startup: automatically loads all keys from ~/.ssh/*.pub
+if [ -z "$SSH_AUTH_SOCK" ] && [[ -x /usr/bin/ssh-agent ]]; then
+    eval "$(/usr/bin/ssh-agent -s)" > /dev/null
+    for pub in ~/.ssh/*.pub; do
+        key="${pub%.pub}"
+        [[ -f "$key" ]] && /usr/bin/ssh-add "$key" 2>/dev/null
+    done
+fi
 ```
 
-#### gitconfig Special case
+---
 
-A special case is used for the `home/private_dot_gitconfig.tmpl` file, which is not associated with a Secret tag and will automaticly appliqued if Private mode is enable.
+### Shell Stack (Linux / WSL2)
 
-To simplify git operations (fetch, push) without to enter manualy credidentials, the github remote URL use repository token access, stored in a Bitwarden item.
+| Tool                      | How managed                                           |
+| ------------------------- | ----------------------------------------------------- |
+| `zsh`                     | apt package                                           |
+| `oh-my-zsh`               | chezmoi external (archive, weekly refresh)            |
+| `powerlevel10k`           | chezmoi external (pinned to latest GitHub release)    |
+| `zsh-syntax-highlighting` | chezmoi external                                      |
+| `zsh-autosuggestions`     | chezmoi external                                      |
+| Meslo Nerd Font           | chezmoi external (archive)                            |
+| `fastfetch`               | chezmoi external (binary, auto latest)                |
+| `yazi` + `ya`             | chezmoi external (binary, auto latest)                |
+| `fzf`                     | apt package + configured in `.zshrc`                  |
+| `zoxide`                  | apt package + `eval "$(zoxide init zsh)"` in `.zshrc` |
 
-Based on the Git insteadOf directive, a template will automatically insert the directive with the token access into the user Git config file.
+---
 
-```go
-{{/* Private mode: change the remote URL to use token authentication URL for github dotfiles repo */}}
-{{ if .private }}
-# Private mode: use token auth URL for github dotfiles repo
-[url "https://<Github_User>:{{ (bitwardenFields "item" "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx").githubDotfilesToken.value }}@github.com/<Github_User>/dotfiles.git"]
-        insteadOf = https://github.com/<Github_User>/dotfiles.git
-        pushInsteadOf = https://github.com/<Github_User>/dotfiles.git
-{{ end }}
-```
-
-#### References
-
-- [Bitwarden CLI Documentation](https://bitwarden.com/help/cli/)
-- [chezmoi Bitwarden Integration](https://www.chezmoi.io/user-guide/password-managers/bitwarden/)
-- [GitHub Fine Grained Personal Access Tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)
-
-## Architecture & Key Components
+## Architecture
 
 ### Directory Structure
 
-```shell
-
+```
 dotfiles/
-
-├── install.sh                           # Bootstrap installation script for Linux/macOS
-├── install.ps1                          # Bootstrap installation script for Windows
-├── .chezmoiroot                         # Chezmoi source directory declaration, source state dir read from this file
-├── .chezmoiversion                      # Defining the minimum version of chezmoi required
-├── home/                                # Chezmoi source directory (see .chezmoiroot)
-│   ├── .chezmoi.yaml.tmpl               # Main configuration with prompts
-│   ├── .chezmoiexternal.yaml.tmpl       # List of external ressources to be included, can exist in multiple dir level
-│   ├── .chezmoiignore                   # Conditional ignore patterns, can exist in multiple dir level
-│   ├── .chezmoihooks/                   # Pre/post hooks
-│   │   ├── install-password-manager.sh
-│   │   └── ...
-│   ├── .chezmoiscripts/linux/          # Installation scripts
-│   │   ├── run_onchange_before_10_install-packages.sh.tmpl
-│   │   └── ...
-│   ├── .utils/                         # Shared utilities
-│   │   ├── utils.sh                    # Bash utilities
-│   │   └── utils.ps1                   # PowerShell utilities
-│   ├── dot_xxxx                        # Configuration/dotfile file managed by chezmoi 
-│   ├── dot_xxx_yyyy.tmpl               # Configuration/dotfile file managed by chezmoi, using templating
-│   ├── private_dot_gitconfig.tmpl      # Configuration/dotfile file managed by chezmoi, using templating (private)
-│   ├── dot_config/                     # XDG config directory managed by chezmoi
-│   │   ├── xxxDir/config.jsonc
-│   │   └── ...
-│   ├── dot_local/                      # User-local files managed by chezmoi
-│   │   ├── bin/.chezmoiexternal.yaml.tmpl    # Binary downloads
-│   │   └── share/.chezmoiexternal.yaml.tmpl  # Fonts, themes
-.   .
-.   .
-.
+├── install.sh                              # Linux bootstrap
+├── install.ps1                             # Windows bootstrap
+├── .chezmoiroot                            # Source directory pointer
+├── .chezmoiversion                         # Minimum chezmoi version
+└── home/                                   # Chezmoi source root
+    ├── .chezmoi.yaml.tmpl                  # Config generation + prompts
+    ├── .chezmoidata.yaml                   # Package lists database
+    ├── .chezmoiexternal.yaml.tmpl          # External downloads (plugins, fonts, binaries)
+    ├── .chezmoiignore.tmpl                 # Conditional ignore rules
+    ├── .utils/
+    │   ├── utils.sh                        # Shared bash utilities (header/step/info/success...)
+    │   └── utils.ps1                       # Shared PowerShell utilities
+    ├── .chezmoiscripts/
+    │   ├── linux/
+    │   │   ├── run_once_before_00_prerequisites.sh.tmpl
+    │   │   ├── run_onchange_before_10_install-packages.sh.tmpl
+    │   │   ├── run_onchange_after_10_chezmoi-package_install.sh.tmpl
+    │   │   ├── run_onchange_after_40_sudo-passwordless.sh.tmpl
+    │   │   ├── run_onchange_after_50_shell-zsh.sh.tmpl
+    │   │   ├── run_once_after_60_wsl-conf.sh.tmpl      # WSL only
+    │   │   └── run_onchange_after_61_wsl-simlinks.sh.tmpl  # WSL only
+    │   └── windows/
+    │       └── run_onchange_before_10_install-packages.ps1.tmpl
+    ├── dot_zshrc.tmpl
+    ├── dot_bashrc
+    ├── dot_nanorc
+    ├── dot_sh_aliases.tmpl
+    ├── dot_sh_functions.tmpl
+    ├── private_dot_gitconfig.tmpl
+    ├── dot_p10k.zsh
+    └── dot_config/
+        ├── fastfetch/                      # fastfetch configuration
+        ├── ohmyposh/                       # Oh My Posh theme (Windows)
+        └── yazi/
+            ├── yazi.toml                   # Manager and preview settings
+            └── keymap.toml                 # Custom keybindings + cheat sheet
 ```
 
 ### Template Variables
 
-Defined in `.chezmoi.yaml.tmpl`:
-
-| Variable                | Type   | Description              | Example                       |
-| ----------------------- | ------ | ------------------------ | ----------------------------- |
-| `.private`              | bool   | Private mode flag        | `true`/`false`                |
-| `.environmentTags`      | list   | Machine environment tags | `["core", "dev"]`             |
-| `.secretsTags`          | list   | Secrets to populate      | `["id_github", "id_homelab"]` |
-| `.installZSH`           | bool   | Install ZSH              | `true`/`false`                |
-| `.changeShell`          | bool   | Change default shell     | `true`/`false`                |
-| `.OS_id`                | string | OS identifier            | `linux-debian`                |
-| `.is_WSL`               | bool   | WSL detection            | `true`/`false`                |
-| `.chezmoi.os`           | string | Operating system         | `linux`/`darwin`              |
-| `.chezmoi.arch`         | string | Architecture             | `amd64`/`arm64`               |
-| `.chezmoi.hostname`     | string | Hostname                 | `myserver`                    |
-| `.chezmoi.username`     | string | Current user             | `<user>`                      |
-| `.chezmoi.osRelease.id` | string | Distribution ID          | `debian`/`fedora`             |
+| Variable                | Type   | Description               | Example             |
+| ----------------------- | ------ | ------------------------- | ------------------- |
+| `.environmentTags`      | list   | Selected environment tags | `["core"]`          |
+| `.OS_id`                | string | OS + distro identifier    | `linux-ubuntu`      |
+| `.is_WSL`               | bool   | Running inside WSL2       | `true`              |
+| `.chezmoi.os`           | string | Operating system          | `linux` / `windows` |
+| `.chezmoi.arch`         | string | CPU architecture          | `amd64`             |
+| `.chezmoi.username`     | string | Current user              | `phenates`          |
+| `.chezmoi.hostname`     | string | Machine hostname          | `my-laptop`         |
+| `.chezmoi.osRelease.id` | string | Linux distribution ID     | `ubuntu` / `debian` |
 
 ### File Naming Conventions
 
-#### Chezmoi Prefixes
+| Prefix / Suffix | Effect                             | Example                       |
+| --------------- | ---------------------------------- | ----------------------------- |
+| `dot_`          | Maps to dotfile                    | `dot_zshrc.tmpl` → `~/.zshrc` |
+| `private_`      | Sets `0600` permissions            | `private_dot_gitconfig.tmpl`  |
+| `executable_`   | Sets `0755` permissions            | `executable_script.sh`        |
+| `run_once_`     | Runs once, never again             | `run_once_before_00_...`      |
+| `run_onchange_` | Runs when template content changes | `run_onchange_before_10_...`  |
+| `.tmpl`         | Go template processing             | `dot_zshrc.tmpl`              |
 
-| Prefix          | Purpose            | Example                         | Target                |
-| --------------- | ------------------ | ------------------------------- | --------------------- |
-| `dot_`          | Regular dotfiles   | `dot_bashrc`                    | `~/.bashrc`           |
-| `private_`      | Sensitive dotfiles | `private_dot_gitconfig.tmpl`    | `~/.gitconfig`        |
-| `executable_`   | Executable files   | `executable_script.sh`          | Executable script     |
-| `run_once_`     | Run once scripts   | `run_once_install.sh`           | One-time execution    |
-| `run_onchange_` | Run on change      | `run_onchange_packages.sh.tmpl` | When template changes |
-| `.tmpl`         | Template files     | `dot_sh_aliases.tmpl`           | Dynamic content       |
-
-#### File Permissions
-
-Chezmoi sets permissions automatically:
-
-- `private_*` files → `0600` (owner read/write only)
-- Regular files → `0644` (owner read/write, others read)
-- `executable_*` files → `0755` (executable)
+---
 
 ## Template System
 
-### Template Files
-
-Files with `.tmpl` extension use chezmoi's templating (Go template syntax) :
+### OS / WSL Conditions
 
 ```go
-{{- if .private -}}
-# Private mode enabled - load secrets from Bitwarden
-{{ bitwarden "item" "GitHub Token" }}
-{{- end }}
-  
-
-{{- if has "dev" .tags -}}
-# Development tools enabled and installation
-export PATH="$HOME/.local/bin:$PATH"
-{{- end }}
-```
-
-### Conditional Logic Patterns
-
-**OS Detection**:
-
-```shell
 {{- if eq .chezmoi.os "linux" -}}
-# Linux-specific configuration
+# Linux-specific
 {{- else if eq .chezmoi.os "windows" -}}
-# Windows-specific configuration
+# Windows-specific
+{{- end -}}
+
+{{- if .is_WSL -}}
+# WSL-only configuration
 {{- end -}}
 ```
 
-**Distribution Check**:
+### Distribution Check
 
 ```go
-{{- if eq .OS_id "linux-debian" -}}
+{{- if eq .OS_id "linux-ubuntu" "linux-debian" -}}
 # Debian/Ubuntu specific
-{{- else if eq .OS_id "linux-fedora" -}}
-# Fedora/RHEL specific
 {{- end -}}
 ```
 
-**Tag-based Inclusion**:
+### Environment Tag Check
 
 ```go
-{{- if has "core+" .tags -}}
-# Install enhanced tools like yazi
-{{- end -}}
-```
-
-**Multi-condition**:
-
-```go
-{{- if and .private (has "work" .tags) -}}
-# Work-specific private configuration
+{{- if has "core" .environmentTags -}}
+# Deploy core tools
 {{- end -}}
 ```
 
 ### External Sources
 
-Template for downloading binaries/archives in `.chezmoiexternal.yaml.tmpl`:
-
 ```yaml
+# In .chezmoiexternal.yaml.tmpl
 ".local/bin/tool":
-  type: "archive-file"  # or "file"
-  url: "{{ gitHubLatestReleaseAssetURL "owner/repo" "pattern" }}"
-  executable: true
-  refreshPeriod: "168h"  # 1 week
-  stripComponents: 1
+    type: "archive-file"
+    url: "{{ gitHubLatestReleaseAssetURL "owner/repo" "asset-pattern" }}"
+    executable: true
+    refreshPeriod: "168h"
+    stripComponents: 1
+    path: "bin/tool"
 ```
 
-**Example** (fastfetch):
-
-```yaml
-".local/bin/fastfetch":
-  type: "file"
-  url: "{{ gitHubLatestReleaseAssetURL "fastfetch-cli/fastfetch" (printf "fastfetch-%s-%s" .chezmoi.os .chezmoi.arch) }}"
-  executable: true
-  refreshPeriod: "168h"
-```
-
-### Template functions
+### Useful Template Functions
 
 ```go
-{{ has "value" .list }}          # Check if list contains value
-{{ lookPath "command" }}         # Check if command exists in PATH
-{{ output "cmd" "arg" }}         # Execute command and get output
-{{ bitwarden "type" "item" }}    # Retrieve from Bitwarden
-{{ gitHubLatestReleaseAssetURL "owner/repo" "pattern" }}  # Get GitHub release URL
+{{ has "value" .list }}                               # List contains value
+{{ gitHubLatestRelease "owner/repo" }}                # Latest release info
+{{ gitHubLatestReleaseAssetURL "owner/repo" "pat" }}  # Latest release asset URL
+{{ lookPath "command" }}                              # Command in PATH?
+{{ output "cmd" "arg" }}                              # Capture command output
 ```
 
-## Scripts & Hooks
+---
 
-### Shared Utilities
+## Scripts Reference
 
-The `.utils` directory contains utility functions for both Bash and PowerShell scripts.
+### Linux Scripts
 
-- Bash Utilities (`home/.utils/utils.sh`)
+| Script                                                  | Type           | Purpose                                                 |
+| ------------------------------------------------------- | -------------- | ------------------------------------------------------- |
+| `run_once_before_00_prerequisites.sh.tmpl`              | `run_once`     | Check required tools (`sudo`, `curl`, `git`, `apt-get`) |
+| `run_onchange_before_10_install-packages.sh.tmpl`       | `run_onchange` | Install apt packages from `.chezmoidata.yaml`           |
+| `run_onchange_after_10_chezmoi-package_install.sh.tmpl` | `run_onchange` | Replace chezmoi standalone binary with `.deb` package   |
+| `run_onchange_after_40_sudo-passwordless.sh.tmpl`       | `run_onchange` | Grant passwordless sudo (validated with `visudo -cf`)   |
+| `run_onchange_after_50_shell-zsh.sh.tmpl`               | `run_onchange` | Set zsh as default shell, refresh font cache            |
+| `run_once_after_60_wsl-conf.sh.tmpl`                    | `run_once`     | Configure `/etc/wsl.conf` — WSL only                    |
+| `run_onchange_after_61_wsl-simlinks.sh.tmpl`            | `run_onchange` | Create home symlinks — WSL only                         |
 
-**Usage**:
+### Shared Utilities (`home/.utils/utils.sh`)
 
 ```bash
-# Always source at the beginning of scripts
-source "$HOME/.local/share/chezmoi/home/.utils/utils.sh"
+source "{{ .chezmoi.sourceDir }}/.utils/utils.sh"
 
-# Example usage
-step "Installing packages..."
-if command_exists apt; then
-  success "APT package manager found"
-else
-  error "APT not found"
-  exit 1
-fi
+header "Section title"       # ===== Section title =====
+step "Doing something..."    #   -->  Doing something...
+info "Some information"      # [INFO]  Some information
+success "It worked"          # [ OK ]  It worked
+warning "Something odd"      # [WARN]  Something odd
+error "Something failed"     # [ERR ]  Something failed >&2
+command_exists "git"         # returns 0 if command found
+require_tools git curl sudo  # exits with warning if any missing
 ```
 
-- PowerShell Utilities (`home/.utils/utils.ps1`)
-
-**Usage**:
-
-```powershell
-# Import at the beginning of scripts
-. "$HOME\.local\share\chezmoi\home\.utils\utils.ps1"
-
-# Example usage
-Write-Step "Installing packages..."
-if (Test-CommandExists "winget") {
-    Write-Success "Winget found"
-} else {
-    Write-Error "Winget not found"
-    exit 1
-}
-```
-
-### Hook Types
-
-**`hooks.read-source-state.pre`** - Before reading source state
-
-- **Example**: `install-password-manager.sh` (install Bitwarden CLI)
-- **Purpose**: Install dependencies needed for template rendering
+---
 
 ## Development Workflows
 
-### Making Changes on dotfiles
-
-1. **Edit source files** in `home/` directory
+### Edit and Apply
 
 ```bash
-chezmoi edit ~/.bashrc
-# or directly edit
-nano home/dot_bashrc
-```
+# Edit a managed file
+chezmoi edit ~/.zshrc
 
-2. **Test templates**:
-
-```bash
-chezmoi execute-template < home/dot_sh_aliases.tmpl
-```
-
-3. **Preview changes**:
-
-```bash
+# Preview changes before applying
 chezmoi diff
+
+# Apply changes
+chezmoi apply
+
+# Apply and see what runs
+chezmoi apply --verbose
 ```
 
-4. **Apply changes**:
+### Test Templates
 
 ```bash
-chezmoi apply --dry-run    # Test first
-chezmoi apply              # Actually apply
+# Render a template to stdout
+chezmoi execute-template < home/dot_zshrc.tmpl
+
+# Show rendered content of a deployed file
+chezmoi cat ~/.zshrc
+
+# Inspect template variables
+chezmoi data
+chezmoi data | grep -i wsl
 ```
 
-5. **Commit changes**:
+### Force Re-run Scripts
 
 ```bash
-cd ~/.local/share/chezmoi
-git add .
-git commit -m "feat: description"
-git push
+# Re-run all run_onchange_ scripts (by clearing their state)
+chezmoi state delete-bucket --bucket scriptState
+chezmoi apply
+
+# Re-run all run_once_ scripts
+chezmoi state delete-bucket --bucket entryState
+chezmoi apply
 ```
 
-6. **Update remote**:
+### Add New Dotfiles
 
 ```bash
-chezmoi update    # Pulls from git + applies
-```
+# Add an existing file to chezmoi management
+chezmoi add ~/.config/tool/config.yml
 
-### Adding New Ressources
-
-1. **Add new config file/dotfile** in `home/dot_config/tool/`
-
-```bash
-# Add the file to chezmoi managed ressources
-chezmoi add .config/tool/config.yml
-
-# Create directly in the chezmoi source dir
+# Or create directly in source
 mkdir -p home/dot_config/tool
 touch home/dot_config/tool/config.yml
-```
-
-2. **Add external sources to `home/dot_local/bin/.chezmoiexternal.yaml.tmpl`
-
-```yaml
-# See external Sources
-".local/bin/tool":
-     type: "file"
-     url: "https://example.com/tool-binary"
-     executable: true
-```
-
-3. **Update `.chezmoiignore`** if conditional
-
-```shell
-{{ if not (has "dev" .tags) }}
-.config/tool/
-{{ end }}
-```
-
-4. **Add installation script** in `.chezmoiscripts/linux/`
-
-```bash
-# run_onchange_before_20_install-tool.sh.tmpl
-{{ if has "dev" .tags -}}
-# Install tool dependencies
-{{ end -}}
-```
-
-5. **Update package lists** if needed
-
-### Adding/Populate Secrets
-
-1. **Store secrets** in Bitwarden vault
-
-- Item name: `My_Secret_Name`
-- Field: Store the secret content
-
-1. **Add secret template**: 
-
-```go
-{{ bitwarden "item" "My_Secret_Name" }}
-```
-
-2. **Add field secret template**: `home/dot_ssh/id_NAME.pub.tmpl`
-
-```go
-{{ bitwarden "fields" "SSH_ID_NAME" "public_key" }}
-```
-
-3. **Update `.chezmoiignore`** conditional
-
-```shell
-{{ if not (has "id_NAME" .secretsTags) }}
-.ssh/id_NAME
-.ssh/id_NAME.pub
-{{ end }}
-```
-
-4. **Add to selection prompts** in `.chezmoi.yaml.tmpl`
-
-```go
-{{- if $private -}}
-{{-   $secretsTags_choices := list "id_xxx" "id_yyy" "id_NAME" -}}
-{{-   $secretsTags = promptMultichoice "Select secrets tags to populate on this machine" $secretsTags_choices -}}
-{{- end -}}
-```
-
-## Testing & Validation
-
-### Pre-commit Checks
-
-```bash
-# Validate script syntax
-shellcheck home/**/*.sh
-  
-# Test template rendering
-chezmoi execute-template < home/.chezmoi.yaml.tmpl
-  
-# Dry-run apply
-chezmoi apply --dry-run --verbose
-  
-# Check diff
-chezmoi diff
-```
-
-### Common Testing Commands
-
-```bash
-# Re-run scripts (clears script state)
-chezmoi state delete-bucket --bucket=scriptState
 chezmoi apply
-  
-# Verify template variables
-chezmoi data
-  
-# Test specific file rendering
-chezmoi cat ~/.bashrc
-  
-# Debug mode
-chezmoi apply --verbose --debug
-  
-# Verify external sources
-chezmoi verify
-  
-# List managed files
-chezmoi managed
-  
-# Show source file for a target
-chezmoi source-path ~/.bashrc
 ```
 
-### Testing New Scripts
-
-1. **Test script syntax**:
+### Sync to All Machines
 
 ```bash
-bash -n home/.chezmoiscripts/linux/script.sh.tmpl
-shellcheck home/.chezmoiscripts/linux/script.sh.tmpl
+# On the editing machine — changes are auto-committed and pushed (autoCommit: true)
+chezmoi apply
+
+# On other machines
+chezmoi update    # git pull + apply
 ```
 
-2. **Test template rendering**:
+---
+
+## Chezmoi Cheat-sheet
 
 ```bash
-chezmoi execute-template < home/.chezmoiscripts/linux/script.sh.tmpl
+# ── Init ─────────────────────────────────────────────────────────────────────
+chezmoi init phenates                # Clone repo, generate config
+chezmoi init phenates --apply        # Clone + apply
+chezmoi init phenates --one-shot     # Clone + apply + remove source dir
+chezmoi init --force                 # Re-run init prompts (re-init)
+chezmoi init --force --apply         # Re-init + apply immediately
+
+# ── Daily ────────────────────────────────────────────────────────────────────
+chezmoi apply                        # Apply source to home (autoCommit: true → auto git commit + push)
+chezmoi apply --dry-run              # Preview without applying
+chezmoi apply --verbose              # Show each file operation
+chezmoi apply --debug                # Full debug output
+chezmoi apply --exclude scripts      # Apply files only, skip scripts
+chezmoi apply --include scripts      # Run scripts only, skip files
+chezmoi apply --keep-going           # Continue on errors
+chezmoi update                       # git pull + apply
+chezmoi diff                         # Show pending changes (source vs target)
+chezmoi diff ~/.zshrc                # Diff for a specific file
+chezmoi status                       # File-level status (A/M/D)
+
+# ── Source editing ────────────────────────────────────────────────────────────
+chezmoi edit ~/.zshrc                # Open source file in $EDITOR
+chezmoi edit --apply ~/.zshrc        # Edit + apply immediately
+chezmoi add ~/.config/tool/conf      # Add file to source state
+chezmoi re-add ~/.zshrc              # Update source from current target
+chezmoi forget ~/.zshrc              # Remove from source (keeps target)
+chezmoi remove ~/.zshrc              # Remove from source AND target
+chezmoi cd                           # cd to source directory
+chezmoi git -- status                # Run git in source directory
+chezmoi git -- log --oneline -10     # Git log in source directory
+chezmoi merge ~/.zshrc               # 3-way merge source/target/last-applied
+
+# ── Inspection ────────────────────────────────────────────────────────────────
+chezmoi data                         # All template variables (JSON)
+chezmoi data | grep -i wsl           # Filter template variables
+chezmoi dump-config                  # Show effective chezmoi config
+chezmoi managed                      # List all managed files
+chezmoi managed --include files      # List managed files only
+chezmoi unmanaged                    # List unmanaged files in home
+chezmoi cat ~/.zshrc                 # Show rendered file content
+chezmoi source-path ~/.zshrc         # Source path for a given target
+chezmoi target-path home/dot_zshrc  # Target path for a given source
+
+# ── Templates ────────────────────────────────────────────────────────────────
+chezmoi execute-template             # Render template from stdin
+chezmoi execute-template '{{ .chezmoi.os }}'  # Render inline expression
+
+# ── Externals ────────────────────────────────────────────────────────────────
+chezmoi verify                       # Verify external sources checksums
+chezmoi apply --refresh-externals    # Force re-download all externals
+
+# ── State ────────────────────────────────────────────────────────────────────
+chezmoi state dump                                        # Dump internal DB
+chezmoi state delete-bucket --bucket scriptState          # Reset run_onchange_ state
+chezmoi state delete-bucket --bucket entryState           # Reset run_once_ state
+
+# ── Maintenance ──────────────────────────────────────────────────────────────
+chezmoi upgrade                      # Upgrade chezmoi itself
+chezmoi doctor                       # Check environment for issues
+chezmoi purge                        # Remove chezmoi config + state (not dotfiles)
+chezmoi archive --output=dotfiles.tar.gz  # Export source state as archive
+chezmoi completion zsh               # Generate zsh completion script
 ```
 
-3. **Dry-run specific script**:
+---
 
-```bash
-chezmoi state delete-bucket --bucket=scriptState
-chezmoi apply --dry-run
-```
+## References
 
-4. **Run in isolation**:
-
-```bash
-# Render and save to temp file
-chezmoi execute-template < script.sh.tmpl > /tmp/test.sh
-bash -x /tmp/test.sh  # Debug mode
-```
-
-## Documentation References
-
-- [chezmoi - documentation](https://www.chezmoi.io/)
-- Examples/Inspirations:
-    - [Doctor Documentation \| Install Doctor](https://install.doctor/docs)
-    - [GitHub - twpayne/dotfiles: My dotfiles, managed with https://chezmoi.io.](https://github.com/twpayne/dotfiles)
-    - [GitHub - cearley/dotfiles: My personal dotfiles and configuration for various tools and applications.](https://github.com/cearley/dotfiles)
-    - [GitHub - nandalopes/dotfiles: YADR - The best vim, git, zsh plugins and the cleanest vimrc you've ever seen (GNU/Linux fork)](https://github.com/nandalopes/dotfiles)
+- [chezmoi documentation](https://www.chezmoi.io/)
+- [chezmoi — Windows notes](https://www.chezmoi.io/user-guide/machines/windows/)
+- [oh-my-zsh](https://ohmyz.sh/)
+- [powerlevel10k](https://github.com/romkatv/powerlevel10k)
+- [yazi file manager](https://yazi-rs.github.io/)
+- Inspiration:
+  - [twpayne/dotfiles](https://github.com/twpayne/dotfiles)
+  - [Install Doctor](https://install.doctor/docs)
