@@ -83,8 +83,11 @@ fi
 if [[ "${WSL_RESTART_NEEDED}" == "true" ]]; then
     warning "WSL restart required to apply changes."
     warning "From PowerShell: wsl --shutdown — then reopen WSL."
+    echo ""
 else
-    success "wsl.conf already up to date"
+    echo ""
+    success "🎉 wsl.conf already up to date! 🎉"
+    echo ""
 fi
 
 {{ end -}}

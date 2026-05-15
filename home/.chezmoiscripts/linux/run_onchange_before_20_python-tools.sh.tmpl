@@ -13,19 +13,6 @@ source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
 
 set -e # -e: script exit on error
 
-## Variables
-UV_TOOLS=()
-
-# Collect uv tools based on environment tags
-{{- range $tag := .environmentTags }}
-{{-   if hasKey (index $.packages.python "uv") $tag }}
-info "Python tools from {{ $tag }} tag will be included."
-{{-     range (index $.packages.python "uv" $tag) | sortAlpha | uniq }}
-UV_TOOLS+=("{{ . }}")
-{{-     end }}
-{{-   end }}
-{{- end }}
-
 ## Functions
 uv_install() {
     local tool="$1"
@@ -52,14 +39,18 @@ else
     success "uv installed ($(uv --version))"
 fi
 
-# ── Step 2: install tools ─────────────────────────────────────────────────────
-step "Installing Python tools..."
-for tool in "${UV_TOOLS[@]}"; do
-    uv_install "${tool}"
-done
+# ── Step 2: install tools by environment tag ──────────────────────────────────
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.python "uv") $tag }}
+step "Installing {{ $tag }} Python tools..."
+{{-     range (index $.packages.python "uv" $tag) | sortAlpha | uniq }}
+uv_install "{{ . }}"
+{{-     end }}
+{{-   end }}
+{{- end }}
 
 echo ""
-success "Python tools installation completed!"
+success "🎉 Python tools installation completed! 🎉"
 echo ""
 
 {{ end -}}

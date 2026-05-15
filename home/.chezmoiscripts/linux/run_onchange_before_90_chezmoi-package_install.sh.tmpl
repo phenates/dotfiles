@@ -31,7 +31,7 @@ header "Script - Replace chezmoi binary file by the package .deb"
 info "Package URL: $PACKAGE_URL"
 
 if [[ "$(command -v chezmoi)" == "/usr/bin/chezmoi" ]] ; then
-  info "Chezmoi package already installed"
+  success "🎉 Chezmoi package already installed 🎉"
   exit 0
 fi
 

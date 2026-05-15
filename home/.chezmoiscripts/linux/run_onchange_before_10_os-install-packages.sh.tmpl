@@ -25,9 +25,6 @@ set -e # -e: script exit on error
 {{   $pkgManager = "pacman" -}}
 {{- end -}}
 
-# Packages list to install
-LINUX_PACKAGES=()
-
 # Use sudo only when not already running as root
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -119,16 +116,6 @@ exit 1
 PACKAGE_UPDATE="{{ $pkgManager }}_update"
 PACKAGE_INSTALL="{{ $pkgManager }}_install"
 
-# Collect packages based on environment tags
-{{- range $tag := .environmentTags }}
-{{-   if hasKey (index $.packages.linux $pkgManager) $tag }}
-info "Packages from {{ $tag }} tag will be included."
-{{-     range (index $.packages.linux $pkgManager $tag) | sortAlpha | uniq }}
-LINUX_PACKAGES+=("{{ . }}")
-{{-     end }}
-{{-   end }}
-{{- end }}
-
 ## Check required package manager
 step "Tools validation..."
 if ! require_tools {{ $pkgManager }}; then
@@ -140,14 +127,18 @@ success "Required tools available"
 step "Updating {{ $pkgManager }} package list..."
 $PACKAGE_UPDATE || exit 1
 
-# Install packages if not already installed
-step "Installing packages..."
-for package in "${LINUX_PACKAGES[@]}"; do
-    $PACKAGE_INSTALL "$package"
-done
+# Install packages by environment tag
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.linux $pkgManager) $tag }}
+step "Installing {{ $tag }} packages..."
+{{-     range (index $.packages.linux $pkgManager $tag) | sortAlpha | uniq }}
+$PACKAGE_INSTALL "{{ . }}"
+{{-     end }}
+{{-   end }}
+{{- end }}
 
 echo ""
-success "Linux packages installation completed! 🎉"
+success "🎉 Linux packages installation completed! 🎉"
 echo ""
 
 {{ end -}}
