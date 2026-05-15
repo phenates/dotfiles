@@ -305,6 +305,53 @@ dotfiles/
 | `run_onchange_` | Runs when template content changes | `run_onchange_before_10_...`  |
 | `.tmpl`         | Go template processing             | `dot_zshrc.tmpl`              |
 
+### Scripts Convention
+
+Scripts follow a strict separation of concerns:
+
+| Phase    | Prefix     | Role                                        |
+| -------- | ---------- | ------------------------------------------- |
+| `before_`| install    | Install packages, tools, binaries           |
+| `after_` | configure  | Configure the system (shell, symlinks, sudo)|
+
+**Rule:** everything that installs software goes in `before_`, everything that configures the system goes in `after_`. This guarantees all tools are present before any configuration script runs.
+
+```
+before_00  prerequisites check
+before_10  apt / winget packages
+before_20  additional tooling (uv, ...)
+    ↓
+    External downloads (.chezmoiexternal)
+    File application (dotfiles)
+    ↓
+after_40   passwordless sudo
+after_50   default shell, font cache
+after_60   /etc/wsl.conf  (WSL only)
+after_61   home symlinks  (WSL only)
+```
+
+### Package Database (`.chezmoidata.yaml`)
+
+All package lists are centralized in `.chezmoidata.yaml`, organized by OS and package manager:
+
+```yaml
+packages:
+  linux:
+    apt:
+      core: [zsh, git, ...]
+  windows:
+    winget:
+      core: [Git.Git, ...]
+  python:
+    uv:
+      core: [tldr, ...]
+```
+
+chezmoi reads this file and merges it into template data on **every `chezmoi apply`**.
+
+> **No `chezmoi init` required.**
+> Unlike the `data:` section of `chezmoi.yaml` — which is only regenerated on `chezmoi init` — `.chezmoidata.yaml` is a regular source file. Any change takes effect on the next `chezmoi apply`, which also re-triggers the relevant `run_onchange_` install script automatically.
+
 ---
 
 ## Template System
@@ -459,75 +506,6 @@ chezmoi apply
 
 # On other machines
 chezmoi update    # git pull + apply
-```
-
----
-
-## Chezmoi Cheat-sheet
-
-```bash
-# ── Init ─────────────────────────────────────────────────────────────────────
-chezmoi init phenates                # Clone repo, generate config
-chezmoi init phenates --apply        # Clone + apply
-chezmoi init phenates --one-shot     # Clone + apply + remove source dir
-chezmoi init --force                 # Re-run init prompts (re-init)
-chezmoi init --force --apply         # Re-init + apply immediately
-
-# ── Daily ────────────────────────────────────────────────────────────────────
-chezmoi apply                        # Apply source to home (autoCommit: true → auto git commit + push)
-chezmoi apply --dry-run              # Preview without applying
-chezmoi apply --verbose              # Show each file operation
-chezmoi apply --debug                # Full debug output
-chezmoi apply --exclude scripts      # Apply files only, skip scripts
-chezmoi apply --include scripts      # Run scripts only, skip files
-chezmoi apply --keep-going           # Continue on errors
-chezmoi update                       # git pull + apply
-chezmoi diff                         # Show pending changes (source vs target)
-chezmoi diff ~/.zshrc                # Diff for a specific file
-chezmoi status                       # File-level status (A/M/D)
-
-# ── Source editing ────────────────────────────────────────────────────────────
-chezmoi edit ~/.zshrc                # Open source file in $EDITOR
-chezmoi edit --apply ~/.zshrc        # Edit + apply immediately
-chezmoi add ~/.config/tool/conf      # Add file to source state
-chezmoi re-add ~/.zshrc              # Update source from current target
-chezmoi forget ~/.zshrc              # Remove from source (keeps target)
-chezmoi remove ~/.zshrc              # Remove from source AND target
-chezmoi cd                           # cd to source directory
-chezmoi git -- status                # Run git in source directory
-chezmoi git -- log --oneline -10     # Git log in source directory
-chezmoi merge ~/.zshrc               # 3-way merge source/target/last-applied
-
-# ── Inspection ────────────────────────────────────────────────────────────────
-chezmoi data                         # All template variables (JSON)
-chezmoi data | grep -i wsl           # Filter template variables
-chezmoi dump-config                  # Show effective chezmoi config
-chezmoi managed                      # List all managed files
-chezmoi managed --include files      # List managed files only
-chezmoi unmanaged                    # List unmanaged files in home
-chezmoi cat ~/.zshrc                 # Show rendered file content
-chezmoi source-path ~/.zshrc         # Source path for a given target
-chezmoi target-path home/dot_zshrc  # Target path for a given source
-
-# ── Templates ────────────────────────────────────────────────────────────────
-chezmoi execute-template             # Render template from stdin
-chezmoi execute-template '{{ .chezmoi.os }}'  # Render inline expression
-
-# ── Externals ────────────────────────────────────────────────────────────────
-chezmoi verify                       # Verify external sources checksums
-chezmoi apply --refresh-externals    # Force re-download all externals
-
-# ── State ────────────────────────────────────────────────────────────────────
-chezmoi state dump                                        # Dump internal DB
-chezmoi state delete-bucket --bucket scriptState          # Reset run_onchange_ state
-chezmoi state delete-bucket --bucket entryState           # Reset run_once_ state
-
-# ── Maintenance ──────────────────────────────────────────────────────────────
-chezmoi upgrade                      # Upgrade chezmoi itself
-chezmoi doctor                       # Check environment for issues
-chezmoi purge                        # Remove chezmoi config + state (not dotfiles)
-chezmoi archive --output=dotfiles.tar.gz  # Export source state as archive
-chezmoi completion zsh               # Generate zsh completion script
 ```
 
 ---

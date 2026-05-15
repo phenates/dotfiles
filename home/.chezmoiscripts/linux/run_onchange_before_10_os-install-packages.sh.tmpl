@@ -28,6 +28,7 @@ set -e # -e: script exit on error
 # Packages list to install
 LINUX_PACKAGES=()
 
+# Use sudo only when not already running as root
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
 {{   $sudo = "" -}}

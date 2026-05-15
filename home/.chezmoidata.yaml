@@ -6,12 +6,13 @@ packages:
         - "zsh"
         - "eza"
         - "bat"
+        - "micro"
 
         # ── Navigation & search ───────────────────────────────────────────────
-        - "fzf"           # yazi dependency: for quick file subtree navigation
-        - "zoxide"        # yazi dependency: for historical directories navigation
-        - "fd-find"       # yazi dependency: for file searching
-        - "ripgrep"       # yazi dependency: for file content searching
+        - "fzf" # yazi dependency: for quick file subtree navigation
+        - "zoxide" # yazi dependency: for historical directories navigation
+        - "fd-find" # yazi dependency: for file searching
+        - "ripgrep" # yazi dependency: for file content searching
 
         # ── Network & transfers ───────────────────────────────────────────────
         - "curl"
@@ -20,24 +21,25 @@ packages:
 
         # ── Files & archives ──────────────────────────────────────────────────
         - "unzip"
-        - "file"          # yazi dependency: for file type detection
-        - "7zip"          # yazi dependency: for archive extraction and preview
+        - "file" # yazi dependency: for file type detection
+        - "7zip" # yazi dependency: for archive extraction and preview
         - "poppler-utils" # yazi dependency: for PDF preview
         # - "ffmpeg"      # yazi dependency: for video thumbnails
         # - "resvg"       # yazi dependency: for SVG preview
 
         # ── Dev tools ────────────────────────────────────────────────────────
         - "git"
-        - "jq"            # yazi dependency: for JSON preview
+        - "jq" # yazi dependency: for JSON preview
+        - "python3"
 
         # ── System ───────────────────────────────────────────────────────────
         - "man-db"
         - "fontconfig"
 
         # ── Clipboard ────────────────────────────────────────────────────────
-        - "xclip"         # yazi dependency: for Linux clipboard support (X11)
-        - "xsel"          # yazi dependency: for Linux clipboard support (X11 alt)
-        - "wl-clipboard"  # yazi dependency: for Linux clipboard support (Wayland)
+        - "xclip" # yazi dependency: for Linux clipboard support (X11)
+        - "xsel" # yazi dependency: for Linux clipboard support (X11 alt)
+        - "wl-clipboard" # yazi dependency: for Linux clipboard support (Wayland)
 
   windows:
     winget:
@@ -54,22 +56,28 @@ packages:
         - "Fastfetch-cli.Fastfetch"
 
         # ── Navigation & search ───────────────────────────────────────────────
-        - "junegunn.fzf"                    # yazi dependency: for quick file subtree navigation
-        - "ajeetdsouza.zoxide"              # yazi dependency: for historical directories navigation
-        - "sharkdp.fd"                      # yazi dependency: for file searching
-        - "BurntSushi.ripgrep.MSVC"         # yazi dependency: for file content searching
+        - "junegunn.fzf" # yazi dependency: for quick file subtree navigation
+        - "ajeetdsouza.zoxide" # yazi dependency: for historical directories navigation
+        - "sharkdp.fd" # yazi dependency: for file searching
+        - "BurntSushi.ripgrep.MSVC" # yazi dependency: for file content searching
 
         # ── Network & transfers ───────────────────────────────────────────────
         - "JernejSimoncic.Wget"
 
         # ── File manager (yazi) & dependencies ───────────────────────────────
         - "sxyazi.yazi"
-        - "7zip.7zip"                       # yazi dependency: for archive extraction and preview
-        - "jqlang.jq"                       # yazi dependency: for JSON preview
-        - "oschwartz10612.Poppler"          # yazi dependency: for PDF preview
+        - "7zip.7zip" # yazi dependency: for archive extraction and preview
+        - "jqlang.jq" # yazi dependency: for JSON preview
+        - "oschwartz10612.Poppler" # yazi dependency: for PDF preview
         # - "ImageMagick.ImageMagick"       # yazi dependency: for image preview
         # - "Gyan.FFmpeg"                   # yazi dependency: for video thumbnails
 
     powershellModule:
       core:
         - "NerdFonts"
+
+  python:
+    uv:
+      core:
+        # ── Shell & terminal ──────────────────────────────────────────────────
+        - "tldr"
