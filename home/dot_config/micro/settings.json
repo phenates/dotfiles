@@ -1,0 +1,19 @@
+{
+    "colorscheme": "simple",
+    "autoindent": true,
+    "cursorline": true,
+    "diffgutter": true,
+    "hlsearch": true,
+    "hltrailingws": true,
+    "mouse": true,
+    "rmtrailingws": true,
+    "ruler": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollbar": true,
+    "scrollmargin": 5,
+    "softwrap": true,
+    "tabsize": 4,
+    "tabstospaces": true,
+    "wordwrap": true
+}
