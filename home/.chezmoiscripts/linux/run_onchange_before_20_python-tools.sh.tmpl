@@ -1,0 +1,65 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+
+#==============================================================================
+#description  :chezmoi bash script, running before `chezmoi apply`.
+#              Install uv package manager and Python tools.
+#version      :0.1
+#date         :2026-05-15
+#==============================================================================
+
+# Source utility functions
+source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
+
+set -e # -e: script exit on error
+
+## Variables
+UV_TOOLS=()
+
+# Collect uv tools based on environment tags
+{{- range $tag := .environmentTags }}
+{{-   if hasKey (index $.packages.python "uv") $tag }}
+info "Python tools from {{ $tag }} tag will be included."
+{{-     range (index $.packages.python "uv" $tag) | sortAlpha | uniq }}
+UV_TOOLS+=("{{ . }}")
+{{-     end }}
+{{-   end }}
+{{- end }}
+
+## Functions
+uv_install() {
+    local tool="$1"
+    local output
+    output=$(uv tool install "${tool}" 2>&1)
+    if echo "${output}" | grep -q "already installed"; then
+        info "${tool} — already installed"
+    else
+        success "${tool} installed"
+    fi
+}
+
+## Main
+header "Script - Python tools installation (uv)"
+
+# ── Step 1: ensure uv is installed ────────────────────────────────────────────
+step "uv package manager"
+if command_exists uv; then
+    info "uv — already installed ($(uv --version))"
+else
+    info "uv — not found, installing via official script..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
+    success "uv installed ($(uv --version))"
+fi
+
+# ── Step 2: install tools ─────────────────────────────────────────────────────
+step "Installing Python tools..."
+for tool in "${UV_TOOLS[@]}"; do
+    uv_install "${tool}"
+done
+
+echo ""
+success "Python tools installation completed!"
+echo ""
+
+{{ end -}}
