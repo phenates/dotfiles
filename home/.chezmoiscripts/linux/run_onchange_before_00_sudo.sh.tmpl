@@ -2,16 +2,18 @@
 #!/bin/bash
 
 #==============================================================================
-#description  :chezmoi bash script, running after `chezmoi apply`
-#              Configure zsh as default shell.
-#version      :0.3
-#date         :2025-10-17
+#description  :chezmoi bash script, running before `chezmoi apply`.
+#              Ensures sudo is installed, user is in the sudo group, and
+#              passwordless sudo is configured. Must run first — all subsequent
+#              scripts rely on passwordless sudo.
+#version      :0.2
+#date         :2026-05-15
 #==============================================================================
 
 # Source utility functions
 source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
 
-set -e # -e: exit on error
+set -e
 
 # Use sudo only when not already running as root
 {{- $sudo := "sudo " -}}
@@ -20,7 +22,7 @@ set -e # -e: exit on error
 {{- end }}
 
 ## Main
-header "Script - sudo Passwordless configuration"
+header "Script - sudo configuration"
 
 REAL_USER="{{ .chezmoi.username }}"
 SUDOERS_FILE="/etc/sudoers.d/${REAL_USER}"
@@ -62,8 +64,6 @@ else
     rm -f "${TMPFILE}"
 fi
 
-echo ""
-success "🎉 sudo Passwordless configuration completed! 🎉"
-echo ""
+success "sudo configuration complete"
 
 {{ end -}}

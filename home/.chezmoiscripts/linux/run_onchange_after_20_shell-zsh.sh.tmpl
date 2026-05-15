@@ -13,8 +13,15 @@ source "{{ .chezmoi.sourceDir -}}/.utils/utils.sh"
 
 set -e # -e: exit on error
 
+{{- $sudo := "sudo " -}}
+{{- if eq .chezmoi.username "root" -}}
+{{-   $sudo = "" -}}
+{{- end }}
+
 ## Main
 header "Script - zsh shell"
+
+REAL_USER="{{ .chezmoi.username }}"
 
 step "zsh stack"
 info "zsh         — installed via packages script"
@@ -29,17 +36,19 @@ else
 fi
 
 # Change default shell to zsh
+# Uses usermod (requires sudo) instead of chsh to avoid PAM password prompt
 step "Change default shell to zsh..."
-if [[ "$SHELL" != *"zsh"* ]]; then
-  chsh -s $(which zsh)
-  if [ $? -eq 0 ]; then
-    success "Default shell changed to zsh"
-    info "Logout and login or run 'exec zsh && source .zshrc', for the change to take effect."
-  else
-    error "Failed to change default shell to zsh"
-  fi
+ZSH_PATH=$(which zsh)
+CURRENT_SHELL=$(getent passwd "${REAL_USER}" | cut -d: -f7)
+if [[ "${CURRENT_SHELL}" == "${ZSH_PATH}" ]]; then
+    info "zsh is already the default shell"
 else
-  info "zsh is already the default shell"
+    if {{ $sudo }}usermod -s "${ZSH_PATH}" "${REAL_USER}"; then
+        success "Default shell changed to zsh"
+        info "Logout and login, or run 'exec zsh' for the change to take effect."
+    else
+        error "Failed to change default shell to zsh"
+    fi
 fi
 
 {{ end -}}
