@@ -32,7 +32,7 @@
 {{- writeToStdout (printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n") -}}
 
 {{- if $interactive -}}
-{{-   $tag_choices := list "core" -}} {{/* extend here: "dev" "ai" "sysAdmin" "devOps" */}}
+{{-   $tag_choices := list "core" "dev" -}} {{/* extend here: "dev" "ai" "sysAdmin" "devOps" */}}
 {{-   $environmentTags = promptMultichoice "  ?  Select environment for this machine " $tag_choices $previousEnvTags -}}
 {{-   writeToStdout (printf "---->  '%s' \n\n" $environmentTags) -}}
 {{- else -}}

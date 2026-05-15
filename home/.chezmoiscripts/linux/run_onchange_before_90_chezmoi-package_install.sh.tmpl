@@ -28,7 +28,6 @@ trap 'rm -f "$TEMP_DIR"' EXIT
 
 ## Main
 header "Script - Replace chezmoi binary file by the package .deb"
-info "Package URL: $PACKAGE_URL"
 
 if [[ "$(command -v chezmoi 2>/dev/null)" == "/usr/bin/chezmoi" ]]; then
   info "Chezmoi package already installed"
@@ -47,6 +46,7 @@ success "Required tools available"
 
 ## Install chezmoi package
 step "Downloading chezmoi .deb ..."
+info "Package URL: $PACKAGE_URL"
 if ! wget -q -O "$TEMP_DIR" "$PACKAGE_URL" ; then
   error "Failed to download .deb from: $PACKAGE_URL"
   exit 1

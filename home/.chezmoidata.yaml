@@ -41,6 +41,9 @@ packages:
         - "xsel" # yazi dependency: for Linux clipboard support (X11 alt)
         - "wl-clipboard" # yazi dependency: for Linux clipboard support (Wayland)
 
+      dev:
+        - yamllint
+
   windows:
     winget:
       core:
