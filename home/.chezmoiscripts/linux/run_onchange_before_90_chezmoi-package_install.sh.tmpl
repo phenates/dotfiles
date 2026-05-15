@@ -30,7 +30,7 @@ trap 'rm -f "$TEMP_DIR"' EXIT
 header "Script - Replace chezmoi binary file by the package .deb"
 info "Package URL: $PACKAGE_URL"
 
-if [[ "$(command -v chezmoi)" == "/usr/bin/chezmoi" &>/dev/null ]] ; then
+if [[ "$(command -v chezmoi &>/dev/null)" == "/usr/bin/chezmoi" ]] ; then
   info "Chezmoi package already installed"
   echo ""
   success "🎉 Replacement Chezmoi binary by package completed! 🎉"
