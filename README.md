@@ -142,15 +142,15 @@ chezmoi completion zsh               # Generate zsh completion script
    └── Generates ~/.config/chezmoi/chezmoi.yaml
 
 3. chezmoi apply
-   ├── run_once_before_00     → Prerequisites check
+   ├── run_onchange_before_00 → sudo: install, group membership, passwordless
    ├── run_onchange_before_10 → Packages installation (apt / winget)
+   ├── run_onchange_before_20 → Python tools (uv install + uv tool install)
+   ├── run_onchange_before_90 → chezmoi .deb installation (Linux)
    ├── External downloads     → oh-my-zsh, plugins, fonts, binaries (.chezmoiexternal.yaml.tmpl)
    ├── File application       → Dotfiles deployed to ~
-   ├── run_onchange_after_10 → Replace chezmoi binary with .deb (Linux)
-   ├── run_onchange_after_40 → Passwordless sudo (Linux)
-   ├── run_onchange_after_50 → zsh as default shell + font cache refresh
-   ├── run_once_after_60    → /etc/wsl.conf configuration (WSL only)
-   └── run_onchange_after_61 → Home symlinks: MaPomme, homelab, .ssh (WSL only)
+   ├── run_onchange_after_20  → zsh as default shell + font cache
+   ├── run_onchange_after_60  → /etc/wsl.conf configuration (WSL only)
+   └── run_onchange_after_61  → Home symlinks: MaPomme, homelab, .ssh (WSL only)
 ```
 
 ---
@@ -200,10 +200,10 @@ Tags selected at `chezmoi init` time control which packages and tools are deploy
 
 Specific configuration applied automatically when `is_WSL` is `true`:
 
-| Script                                       | Purpose                                                                              |
-| -------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `run_once_after_60_wsl-conf.sh.tmpl`         | Configures `/etc/wsl.conf`: default user, automount (`metadata,umask=077`), hostname |
-| `run_onchange_after_61_wsl-simlinks.sh.tmpl` | Creates home symlinks: `~/MaPomme → /mnt/e`, `~/homelab`, `~/.ssh → Windows .ssh`    |
+| Script                                          | Purpose                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `run_onchange_after_60_wsl-conf.sh.tmpl`        | Configures `/etc/wsl.conf`: default user, automount (`metadata,umask=077`), hostname |
+| `run_onchange_after_61_wsl-simlinks.sh.tmpl`    | Creates home symlinks: `~/MaPomme → /mnt/e`, `~/homelab`, `~/.ssh → Windows .ssh`   |
 
 **SSH agent** (`.zshrc.tmpl`, WSL only): starts a local `ssh-agent` and loads all private keys from `~/.ssh` (detected via `.pub` counterparts).
 
@@ -257,13 +257,13 @@ dotfiles/
     │   └── utils.ps1                       # Shared PowerShell utilities
     ├── .chezmoiscripts/
     │   ├── linux/
-    │   │   ├── run_once_before_00_prerequisites.sh.tmpl
-    │   │   ├── run_onchange_before_10_install-packages.sh.tmpl
-    │   │   ├── run_onchange_after_10_chezmoi-package_install.sh.tmpl
-    │   │   ├── run_onchange_after_40_sudo-passwordless.sh.tmpl
-    │   │   ├── run_onchange_after_50_shell-zsh.sh.tmpl
-    │   │   ├── run_once_after_60_wsl-conf.sh.tmpl      # WSL only
-    │   │   └── run_onchange_after_61_wsl-simlinks.sh.tmpl  # WSL only
+    │   │   ├── run_onchange_before_00_sudo.sh.tmpl
+    │   │   ├── run_onchange_before_10_os-install-packages.sh.tmpl
+    │   │   ├── run_onchange_before_20_python-tools.sh.tmpl
+    │   │   ├── run_onchange_before_90_chezmoi-package_install.sh.tmpl
+    │   │   ├── run_onchange_after_20_shell-zsh.sh.tmpl
+    │   │   ├── run_onchange_after_60_wsl-conf.sh.tmpl       # WSL only
+    │   │   └── run_onchange_after_61_wsl-simlinks.sh.tmpl   # WSL only
     │   └── windows/
     │       └── run_onchange_before_10_install-packages.ps1.tmpl
     ├── dot_zshrc.tmpl
@@ -317,15 +317,15 @@ Scripts follow a strict separation of concerns:
 **Rule:** everything that installs software goes in `before_`, everything that configures the system goes in `after_`. This guarantees all tools are present before any configuration script runs.
 
 ```
-before_00  prerequisites check
+before_00  sudo configuration (install, group membership, passwordless)
 before_10  apt / winget packages
-before_20  additional tooling (uv, ...)
+before_20  Python tools (uv + uv tool install)
+before_90  chezmoi .deb replacement
     ↓
     External downloads (.chezmoiexternal)
     File application (dotfiles)
     ↓
-after_40   passwordless sudo
-after_50   default shell, font cache
+after_20   default shell, font cache
 after_60   /etc/wsl.conf  (WSL only)
 after_61   home symlinks  (WSL only)
 ```
@@ -399,6 +399,26 @@ chezmoi reads this file and merges it into template data on **every `chezmoi app
     path: "bin/tool"
 ```
 
+### Conditional Ignores (`.chezmoiignore.tmpl`)
+
+Files or paths listed in `.chezmoiignore.tmpl` are excluded from chezmoi management. The file is a Go template, enabling OS- and WSL-conditional rules.
+
+```go
+# Ignore .ssh on WSL — managed as a symlink to Windows .ssh
+# chezmoi must not touch it or the symlink would be replaced by a directory
+{{ if .is_WSL }}
+.ssh
+.ssh/**
+{{ end }}
+
+# Ignore platform-specific directories
+{{ if eq .chezmoi.os "windows" }}
+.config/some-linux-tool/
+{{ end }}
+```
+
+> **Rule:** any path that chezmoi should not own (symlinks, OS-specific dirs, externally managed files) must appear here, otherwise chezmoi will overwrite or track it.
+
 ### Useful Template Functions
 
 ```go
@@ -415,15 +435,15 @@ chezmoi reads this file and merges it into template data on **every `chezmoi app
 
 ### Linux Scripts
 
-| Script                                                  | Type           | Purpose                                                 |
-| ------------------------------------------------------- | -------------- | ------------------------------------------------------- |
-| `run_once_before_00_prerequisites.sh.tmpl`              | `run_once`     | Check required tools (`sudo`, `curl`, `git`, `apt-get`) |
-| `run_onchange_before_10_install-packages.sh.tmpl`       | `run_onchange` | Install apt packages from `.chezmoidata.yaml`           |
-| `run_onchange_after_10_chezmoi-package_install.sh.tmpl` | `run_onchange` | Replace chezmoi standalone binary with `.deb` package   |
-| `run_onchange_after_40_sudo-passwordless.sh.tmpl`       | `run_onchange` | Grant passwordless sudo (validated with `visudo -cf`)   |
-| `run_onchange_after_50_shell-zsh.sh.tmpl`               | `run_onchange` | Set zsh as default shell, refresh font cache            |
-| `run_once_after_60_wsl-conf.sh.tmpl`                    | `run_once`     | Configure `/etc/wsl.conf` — WSL only                    |
-| `run_onchange_after_61_wsl-simlinks.sh.tmpl`            | `run_onchange` | Create home symlinks — WSL only                         |
+| Script                                               | Purpose                                                       |
+| ---------------------------------------------------- | ------------------------------------------------------------- |
+| `run_onchange_before_00_sudo.sh.tmpl`                | sudo: install, group membership, passwordless (`visudo -cf`)  |
+| `run_onchange_before_10_os-install-packages.sh.tmpl` | Install apt packages by environment tag                       |
+| `run_onchange_before_20_python-tools.sh.tmpl`        | Install uv + Python tools by environment tag                  |
+| `run_onchange_before_90_chezmoi-package_install.sh.tmpl` | Replace chezmoi binary with `.deb` package               |
+| `run_onchange_after_20_shell-zsh.sh.tmpl`            | Set zsh as default shell, refresh font cache                  |
+| `run_onchange_after_60_wsl-conf.sh.tmpl`             | Configure `/etc/wsl.conf` — WSL only                          |
+| `run_onchange_after_61_wsl-simlinks.sh.tmpl`         | Create home symlinks — WSL only                               |
 
 ### Shared Utilities (`home/.utils/utils.sh`)
 
@@ -489,13 +509,38 @@ chezmoi apply
 ### Add New Dotfiles
 
 ```bash
-# Add an existing file to chezmoi management
+# Add an existing file from home to the source
 chezmoi add ~/.config/tool/config.yml
+# → creates home/dot_config/tool/config.yml
 
-# Or create directly in source
-mkdir -p home/dot_config/tool
-touch home/dot_config/tool/config.yml
-chezmoi apply
+# Edit then apply immediately
+chezmoi edit --apply ~/.config/tool/config.yml
+
+# Re-sync source from a file you edited directly in ~
+chezmoi re-add ~/.config/tool/config.yml
+```
+
+**As a template** (to use variables like `.chezmoi.os`, `.name`...):
+
+```bash
+# Rename the source file to add .tmpl suffix
+mv home/dot_config/tool/config.yml home/dot_config/tool/config.yml.tmpl
+# Then use Go template syntax inside the file
+```
+
+**As a private file** (deployed with `0600` permissions):
+
+```bash
+chezmoi add --encrypt ~/.config/tool/secret.conf
+# or simply prefix the source filename with private_:
+# home/dot_config/tool/private_secret.conf → ~/.config/tool/secret.conf (0600)
+```
+
+**Exclude a file from chezmoi management** — add it to `.chezmoiignore.tmpl`:
+
+```
+# home/.chezmoiignore.tmpl
+.config/tool/cache/
 ```
 
 ### Sync to All Machines
