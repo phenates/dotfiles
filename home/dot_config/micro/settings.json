@@ -1,19 +1,37 @@
 {
-    "colorscheme": "simple",
-    "autoindent": true,
-    "cursorline": true,
-    "diffgutter": true,
-    "hlsearch": true,
-    "hltrailingws": true,
-    "mouse": true,
-    "rmtrailingws": true,
-    "ruler": true,
-    "savecursor": true,
-    "saveundo": true,
-    "scrollbar": true,
-    "scrollmargin": 5,
-    "softwrap": true,
+  "colorscheme": "simple",
+  "autoindent": true,
+  "cursorline": true,
+  "diffgutter": true,
+  "hlsearch": true,
+  "hltrailingws": true,
+  "mouse": true,
+  "rmtrailingws": true,
+  "ruler": true,
+  "savecursor": true,
+  "saveundo": true,
+  "scrollbar": true,
+  "scrollmargin": 5,
+  "softwrap": true,
+  "tabsize": 4,
+  "tabstospaces": true,
+  "wordwrap": true,
+  "ft:yaml": {
+    "tabsize": 2
+  },
+  "ft:python": {
     "tabsize": 4,
-    "tabstospaces": true,
+    "tabstospaces": true
+  },
+  "ft:go": {
+    "tabstospaces": false,
+    "tabsize": 4
+  },
+  "ft:markdown": {
+    "softwrap": true,
     "wordwrap": true
+  },
+  "*.yml": {
+    "tabsize": 2
+  }
 }
