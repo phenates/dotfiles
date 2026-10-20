@@ -1,6 +1,12 @@
 ## Host: use specific SSH options when etablishing a connection with the remote SSH server
 ## use: git@github-dotfiles:phenates/dotfiles.git
 
+# Global host
+Host *
+	ServerAliveInterval 60
+	ServerAliveCountMax 3
+	Compression yes
+
 # github repo dotfiles
 Host github-dotfiles
 	HostName github.com
