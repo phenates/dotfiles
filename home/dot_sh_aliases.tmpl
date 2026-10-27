@@ -64,11 +64,8 @@ fi
 
 
 # bat, cat clone with syntax highlighting and Git integration
-if command -v 'bat' &> /dev/null; then
-    alias cat="bat"
-elif command -v 'batcat' &> /dev/null; then
+if command -v 'batcat' &> /dev/null; then
     alias bat="batcat"
-    alias cat="batcat"
 fi
 
 # Micro editor
