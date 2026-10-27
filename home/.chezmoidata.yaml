@@ -8,6 +8,7 @@ packages:
         - "manpages-dev"
         - "info"
         - "fontconfig"
+        - "htop"
 
         # ── Shell & terminal & File editor ───────────────────────────────────
         - "zsh"
