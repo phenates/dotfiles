@@ -1,0 +1,20 @@
+" === Apparence ===
+syntax on               " Coloration syntaxique
+set number              " Numéros de ligne
+set showmatch           " Surligne la parenthèse correspondante
+
+" === Recherche ===
+set incsearch           " Résultats en temps réel
+set hlsearch            " Surligne toutes les occurrences
+set ignorecase          " Insensible à la casse
+set smartcase           " Sauf si majuscule dans la recherche
+
+" === Indentation ===
+set tabstop=4
+set shiftwidth=4
+set expandtab           " Tab insère des espaces (pas \t)
+set autoindent          " Conserve l'indentation
+
+" === Confort ===
+set encoding=utf-8
+set scrolloff=8         " Garde 8 lignes visibles autour du curseur
