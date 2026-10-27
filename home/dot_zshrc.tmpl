@@ -88,6 +88,9 @@ plugins=(git zsh-syntax-highlighting zsh-autosuggestions colorize colored-man-pa
 
 source $ZSH/oh-my-zsh.sh
 
+# Exclude *.dll file from Oh My Zsh completion
+zstyle ':completion:*:*:-command-:*:*' ignored-patterns '*.dll'
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
