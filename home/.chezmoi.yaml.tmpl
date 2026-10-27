@@ -68,7 +68,7 @@ data:
 {{/* Editor used by `chezmoi edit` */}}
 {{ if eq .chezmoi.os "linux" -}}
 edit:
-  command: "nano"
+  command: "vi"
 {{ else if eq .chezmoi.os "windows" -}}
 {{   if lookPath "code" -}}
 edit:
